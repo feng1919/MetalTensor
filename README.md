@@ -1,2 +1,2 @@
 # MetalTensor
-A deep neural network inferencing tools on Apple Metal Platform, iOS &amp; Mac OS X.
+A deep neural network inferencing tool on Apple Metal Platform, iOS &amp; Mac OS X.
