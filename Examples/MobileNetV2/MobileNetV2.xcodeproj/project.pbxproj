@@ -1,0 +1,437 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5A8D23F22341F0FE005F88E6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23F12341F0FE005F88E6 /* AppDelegate.m */; };
+		5A8D23F82341F0FE005F88E6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23F72341F0FE005F88E6 /* ViewController.m */; };
+		5A8D23FD2341F100005F88E6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D23FC2341F100005F88E6 /* Assets.xcassets */; };
+		5A8D24032341F100005F88E6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D24022341F100005F88E6 /* main.m */; };
+		5A8D240A234369D0005F88E6 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D2409234369D0005F88E6 /* Default-568h@2x.png */; };
+		5ACC727A23437751008125BE /* MetalImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACC727823437748008125BE /* MetalImage.framework */; };
+		5ACC727B23437751008125BE /* MetalImage.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACC727823437748008125BE /* MetalImage.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5ACC728623438180008125BE /* MetalTensor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACC728523438174008125BE /* MetalTensor.framework */; };
+		5ACC728723438180008125BE /* MetalTensor.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACC728523438174008125BE /* MetalTensor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5ACC728B2343834A008125BE /* MobileNetV2Summory in Resources */ = {isa = PBXBuildFile; fileRef = 5ACC72882343834A008125BE /* MobileNetV2Summory */; };
+		5ACC728C2343834A008125BE /* MobileNetV2.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACC72892343834A008125BE /* MobileNetV2.m */; };
+		5ACC729023438378008125BE /* synset_words.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5ACC728D23438378008125BE /* synset_words.txt */; };
+		5ACC729123438378008125BE /* ImageNet1000.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACC728F23438378008125BE /* ImageNet1000.m */; };
+		5ACC72952343939C008125BE /* MobileNetV2_1.0.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5ACC72922343939B008125BE /* MobileNetV2_1.0.bin */; };
+		5ACC72962343939C008125BE /* MobileNetV2_1.0.json in Resources */ = {isa = PBXBuildFile; fileRef = 5ACC72932343939B008125BE /* MobileNetV2_1.0.json */; };
+		5ACC72972343939C008125BE /* MobileNetV2_1.0.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5ACC72942343939B008125BE /* MobileNetV2_1.0.plist */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5ACC728423438174008125BE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5ACC728023438173008125BE /* MetalTensor.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5A8D233F2341D767005F88E6;
+			remoteInfo = MetalTensor;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		5A8D241823436E77005F88E6 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5ACC727B23437751008125BE /* MetalImage.framework in Embed Frameworks */,
+				5ACC728723438180008125BE /* MetalTensor.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		5A8D23ED2341F0FE005F88E6 /* MobileNetV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileNetV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A8D23F02341F0FE005F88E6 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		5A8D23F12341F0FE005F88E6 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		5A8D23F62341F0FE005F88E6 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		5A8D23F72341F0FE005F88E6 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		5A8D23FC2341F100005F88E6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5A8D24012341F100005F88E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5A8D24022341F100005F88E6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		5A8D2409234369D0005F88E6 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		5ACC727823437748008125BE /* MetalImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalImage.framework; path = ../../ThirdParts/MetalImage.framework; sourceTree = "<group>"; };
+		5ACC728023438173008125BE /* MetalTensor.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MetalTensor.xcodeproj; path = ../../Framework/MetalTensor.xcodeproj; sourceTree = "<group>"; };
+		5ACC72882343834A008125BE /* MobileNetV2Summory */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MobileNetV2Summory; sourceTree = "<group>"; };
+		5ACC72892343834A008125BE /* MobileNetV2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileNetV2.m; sourceTree = "<group>"; };
+		5ACC728A2343834A008125BE /* MobileNetV2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileNetV2.h; sourceTree = "<group>"; };
+		5ACC728D23438378008125BE /* synset_words.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = synset_words.txt; sourceTree = "<group>"; };
+		5ACC728E23438378008125BE /* ImageNet1000.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageNet1000.h; sourceTree = "<group>"; };
+		5ACC728F23438378008125BE /* ImageNet1000.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageNet1000.m; sourceTree = "<group>"; };
+		5ACC72922343939B008125BE /* MobileNetV2_1.0.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = MobileNetV2_1.0.bin; sourceTree = "<group>"; };
+		5ACC72932343939B008125BE /* MobileNetV2_1.0.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = MobileNetV2_1.0.json; sourceTree = "<group>"; };
+		5ACC72942343939B008125BE /* MobileNetV2_1.0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = MobileNetV2_1.0.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5A8D23EA2341F0FE005F88E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ACC727A23437751008125BE /* MetalImage.framework in Frameworks */,
+				5ACC728623438180008125BE /* MetalTensor.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5A8D23E42341F0FE005F88E6 = {
+			isa = PBXGroup;
+			children = (
+				5A8D2409234369D0005F88E6 /* Default-568h@2x.png */,
+				5ACC728023438173008125BE /* MetalTensor.xcodeproj */,
+				5ACC727823437748008125BE /* MetalImage.framework */,
+				5A8D23EF2341F0FE005F88E6 /* MobileNetV2 */,
+				5A8D23EE2341F0FE005F88E6 /* Products */,
+				5A8D241523436E76005F88E6 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		5A8D23EE2341F0FE005F88E6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5A8D23ED2341F0FE005F88E6 /* MobileNetV2.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5A8D23EF2341F0FE005F88E6 /* MobileNetV2 */ = {
+			isa = PBXGroup;
+			children = (
+				5A8D23F02341F0FE005F88E6 /* AppDelegate.h */,
+				5A8D23F12341F0FE005F88E6 /* AppDelegate.m */,
+				5A8D23F62341F0FE005F88E6 /* ViewController.h */,
+				5A8D23F72341F0FE005F88E6 /* ViewController.m */,
+				5ACC728A2343834A008125BE /* MobileNetV2.h */,
+				5ACC72892343834A008125BE /* MobileNetV2.m */,
+				5ACC72922343939B008125BE /* MobileNetV2_1.0.bin */,
+				5ACC72932343939B008125BE /* MobileNetV2_1.0.json */,
+				5ACC72942343939B008125BE /* MobileNetV2_1.0.plist */,
+				5ACC72882343834A008125BE /* MobileNetV2Summory */,
+				5ACC728D23438378008125BE /* synset_words.txt */,
+				5ACC728E23438378008125BE /* ImageNet1000.h */,
+				5ACC728F23438378008125BE /* ImageNet1000.m */,
+				5A8D23FC2341F100005F88E6 /* Assets.xcassets */,
+				5A8D24012341F100005F88E6 /* Info.plist */,
+				5A8D24022341F100005F88E6 /* main.m */,
+			);
+			path = MobileNetV2;
+			sourceTree = "<group>";
+		};
+		5A8D241523436E76005F88E6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5ACC728123438173008125BE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5ACC728523438174008125BE /* MetalTensor.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5A8D23EC2341F0FE005F88E6 /* MobileNetV2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A8D24062341F100005F88E6 /* Build configuration list for PBXNativeTarget "MobileNetV2" */;
+			buildPhases = (
+				5A8D23E92341F0FE005F88E6 /* Sources */,
+				5A8D23EA2341F0FE005F88E6 /* Frameworks */,
+				5A8D23EB2341F0FE005F88E6 /* Resources */,
+				5A8D241823436E77005F88E6 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MobileNetV2;
+			productName = MobileNetV2;
+			productReference = 5A8D23ED2341F0FE005F88E6 /* MobileNetV2.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5A8D23E52341F0FE005F88E6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1100;
+				ORGANIZATIONNAME = fengshi;
+				TargetAttributes = {
+					5A8D23EC2341F0FE005F88E6 = {
+						CreatedOnToolsVersion = 11.0;
+					};
+				};
+			};
+			buildConfigurationList = 5A8D23E82341F0FE005F88E6 /* Build configuration list for PBXProject "MobileNetV2" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5A8D23E42341F0FE005F88E6;
+			productRefGroup = 5A8D23EE2341F0FE005F88E6 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 5ACC728123438173008125BE /* Products */;
+					ProjectRef = 5ACC728023438173008125BE /* MetalTensor.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				5A8D23EC2341F0FE005F88E6 /* MobileNetV2 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		5ACC728523438174008125BE /* MetalTensor.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = MetalTensor.framework;
+			remoteRef = 5ACC728423438174008125BE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5A8D23EB2341F0FE005F88E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A8D23FD2341F100005F88E6 /* Assets.xcassets in Resources */,
+				5ACC72972343939C008125BE /* MobileNetV2_1.0.plist in Resources */,
+				5ACC72962343939C008125BE /* MobileNetV2_1.0.json in Resources */,
+				5A8D240A234369D0005F88E6 /* Default-568h@2x.png in Resources */,
+				5ACC729023438378008125BE /* synset_words.txt in Resources */,
+				5ACC728B2343834A008125BE /* MobileNetV2Summory in Resources */,
+				5ACC72952343939C008125BE /* MobileNetV2_1.0.bin in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5A8D23E92341F0FE005F88E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A8D23F82341F0FE005F88E6 /* ViewController.m in Sources */,
+				5ACC729123438378008125BE /* ImageNet1000.m in Sources */,
+				5A8D23F22341F0FE005F88E6 /* AppDelegate.m in Sources */,
+				5A8D24032341F100005F88E6 /* main.m in Sources */,
+				5ACC728C2343834A008125BE /* MobileNetV2.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		5A8D24042341F100005F88E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		5A8D24052341F100005F88E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5A8D24072341F100005F88E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 6LS62R5GKZ;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/../../ThirdParts",
+				);
+				INFOPLIST_FILE = MobileNetV2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fengshi.MobileNetV2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = fengshi_20190110;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5A8D24082341F100005F88E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 6LS62R5GKZ;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/../../ThirdParts",
+				);
+				INFOPLIST_FILE = MobileNetV2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fengshi.MobileNetV2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = fengshi_20190110;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5A8D23E82341F0FE005F88E6 /* Build configuration list for PBXProject "MobileNetV2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A8D24042341F100005F88E6 /* Debug */,
+				5A8D24052341F100005F88E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A8D24062341F100005F88E6 /* Build configuration list for PBXNativeTarget "MobileNetV2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A8D24072341F100005F88E6 /* Debug */,
+				5A8D24082341F100005F88E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5A8D23E52341F0FE005F88E6 /* Project object */;
+}
