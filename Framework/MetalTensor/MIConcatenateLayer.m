@@ -9,7 +9,6 @@
 #import "MIConcatenateLayer.h"
 #import "MITemporaryImageCache.h"
 #import "MIArithmeticLayer.h"
-#import <MetalImage/MetalDevice.h>
 #include "numpy.h"
 
 @interface MIConcatenateLayer() {
@@ -21,56 +20,17 @@
 
 @implementation MIConcatenateLayer
 
-- (instancetype)initWithInputShapes1:(DataShape * _Nonnull *)inputShapes size:(int)size {
+- (void)compile:(id<MTLDevice>)device {
     
-    _offsets = malloc(size * sizeof(int));
-    _outputShape = ConcatenateShapes1(inputShapes, size, _offsets, true);
-    if (self = [super initWithInputShapes1:inputShapes size:size outputShape:&_outputShape]) {
-        
-        _tensorShape = ConcatenateShapes1(inputShapes, size, NULL, false);
-        
-        _neuron = [[MPSCNNNeuron alloc] initWithDevice:[MetalDevice sharedMTLDevice] neuronDescriptor:[MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone]];
-        
-#if DEBUG
-        NSMutableString *string = [NSMutableString string];
-        for (int i = 0; i < size; i ++) {
-            [string appendString:NSStringFromDataShape(inputShapes[i])];
-            if (i != size-1) {
-                [string appendString:@", "];
-            }
-        }
-        
-        DB_TRACE(-_verbose+2, "\n%s init1 [%s] --> %s", self.labelUTF8, string.UTF8String, NSStringFromDataShape(&_outputShape).UTF8String);
-#endif
-        
-    }
-    return self;
-}
+    [super compile:device];
+    
+    _offsets = malloc(_numOfInputs * sizeof(int));
+    _outputShape = ConcatenateShapes(_inputShapes, _numOfInputs, _offsets, true);
+    _tensorShape = ConcatenateShapes(_inputShapes, _numOfInputs, NULL, false);
 
-- (instancetype)initWithInputShapes:(DataShape *_Nonnull)inputShapes size:(int)size {
+    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device
+                                  neuronDescriptor:[MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone]];
     
-    _offsets = malloc(size * sizeof(int));
-    _outputShape = ConcatenateShapes(inputShapes, size, _offsets, true);
-    if (self = [super initWithInputShapes:inputShapes size:size outputShape:&_outputShape]) {
-        
-        _tensorShape = ConcatenateShapes(inputShapes, size, NULL, false);
-        
-        _neuron = [[MPSCNNNeuron alloc] initWithDevice:[MetalDevice sharedMTLDevice] neuronDescriptor:[MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone]];
-        
-#if DEBUG
-        NSMutableString *string = [NSMutableString string];
-        for (int i = 0; i < size; i ++) {
-            [string appendString:NSStringFromDataShape(&inputShapes[i])];
-            if (i != size-1) {
-                [string appendString:@", "];
-            }
-        }
-        
-        DB_TRACE(-_verbose+2, "\n%s init [%s] --> %s", self.labelUTF8, string.UTF8String, NSStringFromDataShape(&_outputShape).UTF8String);
-#endif
-        
-    }
-    return self;
 }
 
 - (void)dealloc {

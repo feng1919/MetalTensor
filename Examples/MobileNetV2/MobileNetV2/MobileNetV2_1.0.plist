@@ -4,7 +4,7 @@
 <dict>
 	<key>input</key>
 	<dict>
-		<key>output</key>
+		<key>inputs</key>
 		<string>224, 224, 3</string>
 		<key>targets</key>
 		<string>preprocess</string>
@@ -15,7 +15,7 @@
 	<dict>
 		<key>type</key>
 		<string>neuron</string>
-		<key>data_shape</key>
+		<key>inputs</key>
 		<string>224, 224, 3</string>
 		<key>activation</key>
 		<string>linear, 2.0, -1.0</string>
@@ -26,14 +26,14 @@
 	<dict>
 		<key>inputs</key>
 		<string>224, 224, 3</string>
-		<key>output</key>
-		<string>112, 112, 32</string>
 		<key>kernel</key>
-		<string>3</string>
+		<string>3, 3</string>
 		<key>filters</key>
 		<string>32</string>
 		<key>stride</key>
 		<string>2</string>
+		<key>padding</key>
+		<string>same</string>
 		<key>weight</key>
 		<string>Conv1</string>
 		<key>activation</key>
@@ -42,14 +42,10 @@
 		<string>expanded_conv_depthwise</string>
 		<key>indices</key>
 		<string>0</string>
-		<key>offset</key>
-		<string>1, 1, 0</string>
 	</dict>
 	<key>expanded_conv_depthwise</key>
 	<dict>
 		<key>inputs</key>
-		<string>112, 112, 32</string>
-		<key>output</key>
 		<string>112, 112, 32</string>
 		<key>kernel</key>
 		<string>3</string>
@@ -68,8 +64,6 @@
 	<dict>
 		<key>inputs</key>
 		<string>112, 112, 32</string>
-		<key>output</key>
-		<string>112, 112, 16</string>
 		<key>kernel</key>
 		<string>1</string>
 		<key>filters</key>
@@ -97,8 +91,6 @@
 		<string>24</string>
 		<key>stride</key>
 		<string>2</string>
-		<key>offset</key>
-		<string>1, 1, 0</string>
 		<key>targets</key>
 		<string>block_2</string>
 		<key>weights</key>
@@ -127,14 +119,14 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>56, 56, 24</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
 		<string>32</string>
 		<key>stride</key>
 		<string>2</string>
-		<key>offset</key>
-		<string>1, 1, 0</string>
 		<key>targets</key>
 		<string>block_4</string>
 		<key>weights</key>
@@ -146,6 +138,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>28, 28, 32</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -163,6 +157,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>28, 28, 32</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -180,14 +176,14 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>28, 28, 32</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
 		<string>64</string>
 		<key>stride</key>
 		<string>2</string>
-		<key>offset</key>
-		<string>1, 1, 0</string>
 		<key>targets</key>
 		<string>block_7</string>
 		<key>weights</key>
@@ -199,6 +195,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>14, 14, 64</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -216,6 +214,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>14, 14, 64</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -233,6 +233,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>14, 14, 64</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -250,6 +252,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>14, 14, 64</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -267,6 +271,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>14, 14, 96</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -284,6 +290,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>14, 14, 96</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -301,14 +309,14 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>14, 14, 96</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
 		<string>160</string>
 		<key>stride</key>
 		<string>2</string>
-		<key>offset</key>
-		<string>1, 1, 0</string>
 		<key>targets</key>
 		<string>block_14</string>
 		<key>weights</key>
@@ -320,6 +328,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>7, 7, 160</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -337,6 +347,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>7, 7, 160</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -356,6 +368,8 @@
 		<string>inverted_residual</string>
 		<key>inputs</key>
 		<string>7, 7, 160</string>
+		<key>kernel</key>
+		<string>3</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -375,8 +389,6 @@
 		<string>Conv_1</string>
 		<key>targets</key>
 		<string>pooling</string>
-		<key>output</key>
-		<string>7, 7, 1280</string>
 		<key>kernel</key>
 		<string>1</string>
 		<key>filters</key>
@@ -388,16 +400,12 @@
 	<dict>
 		<key>inputs</key>
 		<string>7, 7, 1280</string>
-		<key>output</key>
-		<string>1, 1, 1280</string>
 		<key>type</key>
 		<string>pooling_average</string>
 		<key>kernel</key>
 		<string>7, 7</string>
 		<key>stride</key>
-		<string>4</string>
-		<key>offset</key>
-		<string>3, 3, 0</string>
+		<string>7</string>
 		<key>targets</key>
 		<string>logits</string>
 	</dict>
@@ -407,22 +415,16 @@
 		<string>dense</string>
 		<key>inputs</key>
 		<string>1, 1, 1280</string>
-		<key>output</key>
-		<string>1, 1, 1000</string>
+		<key>filters</key>
+		<string>1000</string>
 		<key>weight</key>
 		<string>Logits</string>
 		<key>targets</key>
 		<string>softmax</string>
-		<key>kernel</key>
-		<string>1</string>
-		<key>filters</key>
-		<string>1000</string>
 	</dict>
 	<key>softmax</key>
 	<dict>
 		<key>inputs</key>
-		<string>1, 1, 1000</string>
-		<key>output</key>
 		<string>1, 1, 1000</string>
 		<key>targets</key>
 		<string>output</string>
@@ -432,8 +434,6 @@
 	<key>output</key>
 	<dict>
 		<key>inputs</key>
-		<string>1, 1, 1000</string>
-		<key>output</key>
 		<string>1, 1, 1000</string>
 		<key>type</key>
 		<string>output</string>

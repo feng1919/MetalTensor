@@ -8,26 +8,25 @@
 
 #import <Foundation/Foundation.h>
 #import "MetalTensorLayer.h"
+#import "MIDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MIConvolutionLayer : MetalTensorLayer <MetalTensorWeights>
 
 @property (nonatomic, assign) MPSImageEdgeMode edgeMode;
+@property (nonatomic, assign) MTPaddingMode padding;
 @property (nonatomic, assign) MPSOffset offset;
-@property (nonatomic, strong) id<MPSCNNConvolutionDataSource> dataSource;
-
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-                  kernelDataSource:(id<MPSCNNConvolutionDataSource>)dataSource;
-
-- (void)setOffsetWithX:(NSUInteger)x Y:(NSUInteger)y Z:(NSUInteger)z;
+@property (nonatomic, assign) KernelShape kernel;
+@property (nonatomic, assign) NeuronType neuron;
+@property (nonatomic, strong) MICNNKernelDataSource *dataSource;
+@property (nonatomic, assign, getter=isDepthWise) BOOL depthWise;
 
 MIConvolutionLayer *MakeConvolutionLayer(NSString *module_name,
                                          KernelShape *k,
                                          NeuronType *n,
-                                         DataShape *input,
-                                         DataShape *output);
+                                         MTPaddingMode padding,
+                                         DataShape *input);
 
 @end
 

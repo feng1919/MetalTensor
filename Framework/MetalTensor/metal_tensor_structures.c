@@ -223,6 +223,74 @@ KernelShape KernelShapeMake(int row, int column, int depth, int kernel, int stri
     return k;
 }
 
+int conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding) {
+    
+    int dilation = 1;
+    int dilated_filter_size = kernel + (kernel - 1) * (dilation - 1);
+    int output_length;
+    
+    switch (padding) {
+        case MTPaddingMode_tfsame:
+            output_length = input_length;
+            break;
+            
+        case MTPaddingMode_tfvalid:
+            output_length = input_length - dilated_filter_size + 1;
+            break;
+            
+        case MTPaddingMode_tffull:
+            output_length = input_length + dilated_filter_size - 1;
+            break;
+            
+        default:
+            assert(0);
+            output_length = input_length;
+            break;
+    }
+    
+    return (output_length + stride - 1) / stride;
+}
+
+int conv_offset(int kernel, int stride) {
+    return kernel % stride;
+}
+
+int trans_conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding) {
+    
+    int dilation = 1;
+    int kernel_size = kernel + (kernel - 1) * (dilation - 1);
+    int dim_size;
+    
+    switch (MTPaddingMode_tfvalid) {
+        case MTPaddingMode_tfvalid:
+            dim_size = input_length * stride + fmaxl(kernel_size - stride, 0);
+            break;
+        
+        case MTPaddingMode_tffull:
+            dim_size = input_length * stride - (stride + kernel_size - 2);
+            break;
+            
+        case MTPaddingMode_tfsame:
+            dim_size = input_length * stride;
+            break;
+            
+        default:
+            assert(0);
+            dim_size = input_length * stride;
+            break;
+    }
+    
+    return dim_size;
+}
+
+int trans_conv_offset(int kernel, int stride) {
+    return -1 * (kernel % stride);
+}
+
+int pooling_offset(int kernel) {
+    return (kernel - 1) / 2;
+}
+
 int make_divisible_8(int v) {
     return make_divisible(v, 8, 8);
 }

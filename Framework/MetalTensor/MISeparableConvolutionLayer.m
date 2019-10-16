@@ -7,6 +7,7 @@
 //
 
 #import "MISeparableConvolutionLayer.h"
+#include "numpy.h"
 
 @interface MISeparableConvolutionLayer() {
     
@@ -18,62 +19,73 @@
 
 @implementation MISeparableConvolutionLayer
 
-
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-{
-    return [self initWithInputShape:inputShape interShape:inputShape outputShape:outputShape];
+- (void)initialize {
+    _kernels = malloc(2 * sizeof(KernelShape));
+    _neurons = malloc(2 * sizeof(NeuronType));
+    _padding = MTPaddingMode_tfsame;
+    _offset.x = 0;
+    _offset.y = 0;
+    _offset.z = 0;
 }
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                        interShape:(DataShape *)interShape
-                       outputShape:(DataShape *)outputShape
-{
-    if (self = [super initWithInputShape:inputShape outputShape:outputShape]) {
-        DB_TRACE(-_verbose+2, "\n%s init %s --> %s --> %s", self.labelUTF8,
-                 NSStringFromDataShape(inputShape).UTF8String,
-                 NSStringFromDataShape(interShape).UTF8String,
-                 NSStringFromDataShape(outputShape).UTF8String);
-        
-        _depthwise = [[MIConvolutionLayer alloc] initWithInputShape:inputShape
-                                                        outputShape:interShape];
-        _project = [[MIConvolutionLayer alloc] initWithInputShape:interShape
-                                                      outputShape:outputShape];
-        [_depthwise addTarget:_project];
+- (void)dealloc {
+    if (_kernels) {
+        free(_kernels);
+        _kernels = NULL;
     }
-    return self;
-}
-
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-               depthwiseKernelData:(id<MPSCNNConvolutionDataSource>)dataSource1
-                 projectKernelData:(id<MPSCNNConvolutionDataSource>)dataSource2
-{
-    return [self initWithInputShape:inputShape interShape:inputShape outputShape:outputShape depthwiseKernelData:dataSource1 projectKernelData:dataSource2];
-}
-
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                        interShape:(DataShape *)interShape
-                       outputShape:(DataShape *)outputShape
-               depthwiseKernelData:(id<MPSCNNConvolutionDataSource>)dataSource1
-                 projectKernelData:(id<MPSCNNConvolutionDataSource>)dataSource2
-{
-    if (self = [super initWithInputShape:inputShape outputShape:outputShape]) {
-        DB_TRACE(-_verbose+2, "\n%s init %s --> %s --> %s", self.labelUTF8,
-                 NSStringFromDataShape(inputShape).UTF8String,
-                 NSStringFromDataShape(interShape).UTF8String,
-                 NSStringFromDataShape(outputShape).UTF8String);
-        
-        _depthwise = [[MIConvolutionLayer alloc] initWithInputShape:inputShape
-                                                       outputShape:interShape
-                                                  kernelDataSource:dataSource1];
-        _project = [[MIConvolutionLayer alloc] initWithInputShape:interShape
-                                                     outputShape:outputShape
-                                                kernelDataSource:dataSource2];
-        [_depthwise addTarget:_project];
-        
+    
+    if (_neurons) {
+        free(_neurons);
+        _neurons = NULL;
     }
-    return self;
+}
+
+- (void)compile:(id<MTLDevice>)device {
+
+    [super compile:device];
+    
+    _depthwise = [[MIConvolutionLayer alloc] initWithInputShape:&_inputShapes[0]];
+    _depthwise.kernel = _kernels[0];
+    _depthwise.neuron = _neurons[0];
+    _depthwise.depthWise = YES;
+    _depthwise.offset = _offset;
+    _depthwise.padding = _padding;
+    _depthwise.dataSource = _dataSourceDepthWise;
+    [_depthwise compile:device];
+    
+    _project = [[MIConvolutionLayer alloc] initWithInputShape:_depthwise.outputShapeRef];
+    _project.kernel = _kernels[1];
+    _project.neuron = _neurons[1];
+    _project.depthWise = NO;
+    _project.padding = MTPaddingMode_tfsame;
+    _project.dataSource = _dataSourceProject;
+    [_project compile:device];
+    
+    [_depthwise addTarget:_project];
+    
+    _outputShape = _project.outputShape;
+    
+    [self setLabel:_label];
+}
+
+- (void)setOffset:(MPSOffset)offset {
+    _offset = offset;
+    [_depthwise setOffset:_offset];
+}
+
+- (void)setPadding:(MTPaddingMode)padding {
+    _padding = padding;
+    [_depthwise setPadding:_padding];
+}
+
+- (void)setDataSourceDepthWise:(MICNNKernelDataSource *)dataSourceDepthWise {
+    _dataSourceDepthWise = dataSourceDepthWise;
+    _depthwise.dataSource = dataSourceDepthWise;
+}
+
+- (void)setDataSourceProject:(MICNNKernelDataSource *)dataSourceProject {
+    _dataSourceProject = dataSourceProject;
+    _project.dataSource = dataSourceProject;
 }
 
 - (MIConvolutionLayer *)depthwiseComponent {
@@ -85,18 +97,22 @@
 }
 
 - (void)addTarget:(id<MetalTensorInput>)newTarget {
+    NSAssert(_project, @"The separable layer is not compiled yet.");
     [_project addTarget:newTarget];
 }
 
 - (void)addTarget:(id<MetalTensorInput>)newTarget atTempImageIndex:(NSInteger)imageIndex {
+    NSAssert(_project, @"The separable layer is not compiled yet.");
     [_project addTarget:newTarget atTempImageIndex:imageIndex];
 }
 
 - (void)removeTarget:(id<MetalTensorInput>)targetToRemove {
+    NSAssert(_project, @"The separable layer is not compiled yet.");
     [_project removeTarget:targetToRemove];
 }
 
 - (void)removeAllTargets {
+    NSAssert(_project, @"The separable layer is not compiled yet.");
     [_project removeAllTargets];
 }
 
@@ -135,24 +151,28 @@
     [_project loadWeights];
 }
 
-- (void)loadWeightsList:(NSArray<NSString *> *)weightsList rangeList:(NSRange *)rangeList
-           kernelShapes:(KernelShape *)kernelShapes neuronTypes:(NeuronType *)neuronTypes depthWises:(BOOL *)depthWises {
-    [_depthwise loadWeights:weightsList[0] range:&rangeList[0] kernelShape:&kernelShapes[0] neuronType:&neuronTypes[0] depthWise:depthWises?depthWises[0]:YES];
-    [_project loadWeights:weightsList[1] range:&rangeList[1] kernelShape:&kernelShapes[1] neuronType:&neuronTypes[1] depthWise:depthWises?depthWises[1]:NO];
+- (void)loadWeightsList:(NSArray<NSString *> *)weightsList rangeList:(NSRange *)rangeList {
+    [_depthwise loadWeights:weightsList[0] range:&rangeList[0]];
+    [_project loadWeights:weightsList[1] range:&rangeList[1]];
 }
 
 MISeparableConvolutionLayer *MakeSeparableConvolutionLayer(DataShape *input,
-                                                           DataShape *output,
+                                                           KernelShape *kernels,
+                                                           NeuronType *neurons,
                                                            MICNNKernelDataSource *depthWiseData,
                                                            MICNNKernelDataSource *pointWiseData,
-                                                           NSString *name)
+                                                           NSString * __nullable name)
 {
-    DataShape interShape = *input;
-    if (depthWiseData.kernel.stride != 1) {
-        interShape.row = ceilf((float)interShape.row/(float)depthWiseData.kernel.stride);
-        interShape.column = ceilf((float)interShape.column/(float)depthWiseData.kernel.stride);
-    }
-    MISeparableConvolutionLayer *separableLayer = [[MISeparableConvolutionLayer alloc] initWithInputShape:input interShape:&interShape outputShape:output depthwiseKernelData:depthWiseData projectKernelData:pointWiseData];
+    MISeparableConvolutionLayer *separableLayer = [[MISeparableConvolutionLayer alloc] initWithInputShape:input];
+    separableLayer.dataSourceProject = pointWiseData;
+    separableLayer.dataSourceDepthWise = depthWiseData;
+    npmemcpy(separableLayer.kernels, kernels, 2 * sizeof(KernelShape));
+    npmemcpy(separableLayer.neurons, neurons, 2 * sizeof(NeuronType));
+    MPSOffset offset;
+    offset.x = conv_offset(kernels[0].column, kernels[0].stride);
+    offset.y = conv_offset(kernels[0].row, kernels[0].stride);
+    offset.z = 0;
+    [separableLayer setOffset:offset];
     separableLayer.label = name;
     return separableLayer;
 }

@@ -16,9 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
     DataShape _tensorShape;
 }
 
-- (instancetype)initWithInputShapes:(DataShape *_Nonnull)inputShapes size:(int)size;
-- (instancetype)initWithInputShapes1:(DataShape *_Nonnull*_Nonnull)inputShapes size:(int)size;
-
 - (int *)channelOffsets;
 - (DataShape *)tensorShape;
 

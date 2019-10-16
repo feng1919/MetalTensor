@@ -10,6 +10,7 @@
 #import "NSString+Extension.h"
 #import "MIDataSource.h"
 #import <MetalImage/MetalDevice.h>
+#include "numpy.h"
 
 Class DescriptorWithType(NSString *type)
 {
@@ -197,6 +198,23 @@ Class LayerWithType(NSString *type)
             if (neuronList.count > 2) {
                 _neuronType.b = [neuronList[2] floatValue];
             }
+            if (neuronList.count > 3) {
+                _neuronType.c = [neuronList[3] floatValue];
+            }
+        }
+        else {
+            _neuronType.neuron = MPSCNNNeuronTypeNone;
+            _neuronType.a = 0.0f;
+            _neuronType.b = 0.0f;
+            _neuronType.c = 0.0f;
+        }
+        
+        if (dictionary[@"padding"]) {
+            _padding = PaddingModeFromString(dictionary[@"padding"]);
+        }
+        else {
+            // If the padding mode is not specified, we use 'tensorflow same'.
+            _padding = MTPaddingMode_tfsame;
         }
         
         if (dictionary[@"offset"]) {
@@ -207,12 +225,12 @@ Class LayerWithType(NSString *type)
             _offset.z = [offsetList[2] intValue];
         }
         else {
-            _offset.x = _kernelShape.column % _kernelShape.stride;
-            _offset.y = _kernelShape.row % _kernelShape.stride;
+            _offset.x = conv_offset(_kernelShape.column, _kernelShape.stride);
+            _offset.y = conv_offset(_kernelShape.row, _kernelShape.stride);
             _offset.z = 0;
         }
         
-        _depthwise = [dictionary[@"depthwise"] boolValue];
+        _depthWise = [dictionary[@"depthwise"] boolValue];
         
         NSParameterAssert(dictionary[@"weight"]);
         _weight = dictionary[@"weight"];
@@ -249,22 +267,27 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MIConvolutionLayerDescriptor class]]);
-    if (self = [super initWithInputShape:[descriptor inputShapeRef] outputShape:[descriptor outputShapeRef]]) {
+    if (self = [super initWithInputShape:[descriptor inputShapeRef]]) {
         MIConvolutionLayerDescriptor *convDesc = (MIConvolutionLayerDescriptor *)descriptor;
+        
+        self.kernel = convDesc.kernelShape;
+        self.neuron = convDesc.neuronType;
+        self.padding = convDesc.padding;
+        self.depthWise = convDesc.depthWise;
+        self.offset = convDesc.offset;
+        self.edgeMode = MPSImageEdgeModeZero;
+        [self setLabel:convDesc.name];
         
         NSString *weightPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:convDesc.weight];
         if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
             MICNNKernelDataSource *dataSource = MakeDataSource2(weightPath,
                                                                 convDesc.kernelShapeRef,
                                                                 convDesc.neuronTypeRef,
-                                                                NO,
+                                                                convDesc.depthWise,
                                                                 NULL);
             dataSource.range = convDesc.weightRange;
             self.dataSource = dataSource;
         }
-        self.offset = convDesc.offset;
-        self.edgeMode = MPSImageEdgeModeZero;
-        [self setLabel:convDesc.name];
     }
     
     return self;
@@ -284,6 +307,7 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MIReshapeLayerDescriptor class]]);
+    
     return [self initWithInputShape:[descriptor inputShapeRef] outputShape:[descriptor outputShapeRef]];
 }
 
@@ -318,7 +342,7 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MetalTensorInputLayerDescriptor class]]);
-    return [self initWithOutputShape:[descriptor outputShapeRef]];
+    return [self initWithInputShape:[descriptor inputShapes]];
 }
 
 @end
@@ -335,7 +359,7 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MetalTensorOutputLayerDescriptor class]]);
-    return [self initWithOutputShape:[descriptor outputShapeRef]];
+    return [self initWithInputShape:[descriptor inputShapeRef]];
 }
 
 @end
@@ -447,15 +471,15 @@ Class LayerWithType(NSString *type)
             _offset.z = [offsetList[2] intValue];
         }
         else {
-            _offset.x = kernel.x % _stride;
-            _offset.y = kernel.y % _stride;
+            _offset.x = conv_offset(kernel.x, _stride);
+            _offset.y = conv_offset(kernel.y, _stride);
             _offset.z = 0;
         }
         
+        _weightRanges = malloc(3*sizeof(NSRange));
         if (dictionary[@"weight_ranges"]) {
             NSArray<NSString *> *rangeList = [dictionary[@"weight_ranges"] nonEmptyComponentsSeparatedByString:@";"];
             NSAssert(rangeList.count == 3, @"Invlid weight range number: '%@'", dictionary[@"weight_ranges"]);
-            _weightRanges = malloc(3*sizeof(NSRange));
             for (int i = 0; i < 3; i++) {
                 NSArray<NSString *> *rangeComponents = [rangeList[i] nonEmptyComponentsSeparatedByString:@","];
                 _weightRanges[i].location = [rangeComponents[0] integerValue];
@@ -463,18 +487,29 @@ Class LayerWithType(NSString *type)
             }
         }
         else {
-            _weightRanges = NULL;
+            _weightRanges[0].location = NSNotFound;
+            _weightRanges[0].length = 0;
+            _weightRanges[1].location = NSNotFound;
+            _weightRanges[1].length = 0;
+            _weightRanges[2].location = NSNotFound;
+            _weightRanges[2].length = 0;
         }
     }
     return self;
 }
 
 - (void)dealloc {
-    free(_kernelShapes);
-    free(_neuronTypes);
-    
+    if (_kernelShapes) {
+        free(_kernelShapes);
+        _kernelShapes = NULL;
+    }
+    if (_neuronTypes) {
+        free(_neuronTypes);
+        _neuronTypes = NULL;
+    }
     if (_weightRanges) {
         free(_weightRanges);
+        _weightRanges = NULL;
     }
 }
 
@@ -488,54 +523,58 @@ Class LayerWithType(NSString *type)
 @implementation MIInvertedResidualModule (layerDescriptorInit)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
+    
     NSParameterAssert([descriptor isKindOfClass:[MIInvertedResidualModuleDescriptor class]]);
     MIInvertedResidualModuleDescriptor *irmDesc = (MIInvertedResidualModuleDescriptor *)descriptor;
-    DataShape *inputShapes = [irmDesc inputShapes];
     
-    MIInvertedResidualModule *invertedResidualModule = [self initWithInputShape:&inputShapes[0] outputShape:[irmDesc outputShapeRef] dwInputShape:&inputShapes[1] dwOutputShape:&inputShapes[2]];
-    
-    KernelShape *kernels = [irmDesc kernelShapes];
-    NeuronType *neurons = [irmDesc neuronTypes];
-    NSRange *weightRanges = [irmDesc weightRanges];
-    
-    NSString *weightPath = [[NSBundle mainBundle] pathForResource:irmDesc.weights[0] ofType:@"bin"];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
-        MICNNKernelDataSource *dataSource = MakeDataSource1(irmDesc.weights[0],
-                                                             &kernels[0],
-                                                             &neurons[0],
-                                                             NO);
-        if (weightRanges) {
-            dataSource.range = weightRanges[0];
+    if (self = [super initWithInputShape:[descriptor inputShapeRef]]) {
+        
+        KernelShape *kernels = [irmDesc kernelShapes];
+        NeuronType *neurons = [irmDesc neuronTypes];
+        NSRange *weightRanges = [irmDesc weightRanges];
+        
+        npmemcpy(self.kernels, kernels, 3 * sizeof(KernelShape));
+        npmemcpy(self.neurons, neurons, 3 * sizeof(NeuronType));
+        self.offset = irmDesc.offset;
+        self.label = irmDesc.name;
+        
+        NSString *weightPath = [[NSBundle mainBundle] pathForResource:irmDesc.weights[0] ofType:@"bin"];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
+            MICNNKernelDataSource *dataSource = MakeDataSource1(irmDesc.weights[0],
+                                                                 &kernels[0],
+                                                                 &neurons[0],
+                                                                 NO);
+            if (weightRanges) {
+                dataSource.range = weightRanges[0];
+            }
+            [self setExpandDataSource:dataSource];
         }
-        [invertedResidualModule setExpandDataSource:dataSource];
-    }
-    
-    weightPath = [[NSBundle mainBundle] pathForResource:irmDesc.weights[1] ofType:@"bin"];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
-        MICNNKernelDataSource *dataSource = MakeDataSource1(irmDesc.weights[1],
-                                                             &kernels[1],
-                                                             &neurons[1],
-                                                             YES);
-        if (weightRanges) {
-            dataSource.range = weightRanges[1];
+        
+        weightPath = [[NSBundle mainBundle] pathForResource:irmDesc.weights[1] ofType:@"bin"];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
+            MICNNKernelDataSource *dataSource = MakeDataSource1(irmDesc.weights[1],
+                                                                 &kernels[1],
+                                                                 &neurons[1],
+                                                                 YES);
+            if (weightRanges) {
+                dataSource.range = weightRanges[1];
+            }
+            [self setDepthWiseDataSource:dataSource];
         }
-        [invertedResidualModule setDepthWiseDataSource:dataSource];
-    }
-    
-    weightPath = [[NSBundle mainBundle] pathForResource:irmDesc.weights[2] ofType:@"bin"];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
-        MICNNKernelDataSource *dataSource = MakeDataSource1(irmDesc.weights[2],
-                                                            &kernels[2],
-                                                            &neurons[2],
-                                                            NO);
-        if (weightRanges) {
-            dataSource.range = weightRanges[2];
+        
+        weightPath = [[NSBundle mainBundle] pathForResource:irmDesc.weights[2] ofType:@"bin"];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
+            MICNNKernelDataSource *dataSource = MakeDataSource1(irmDesc.weights[2],
+                                                                &kernels[2],
+                                                                &neurons[2],
+                                                                NO);
+            if (weightRanges) {
+                dataSource.range = weightRanges[2];
+            }
+            [self setProjectDataSource:dataSource];
         }
-        [invertedResidualModule setProjectDataSource:dataSource];
     }
-    invertedResidualModule.label = descriptor.name;
-    [[invertedResidualModule depthWiseComponent] setOffset:irmDesc.offset];
-    return invertedResidualModule;
+    return self;
 }
 
 @end
@@ -551,7 +590,7 @@ Class LayerWithType(NSString *type)
 @implementation MISoftMaxLayer (layerDescriptorInit)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
-    return [self initWithInputShape:&descriptor.inputShapes[0] outputShape:[descriptor outputShapeRef]];
+    return [self initWithInputShape:[descriptor inputShapeRef]];
 }
 
 @end
@@ -565,28 +604,13 @@ Class LayerWithType(NSString *type)
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary {
     if (self = [super initWithDictionary:dictionary]) {
         
-        NSParameterAssert(dictionary[@"kernel"]);
-        NSArray<NSString *> *kernelList = [dictionary[@"kernel"] nonEmptyComponentsSeparatedByString:@","];
-        NSAssert(kernelList.count == 1 || kernelList.count == 2, @"Invalid kernel shape: '%@'", dictionary[@"kernel"]);
-        _kernelShape.row = [kernelList[0] intValue];
-        if (kernelList.count == 2) {
-            _kernelShape.column = [kernelList[1] intValue];
-        }
-        else {
-            _kernelShape.column = _kernelShape.row;
-        }
+        _kernelShape.column = _inputShapes[0].column;
+        _kernelShape.row = _inputShapes[0].row;
         _kernelShape.depth = _inputShapes[0].depth;
         
         NSParameterAssert(dictionary[@"filters"]);
         _kernelShape.filters = [dictionary[@"filters"] intValue];
-        
-        if (dictionary[@"stride"]) {
-            _kernelShape.stride = [dictionary[@"stride"] intValue];
-            NSParameterAssert(_kernelShape.stride > 0);
-        }
-        else {
-            _kernelShape.stride = 1;
-        }
+        _kernelShape.stride = _kernelShape.column;
         
         if (dictionary[@"activation"]) {
             NSArray<NSString *> *neuronList = [dictionary[@"activation"] nonEmptyComponentsSeparatedByString:@","];
@@ -643,8 +667,12 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MIFullyConnectedLayerDescriptor class]]);
-    if (self = [super initWithInputShape:[descriptor inputShapeRef] outputShape:[descriptor outputShapeRef]]) {
+    if (self = [super initWithInputShape:[descriptor inputShapeRef]]) {
         MIFullyConnectedLayerDescriptor *denseDesc = (MIFullyConnectedLayerDescriptor *)descriptor;
+        
+        self.kernel = denseDesc.kernelShape;
+        self.neuron = denseDesc.neuronType;
+        [self setLabel:denseDesc.name];
         
         NSString *weightPath = [[NSBundle mainBundle] pathForResource:denseDesc.weight ofType:@"bin"];
         if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
@@ -655,7 +683,6 @@ Class LayerWithType(NSString *type)
             dataSource.range = denseDesc.weightRange;
             self.dataSource = dataSource;
         }
-        [self setLabel:denseDesc.name];
     }
     
     return self;
@@ -701,8 +728,8 @@ Class LayerWithType(NSString *type)
             _offset.z = [offsetList[2] intValue];
         }
         else {
-            _offset.x = _kernelShape.column % _kernelShape.stride;
-            _offset.y = _kernelShape.row % _kernelShape.stride;
+            _offset.x = pooling_offset(_kernelShape.column);
+            _offset.y = pooling_offset(_kernelShape.row);
             _offset.z = 0;
         }
     }
@@ -715,13 +742,10 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MIPoolingAverageLayerDescriptor class]]);
-    if (self = [super initWithInputShape:&descriptor.inputShapes[0] outputShape:[descriptor outputShapeRef]]) {
+    if (self = [super initWithInputShape:[descriptor inputShapeRef]]) {
         MIPoolingAverageLayerDescriptor *poolingDesc = (MIPoolingAverageLayerDescriptor *)descriptor;
-        self.kernelWidth = poolingDesc.kernelShape.column;
-        self.kernelHeight = poolingDesc.kernelShape.row;
+        [self setKernel:poolingDesc.kernelShape];
         [self setOffset:poolingDesc.offset];
-        self.strideInPixelsX = poolingDesc.kernelShape.stride;
-        self.strideInPixelsY = poolingDesc.kernelShape.stride;
     }
     return self;
 }
@@ -755,7 +779,7 @@ Class LayerWithType(NSString *type)
             NSParameterAssert(_kernelShape.stride > 0);
         }
         else {
-            _kernelShape.stride = 1;
+            _kernelShape.stride = 2;
         }
         
         if (dictionary[@"offset"]) {
@@ -766,8 +790,8 @@ Class LayerWithType(NSString *type)
             _offset.z = [offsetList[2] intValue];
         }
         else {
-            _offset.x = _kernelShape.column % _kernelShape.stride;
-            _offset.y = _kernelShape.row % _kernelShape.stride;
+            _offset.x = pooling_offset(_kernelShape.column);
+            _offset.y = pooling_offset(_kernelShape.row);
             _offset.z = 0;
         }
     }
@@ -780,13 +804,10 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MIPoolingMaxLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MIPoolingMaxLayerDescriptor class]]);
-    if (self = [super initWithInputShape:&descriptor.inputShapes[0] outputShape:[descriptor outputShapeRef]]) {
+    if (self = [super initWithInputShape:[descriptor inputShapeRef]]) {
         MIPoolingMaxLayerDescriptor *poolingDesc = (MIPoolingMaxLayerDescriptor *)descriptor;
-        self.kernelWidth = poolingDesc.kernelShape.column;
-        self.kernelHeight = poolingDesc.kernelShape.row;
+        [self setKernel:poolingDesc.kernelShape];
         [self setOffset:poolingDesc.offset];
-        self.strideInPixelsX = poolingDesc.kernelShape.stride;
-        self.strideInPixelsY = poolingDesc.kernelShape.stride;
     }
     return self;
 }
@@ -802,13 +823,6 @@ Class LayerWithType(NSString *type)
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary {
     if (self = [super initWithDictionary:dictionary]) {
         
-        NSParameterAssert(dictionary[@"data_shape"]);
-        NSArray<NSString *> *shapeList = [dictionary[@"data_shape"] nonEmptyComponentsSeparatedByString:@","];
-        NSAssert(shapeList.count == 3, @"Invalid data shape: '%@'", dictionary[@"data_shape"]);
-        _dataShape.row = [shapeList[0] intValue];
-        _dataShape.column = [shapeList[1] intValue];
-        _dataShape.depth = [shapeList[2] intValue];
-        
         NSParameterAssert(dictionary[@"arithmetic"]);
         _arithmetic = dictionary[@"arithmetic"];
         
@@ -818,33 +832,18 @@ Class LayerWithType(NSString *type)
     return self;
 }
 
-- (DataShape *)dataShapeRef {
-    return &_dataShape;
-}
-
 @end
 
 @implementation MIArithmeticLayer (layerDescriptorInit)
 
 - (instancetype)initWithDescriptor:(MIArithmeticLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MIArithmeticLayerDescriptor class]]);
-    DataShape *dataShape = [descriptor dataShapeRef];
+    DataShape *dataShape = [descriptor inputShapeRef];
     DataShape *inputShapes[2] = {dataShape, dataShape};
-    if (self = [super initWithInputShapes1:inputShapes size:2 outputShape:dataShape]) {
-        self->dataShape = *dataShape;
+    if (self = [super initWithInputShapes1:inputShapes size:2]) {
         
-        Class arithmeticClass = [MIArithmeticLayer arithmeticWithType:descriptor.arithmetic];
-        self->arithmetic = [[arithmeticClass alloc] initWithDevice:[MetalDevice sharedMTLDevice]];
-        self->arithmetic.primaryScale = 1.0f;
-        self->arithmetic.bias = 0.0f;
-        self->arithmetic.primaryStrideInPixelsX = 1;
-        self->arithmetic.primaryStrideInPixelsY = 1;
-        self->arithmetic.primaryStrideInFeatureChannels = 1;
-        self->arithmetic.secondaryScale = 1.0f;
-        self->arithmetic.secondaryStrideInPixelsX = 1;
-        self->arithmetic.secondaryStrideInPixelsY = 1;
-        self->arithmetic.secondaryStrideInFeatureChannels = 1;
-        self->arithmetic.destinationFeatureChannelOffset = descriptor.channelOffset;
+        self.channelOffset = descriptor.channelOffset;
+        self.arithmeticType = descriptor.arithmetic;
         
         if (descriptor.secondaryImage) {
             UIImage *secondaryImage = [UIImage imageNamed:descriptor.secondaryImage];
@@ -858,23 +857,6 @@ Class LayerWithType(NSString *type)
     return self;
 }
 
-+ (Class)arithmeticWithType:(NSString *)arithmetic {
-    if ([arithmetic isEqualToString:@"addition"]) {
-        return [MPSCNNAdd class];
-    }
-    if ([arithmetic isEqualToString:@"divide"]) {
-        return [MPSCNNDivide class];
-    }
-    if ([arithmetic isEqualToString:@"subtract"]) {
-        return [MPSCNNSubtract class];
-    }
-    if ([arithmetic isEqualToString:@"multiply"]) {
-        return [MPSCNNMultiply class];
-    }
-    assert(0);
-    return nil;
-}
-
 @end
 
 
@@ -886,13 +868,6 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary {
     if (self = [super initWithDictionary:dictionary]) {
-        
-        NSParameterAssert(dictionary[@"data_shape"]);
-        NSArray<NSString *> *shapeInfo = [dictionary[@"data_shape"] nonEmptyComponentsSeparatedByString:@","];
-        NSAssert(shapeInfo.count == 3, @"Invalid data shape count");
-        _dataShape.row = [shapeInfo[0] intValue];
-        _dataShape.column = [shapeInfo[1] intValue];
-        _dataShape.depth = [shapeInfo[2] intValue];
         
         NSParameterAssert(dictionary[@"activation"]);
         NSArray<NSString *> *neuronInfo = [dictionary[@"activation"] nonEmptyComponentsSeparatedByString:@","];
@@ -910,10 +885,6 @@ Class LayerWithType(NSString *type)
     return self;
 }
 
-- (DataShape *)dataShapeRef {
-    return &_dataShape;
-}
-
 - (NeuronType *)neuronTypeRef {
     return &_neuronType;
 }
@@ -924,7 +895,10 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorNeuronLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MetalTensorNeuronLayerDescriptor class]]);
-    return [self initWithDataShape:descriptor.dataShapeRef neuronType:descriptor.neuronType];
+    if (self = [super initWithInputShape:descriptor.inputShapeRef]) {
+        self.neuronType = descriptor.neuronType;
+    }
+    return self;
 }
 
 @end
@@ -971,26 +945,37 @@ Class LayerWithType(NSString *type)
             if (neuronList.count > 2) {
                 _neuronType.b = [neuronList[2] floatValue];
             }
+            if (neuronList.count > 3) {
+                _neuronType.c = [neuronList[3] floatValue];
+            }
+        }
+        else {
+            _neuronType.neuron = MPSCNNNeuronTypeNone;
+            _neuronType.a = 0.0f;
+            _neuronType.b = 0.0f;
+            _neuronType.c = 0.0f;
+        }
+        
+        if (dictionary[@"padding"]) {
+            _padding = PaddingModeFromString(dictionary[@"padding"]);
+        }
+        else {
+            // If the padding mode is not specified, we use 'tensorflow same'.
+            _padding = MTPaddingMode_tfsame;
         }
         
         if (dictionary[@"offset"]) {
             NSArray<NSString *> *offsetList = [dictionary[@"offset"] nonEmptyComponentsSeparatedByString:@","];
-            NSAssert(offsetList.count == 3, @"Invliad offset number: '%@'", dictionary[@"offset"]);
-            _offset.x = [offsetList[0] intValue];
-            _offset.y = [offsetList[1] intValue];
-            _offset.z = [offsetList[2] intValue];
-        }
-        
-        if (dictionary[@"kernel_offset"]) {
-            NSArray<NSString *> *offsetList = [dictionary[@"kernel_offset"] nonEmptyComponentsSeparatedByString:@","];
-            NSAssert(offsetList.count == 2, @"Invliad kernel offset number: '%@'", dictionary[@"kernel_offset"]);
+            NSAssert(offsetList.count == 2, @"Invliad offset number: '%@'", dictionary[@"offset"]);
             _kernelOffset.x = [offsetList[0] intValue];
             _kernelOffset.y = [offsetList[1] intValue];
         }
         else {
-            _kernelOffset.x = -1 * (_kernelShape.column % _kernelShape.stride);
-            _kernelOffset.y = -1 * (_kernelShape.row % _kernelShape.stride);
+            _kernelOffset.x = trans_conv_offset(_kernelShape.column, _kernelShape.stride);
+            _kernelOffset.y = trans_conv_offset(_kernelShape.row, _kernelShape.stride);
         }
+        
+        _depthWise = [dictionary[@"depthwise"] boolValue];
         
         NSParameterAssert(dictionary[@"weight"]);
         _weight = dictionary[@"weight"];
@@ -1027,22 +1012,27 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MITransposeConvolutionLayerDescriptor class]]);
-    if (self = [super initWithInputShape:[descriptor inputShapeRef] outputShape:[descriptor outputShapeRef]]) {
+    if (self = [super initWithInputShape:[descriptor inputShapeRef]]) {
         MITransposeConvolutionLayerDescriptor *convDesc = (MITransposeConvolutionLayerDescriptor *)descriptor;
         
-        NSString *weightPath = [[NSBundle mainBundle] pathForResource:convDesc.weight ofType:@"bin"];
-        if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
-            MICNNKernelDataSource *dataSource = MakeDataSource1(convDesc.weight,
-                                                                convDesc.kernelShapeRef,
-                                                                convDesc.neuronTypeRef,
-                                                                NO);
-            dataSource.range = convDesc.weightRange;
-            self.dataSource = dataSource;
-        }
-        self.offset = convDesc.offset;
+        self.kernel = convDesc.kernelShape;
+        self.neuron = convDesc.neuronType;
+        self.padding = convDesc.padding;
+        self.depthWise = convDesc.depthWise;
         self.kernelOffset = convDesc.kernelOffset;
         self.edgeMode = MPSImageEdgeModeZero;
         [self setLabel:convDesc.name];
+        
+        NSString *weightPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:convDesc.weight];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
+            MICNNKernelDataSource *dataSource = MakeDataSource2(weightPath,
+                                                                convDesc.kernelShapeRef,
+                                                                convDesc.neuronTypeRef,
+                                                                convDesc.depthWise,
+                                                                NULL);
+            dataSource.range = convDesc.weightRange;
+            self.dataSource = dataSource;
+        }
     }
     
     return self;

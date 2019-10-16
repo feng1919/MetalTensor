@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MIReshapeLayer : MetalTensorLayer
 
+- (instancetype)initWithInputShape:(DataShape *)inputShape outputShape:(DataShape *)outputShape;
+
 @end
 
 MIReshapeLayer *MakeReshapeLayer(DataShape *inputShape, DataShape *outputShape);

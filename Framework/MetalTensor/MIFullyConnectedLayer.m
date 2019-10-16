@@ -7,7 +7,6 @@
 //
 
 #import "MIFullyConnectedLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImageCache.h"
 #import "MIDataSource.h"
 
@@ -19,22 +18,26 @@
 
 @implementation MIFullyConnectedLayer
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-                  kernelDataSource:(id<MPSCNNConvolutionDataSource>)dataSource {
-    if (self = [super initWithInputShape:inputShape outputShape:outputShape]) {
-        _dataSource = dataSource;
+- (void)compile:(id<MTLDevice>)device {
+    
+    [super compile:device];
+    
+    NSParameterAssert(_kernel.column == _inputShapes[0].column &&
+                      _kernel.row == _inputShapes[0].row &&
+                      _kernel.depth == _inputShapes[0].depth);
+    
+    _outputShape.column = 1;
+    _outputShape.row = 1;
+    _outputShape.depth = _kernel.filters;
+    
+    if (_dataSource) {
+        _fullyConnected = [[MPSCNNFullyConnected alloc] initWithDevice:_device weights:_dataSource];
     }
-    return self;
 }
 
 - (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     NSAssert(_dataSource != nil, @"The weights has not been set.");
-    if (_fullyConnected == nil) {
-        _fullyConnected = [[MPSCNNFullyConnected alloc] initWithDevice:[MetalDevice sharedMTLDevice]
-                                                              weights:_dataSource];
-    }
-    
+
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
     
     _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
@@ -59,14 +62,20 @@
     [self.dataSource load];
 }
 
-- (void)loadWeights:(NSString *)weights range:(NSRange *)range
-        kernelShape:(KernelShape *)k neuronType:(NeuronType *)n depthWise:(BOOL)depthWise {
-    self.dataSource = MakeDataSource2(weights, k, n, depthWise, &range[0]);;
+- (void)loadWeights:(NSString *)weights range:(NSRange *)range {
+    self.dataSource = MakeDataSource2(weights, &_kernel, &_neuron, NO, &range[0]);;
     [self.dataSource load];
 }
 
-- (void)setDataSource:(id<MPSCNNConvolutionDataSource>)dataSource {
+- (void)setDataSource:(MICNNKernelDataSource *)dataSource {
+    
+    NSParameterAssert(dataSource);
+    
     _dataSource = dataSource;
+    
+    if (_device) {
+        _fullyConnected = [[MPSCNNFullyConnected alloc] initWithDevice:_device weights:_dataSource];
+    }
     DB_TRACE(-_verbose+1, "\n%s data source --> %s", self.labelUTF8, [dataSource description].UTF8String);
 }
 

@@ -12,13 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MIPoolingMaxLayer : MetalTensorLayer
 
-@property (nonatomic, assign) NSUInteger kernelWidth;
-@property (nonatomic, assign) NSUInteger kernelHeight;
-@property (nonatomic, assign) NSUInteger strideInPixelsX;
-@property (nonatomic, assign) NSUInteger strideInPixelsY;
-@property (nonatomic, assign) MPSOffset offset;
+@property (nonatomic, assign) KernelShape kernel;
 
-- (void)setOffsetWithX:(NSInteger)x Y:(NSInteger)y Z:(NSInteger)z;
+@property (nonatomic, assign) MPSOffset offset;
 
 @end
 

@@ -14,8 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
     
 @protected
     /*
-     *  input information
-     *  tensors and shapes
+     *  input tensors and shapes
      */
     DataShape *_inputShapes;
     int _numOfInputs;
@@ -28,13 +27,33 @@ NS_ASSUME_NONNULL_BEGIN
     BOOL *_receivedFlags;
 }
 
-@property (nonatomic, assign, readonly) DataShape *inputShapes;
-@property (nonatomic, assign, readonly) int numOfInputs;
+/*
+ *  Recommanded initialze functions of MetalTensorLayer.
+ *  The method -init is invalid, for MetalTensorLayer
+ *  there always be an input at least.
+ */
+- (instancetype)initWithInputShape:(DataShape *)inputShape;
+- (instancetype)initWithInputShapes:(DataShape *_Nonnull)inputShapes size:(int)size;
+- (instancetype)initWithInputShapes1:(DataShape *_Nonnull*_Nonnull)inputShapes size:(int)size;
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape outputShape:(DataShape *)outputShape;
-- (instancetype)initWithInputShapes:(DataShape *_Nonnull)inputShapes size:(int)size outputShape:(DataShape *)outputShape;
-- (instancetype)initWithInputShapes1:(DataShape *_Nonnull*_Nonnull)inputShapes size:(int)size outputShape:(DataShape *)outputShape;
+/*
+ *  The input shapes for the MetalTensorLayer instance.
+ */
+- (DataShape * _Nonnull)inputShapes;
 
+/*
+ *  Number Of inputs for the MetalTensorLayer instance.
+ */
+- (int)numOfInputs;
+
+/*
+ *  Initialze assignment to variables.
+ */
+- (void)initialize;
+
+/*
+ *  Remove all cached tensors after the calculation.
+ */
 - (void)removeCachedImages;
 
 @end

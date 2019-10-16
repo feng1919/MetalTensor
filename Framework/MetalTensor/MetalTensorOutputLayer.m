@@ -7,7 +7,6 @@
 //
 
 #import "MetalTensorOutputLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImageCache.h"
 
 @interface MetalTensorOutputLayer() {
@@ -18,15 +17,9 @@
 
 @implementation MetalTensorOutputLayer
 
-- (instancetype)initWithOutputShape:(DataShape *)dataShape1 {
-    if (self = [super initWithInputShape:dataShape1 outputShape:dataShape1]) {
-        [self initializeWithDataShape:dataShape1];
-        DB_TRACE(-_verbose+2, "\n%s init --> %s", self.labelUTF8, NSStringFromDataShape(dataShape1));
-    }
-    return self;
-}
-
-- (void)initializeWithDataShape:(DataShape *)dataShape {
+- (void)compile:(id<MTLDevice>)device {
+    
+    [super compile:device];
     
     /*
      *  It just does nothing.
@@ -35,12 +28,11 @@
      */
     
     MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
-    _neuron = [[MPSCNNNeuron alloc] initWithDevice:[MetalDevice sharedMTLDevice] neuronDescriptor:neuronDesc];
+    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
     
-    MPSImageDescriptor *desc = ImageDescriptor(dataShape);
+    MPSImageDescriptor *desc = ImageDescriptor(&_outputShape);
     desc.storageMode = MTLStorageModeShared;
-    _outputImage = [[MPSImage alloc] initWithDevice:[MetalDevice sharedMTLDevice]
-                                    imageDescriptor:desc];
+    _outputImage = [[MPSImage alloc] initWithDevice:device imageDescriptor:desc];
     
 }
 

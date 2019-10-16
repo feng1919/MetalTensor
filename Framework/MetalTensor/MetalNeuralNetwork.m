@@ -54,7 +54,7 @@
     _allLayers = [NSMutableDictionary dictionary];
     _allLayerDescriptors = [NSMutableDictionary dictionary];
     
-    // generating all of the layers...
+    // generating and compiling all of the layers...
     for (NSString *key in _networkDesc.allKeys) {
         id entity = _networkDesc[key];
         if (![entity isKindOfClass:[NSDictionary class]]) {
@@ -68,21 +68,21 @@
         [_allLayerDescriptors setObject:desc forKey:key];
         
         Class layerClass = LayerWithType(desc.type);
-        MetalTensorLayer *layer = [[layerClass alloc] initWithDescriptor:desc];
-        if (layer) {
-            [layer setLabel:key];
-            [_allLayers setObject:layer forKey:key];
-        }
+        MetalTensorNode *layer = [[layerClass alloc] initWithDescriptor:desc];
+        NSParameterAssert(layer);
+        [layer compile:device];
+        [layer setLabel:key];
+        [_allLayers setObject:layer forKey:key];
     }
     
     // connecting the layers...
     for (NSString *layerName in _allLayerDescriptors.allKeys) {
-        MetalTensorLayer *layer = _allLayers[layerName];
+        MetalTensorNode *layer = _allLayers[layerName];
         MetalTensorLayerDescriptor *desc = _allLayerDescriptors[layerName];
         NSParameterAssert(desc.targetIndices == nil || desc.targetIndices.count == desc.targets.count);
         for (int i = 0; i < desc.targets.count; i++) {
             NSString *target = desc.targets[i];
-            MetalTensorLayer *targetLayer = _allLayers[target];
+            MetalTensorNode *targetLayer = _allLayers[target];
             if (targetLayer) {
                 if ([targetLayer conformsToProtocol:@protocol(MetalTensorInput)]) {
                     // If the index were specified
@@ -178,7 +178,7 @@
             NSUInteger length = [rangeComponents[1] integerValue];
             NSRange range = NSMakeRange(location, length);
             
-            [layer loadWeights:weightsFile range:&range kernelShape:[convDesc kernelShapeRef] neuronType:[convDesc neuronTypeRef] depthWise:convDesc.depthwise];
+            [layer loadWeights:weightsFile range:&range];
         }
         else if ([desc.type isEqualToString:@"dense"]) {
             MIFullyConnectedLayerDescriptor *denseDesc = (MIFullyConnectedLayerDescriptor *)desc;
@@ -188,7 +188,7 @@
             NSUInteger length = [rangeComponents[1] integerValue];
             NSRange range = NSMakeRange(location, length);
             
-            [layer loadWeights:weightsFile range:&range kernelShape:denseDesc.kernelShapeRef neuronType:denseDesc.neuronTypeRef depthWise:NO];
+            [layer loadWeights:weightsFile range:&range];
         }
         else if ([desc.type isEqualToString:@"inverted_residual"]) {
             MIInvertedResidualModuleDescriptor *irmDesc = (MIInvertedResidualModuleDescriptor *)desc;
@@ -200,7 +200,7 @@
                 ranges[i].length = [rangeComponents[1] integerValue];
             }
             
-            [layer loadWeightsList:@[weightsFile, weightsFile, weightsFile] rangeList:ranges kernelShapes:irmDesc.kernelShapes neuronTypes:irmDesc.neuronTypes depthWises:NULL];
+            [layer loadWeightsList:@[weightsFile, weightsFile, weightsFile] rangeList:ranges];
         }
         else if ([desc.type isEqualToString:@"trans_conv"]) {
             MITransposeConvolutionLayerDescriptor *convDesc = (MITransposeConvolutionLayerDescriptor *)desc;
@@ -210,7 +210,7 @@
             NSUInteger length = [rangeComponents[1] integerValue];
             NSRange range = NSMakeRange(location, length);
             
-            [layer loadWeights:weightsFile range:&range kernelShape:[convDesc kernelShapeRef] neuronType:[convDesc neuronTypeRef] depthWise:NO];
+            [layer loadWeights:weightsFile range:&range];
         }
     }
 }
@@ -249,11 +249,11 @@
     return _outputLayers;
 }
 
-- (NSArray<MetalTensorLayer *> *)allLayers {
+- (NSArray<MetalTensorNode *> *)allLayers {
     return _allLayers.allValues;
 }
 
-- (MetalTensorLayer *)layerWithName:(NSString *)name {
+- (MetalTensorNode *)layerWithName:(NSString *)name {
     return _allLayers[name];
 }
 
@@ -277,9 +277,11 @@
 }
 
 - (MetalTensorOutputLayer *)outputLayerWithName:(NSString *)layerName {
-    MetalTensorLayer *layer = [self layerWithName:layerName];
+    NSParameterAssert([layerName length] > 0);
+    MetalTensorNode *layer = [self layerWithName:layerName];
+    NSParameterAssert(layer);
     DataShape output_shape = [layer outputShape];
-    MetalTensorOutputLayer *outputLayer = [[MetalTensorOutputLayer alloc] initWithOutputShape:&output_shape];
+    MetalTensorOutputLayer *outputLayer = [[MetalTensorOutputLayer alloc] initWithInputShape:&output_shape];
     [layer addTarget:outputLayer];
     return outputLayer;
 }

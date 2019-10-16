@@ -7,16 +7,16 @@
 //
 
 #import "MetalTensorLayer.h"
+#import "MIDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MIFullyConnectedLayer : MetalTensorLayer <MetalTensorWeights>
 
-@property (nonatomic, strong) id<MPSCNNConvolutionDataSource> dataSource;
+@property (nonatomic, assign) KernelShape kernel;
+@property (nonatomic, assign) NeuronType neuron;
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-                  kernelDataSource:(id<MPSCNNConvolutionDataSource>)dataSource;
+@property (nonatomic, strong) MICNNKernelDataSource *dataSource;
 
 @end
 

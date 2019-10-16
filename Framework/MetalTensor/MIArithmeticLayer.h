@@ -13,18 +13,16 @@ NS_ASSUME_NONNULL_BEGIN
 @class MIMPSImage;
 @interface MIArithmeticLayer : MetalTensorLayer {
     
-@public
-    MPSCNNArithmetic *arithmetic;
-    DataShape dataShape;
+@protected
+    MPSCNNArithmetic *_arithmetic;
 }
 @property (nonatomic, strong, nullable) MIMPSImage *secondaryImage;
+@property (nonatomic, strong) NSString *arithmeticType;
+@property (nonatomic, assign) NSInteger channelOffset;
 
-+ (instancetype)additionArithmeticLayerWithDataShape:(DataShape *)dataShape;
-+ (instancetype)subtractionArithmeticLayerWithDataShape:(DataShape *)dataShape;
-+ (instancetype)multiplicationArithmeticLayerWithDataShape:(DataShape *)dataShape;
-+ (instancetype)divisionArithmeticLayerWithDataShape:(DataShape *)dataShape;
++ (instancetype)arithmeticLayerWithDataShape:(DataShape *)dataShape;
 
-- (void)setDestinationFeatureChannelOffset:(NSInteger)channelOffset;
++ (Class)arithmeticWithType:(NSString *)arithmetic;
 
 @end
 

@@ -7,7 +7,6 @@
 //
 
 #import "MIDropoutLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImageCache.h"
 
 @interface MIDropoutLayer() {
@@ -19,27 +18,32 @@
 
 @implementation MIDropoutLayer
 
-- (instancetype)init {
-    if (self = [super init]) {
-        DB_TRACE(-_verbose+2, "\n%s", self.labelUTF8);
-    }
-    return self;
+- (void)initialize {
+    _keepProbability = 0.999f;
 }
 
 - (void)setKeepProbability:(float)keepProbability {
     _keepProbability = keepProbability;
-    
     DB_TRACE(-_verbose+1, "\n%s.keepProbability --> %f", self.labelUTF8, keepProbability);
+    
+    if (_device) {
+        _dropout = [[MPSCNNDropout alloc] initWithDevice:_device
+                                         keepProbability:_keepProbability
+                                                    seed:0
+                                      maskStrideInPixels:MTLSizeMake(1, 1, 1)];
+    }
+}
+
+- (void)compile:(id<MTLDevice>)device {
+    [super compile:device];
+
+    _dropout = [[MPSCNNDropout alloc] initWithDevice:device
+                                     keepProbability:_keepProbability
+                                                seed:0
+                                  maskStrideInPixels:MTLSizeMake(1, 1, 1)];
 }
 
 - (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    
-    if (_dropout == nil) {
-        _dropout = [[MPSCNNDropout alloc] initWithDevice:[MetalDevice sharedMTLDevice]
-                                        keepProbability:_keepProbability
-                                                   seed:0
-                                     maskStrideInPixels:MTLSizeMake(1, 1, 1)];
-    }
     
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
     

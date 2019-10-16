@@ -12,9 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MetalTensorNeuronLayer : MetalTensorLayer
 
-@property (nonatomic, readonly) NeuronType neuronType;
-
-- (instancetype)initWithDataShape:(DataShape *)dataShape neuronType:(NeuronType)neuronType;
+@property (nonatomic, assign) NeuronType neuronType;
 
 @end
 

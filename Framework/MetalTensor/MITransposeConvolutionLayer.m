@@ -20,51 +20,40 @@
 
 @implementation MITransposeConvolutionLayer
 
+- (void)initialize {
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape outputShape:(DataShape *)outputShape {
-    if (self = [super initWithInputShape:inputShape outputShape:outputShape]) {
-        NSAssert(DataShapeValid(inputShape), @"Invalid input shape...");
-        NSAssert(DataShapeValid(outputShape), @"Invalid output shape...");
-        _edgeMode = MPSImageEdgeModeZero;
-        _offset.x = 0;
-        _offset.y = 0;
-        _offset.z = 0;
-        
-        DB_TRACE(-_verbose+2, "\n%s init %s --> %s", self.labelUTF8, NSStringFromDataShape(inputShape).UTF8String,
-                 NSStringFromDataShape(outputShape).UTF8String);
-    }
-    return self;
+    _edgeMode = MPSImageEdgeModeZero;
+    _offset.x = 0;
+    _offset.y = 0;
+    _offset.z = 0;
+    _neuron.neuron = MPSCNNNeuronTypeNone;
+    _neuron.a = 0.0f;
+    _neuron.b = 0.0f;
+    _neuron.c = 0.0f;
+    _depthWise = NO;
+    
+    DB_TRACE(-_verbose+2, "\n%s init %s", self.labelUTF8, NSStringFromDataShape(&_inputShapes[0]).UTF8String);
 }
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-                  kernelDataSource:(id<MPSCNNConvolutionDataSource>)dataSource {
-    if (self = [super initWithInputShape:inputShape outputShape:outputShape]) {
-        NSAssert(DataShapeValid(inputShape), @"Invalid input shape...");
-        NSAssert(DataShapeValid(outputShape), @"Invalid output shape...");
-        _edgeMode = MPSImageEdgeModeZero;
-        _offset.x = 0;
-        _offset.y = 0;
-        _offset.z = 0;
+- (void)compile:(id<MTLDevice>)device {
+    [super compile:device];
+    
+    _outputShape.column = trans_conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, _padding);
+    _outputShape.row = trans_conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, _padding);
+    _outputShape.depth = _depthWise?_inputShapes[0].depth:_kernel.filters;
+    
+    if (_dataSource) {
         
-        DB_TRACE(-_verbose+2, "\n%s init %s --> %s", self.labelUTF8, NSStringFromDataShape(inputShape).UTF8String,
-                 NSStringFromDataShape(outputShape).UTF8String);
-        
-        self.dataSource = dataSource;
-    }
-    return self;
-}
-
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    NSAssert(_dataSource != nil, @"The weights has not been set.");
-    if (_convolution == nil) {
-        _convolution = [[MPSCNNConvolutionTranspose alloc] initWithDevice:[MetalDevice sharedMTLDevice]
-                                                                  weights:_dataSource];
+        _convolution = [[MPSCNNConvolutionTranspose alloc] initWithDevice:device weights:_dataSource];
         _convolution.edgeMode = _edgeMode;
         [_convolution setOffset:_offset];
         [_convolution setKernelOffsetX:_kernelOffset.x];
         [_convolution setKernelOffsetY:_kernelOffset.y];
     }
+}
+
+- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    NSAssert(_dataSource != nil, @"The weights has not been set.");
     
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
     
@@ -79,13 +68,6 @@
     [self notifyTargetsAboutNewTempImage:commandBuffer];
 }
 
-- (void)setOffsetWithX:(NSUInteger)x Y:(NSUInteger)y Z:(NSUInteger)z {
-    _offset.x = x;
-    _offset.y = y;
-    _offset.z = z;
-    [_convolution setOffset:_offset];
-}
-
 - (void)setOffset:(MPSOffset)offset {
     _offset = offset;
     [_convolution setOffset:_offset];
@@ -96,10 +78,26 @@
     [_convolution setEdgeMode:_edgeMode];
 }
 
+- (void)setKernelOffset:(MTLInt2)kernelOffset {
+    _kernelOffset = kernelOffset;
+    [_convolution setKernelOffsetX:kernelOffset.x];
+    [_convolution setKernelOffsetY:kernelOffset.y];
+}
+
 - (void)setDataSource:(id<MPSCNNConvolutionDataSource>)dataSource {
+    NSParameterAssert(dataSource);
     _dataSource = dataSource;
     
     DB_TRACE(-_verbose+1, "\n%s data source --> %s", self.labelUTF8, [dataSource description].UTF8String);
+    
+    if (_device) {
+        
+        _convolution = [[MPSCNNConvolutionTranspose alloc] initWithDevice:_device weights:_dataSource];
+        _convolution.edgeMode = _edgeMode;
+        [_convolution setOffset:_offset];
+        [_convolution setKernelOffsetX:_kernelOffset.x];
+        [_convolution setKernelOffsetY:_kernelOffset.y];
+    }
 }
 
 #pragma mark - Management of the weights
@@ -113,31 +111,14 @@
     [self.dataSource load];
 }
 
-- (void)loadWeights:(NSString *)weights range:(NSRange *)range
-        kernelShape:(KernelShape *)k neuronType:(NeuronType *)n depthWise:(BOOL)depthWise{
-    self.dataSource = MakeDataSource2(weights, k, n, depthWise, &range[0]);
+- (void)loadWeights:(NSData *)weights {
+    self.dataSource = [[MICNNKernelDataSource alloc] initWithData:weights kernel:&_kernel neuron:&_neuron depthWise:_depthWise];
     [self.dataSource load];
-    
-    // NHWC
-    // 40 * 3 * 3 * 40
-    {
-        MICNNKernelDataSource *dataSource = (MICNNKernelDataSource *)self.dataSource;
-        NSData *data = [dataSource data];
-        float *buffer = (float *)[data bytes];
-//        int n = dataSource.kernel.kernel;
-        int h = dataSource.kernel.row;
-        int w = dataSource.kernel.column;
-        int c = dataSource.kernel.depth;
-        printf("\n weights: %s", self.labelUTF8);
-        printf("\n c: %d", c);
-        for (int i = 0; i < h; i ++) {
-            printf("\n");
-            for (int j = 0; j < w; j++) {
-                printf("%f ", buffer[(i * w + j) * c]);
-            }
-        }
-        printf("\n");
-    }
+}
+
+- (void)loadWeights:(NSString *)weights range:(NSRange *)range {
+    self.dataSource = MakeDataSource2(weights, &_kernel, &_neuron, _depthWise, &range[0]);
+    [self.dataSource load];
 }
 
 @end

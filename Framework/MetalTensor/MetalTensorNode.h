@@ -14,7 +14,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*
- *  Making the connections between all of the network operations, layers and tensors.
+ *  Connecting all of the network operations, layers and tensors.
  */
 
 @interface MetalTensorNode : NSObject {
@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
     
     NSString *_label;
     
+    id<MTLDevice> _device;
+    
 //#ifdef DEBUG
     // If 0, there will be no 'printf' log in console.
     int _verbose;
@@ -37,8 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) DataShape outputShape;
 @property (nonatomic, strong) MITemporaryImage *outputTempImage;
 
-- (instancetype)initWithOutputShape:(DataShape *)outputShape;
+//- (instancetype)initWithOutputShape:(DataShape *)outputShape;
 - (DataShape *)outputShapeRef;
+
+- (void)compile:(id<MTLDevice>)device;
 
 - (void)removeOutputTempImage;
 - (void)setOutputTempImageToTargets;

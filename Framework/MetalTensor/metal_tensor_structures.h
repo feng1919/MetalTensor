@@ -29,6 +29,8 @@ bool DataShapesTheSame(DataShape *s1, DataShape *s2);
 int ProductOfDataShape(DataShape *shape);
 int ProductOfDataShapeDepth4Divisible(DataShape *shape);
 
+
+
 typedef struct KernelShape{
     int row;
     int column;
@@ -39,6 +41,19 @@ typedef struct KernelShape{
 KernelShape KernelShapeMake(int row, int column, int depth, int filters, int stride);
 bool KernelShapeValid(KernelShape *s);
 bool KernelShapesTheSame(KernelShape *s1, KernelShape *s2);
+
+
+
+typedef enum MTPaddingMode{
+    MTPaddingMode_tfsame = 0,
+    MTPaddingMode_tfvalid = 1,
+    MTPaddingMode_tffull = 2,
+}MTPaddingMode;
+int conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding);
+int conv_offset(int kernel, int stride);
+int trans_conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding);
+int trans_conv_offset(int kernel, int stride);
+int pooling_offset(int kernel);
 
 int make_divisible_8(int v);
 int make_divisible(int v, int divisor, int min_value);

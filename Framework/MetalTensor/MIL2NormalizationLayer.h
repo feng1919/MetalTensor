@@ -12,10 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MIL2NormalizationLayer : MetalTensorLayer
 
-@property (nonatomic, assign) NSUInteger kernelWidth;
-@property (nonatomic, assign) NSUInteger kernelHeight;
-@property (nonatomic, assign) NSUInteger strideInPixelsX;
-@property (nonatomic, assign) NSUInteger strideInPixelsY;
+@property (nonatomic, assign) KernelShape kernel;
+
 @property (nonatomic, assign) MPSOffset offset;
 
 @end

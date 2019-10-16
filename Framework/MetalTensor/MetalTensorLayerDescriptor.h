@@ -70,8 +70,9 @@ Class LayerWithType(NSString *type);
 @property (nonatomic, readonly) KernelShape kernelShape;
 @property (nonatomic, readonly) NeuronType neuronType;
 @property (nonatomic, readonly) MPSOffset offset;
+@property (nonatomic, readonly) MTPaddingMode padding;
 
-@property (nonatomic, readonly) BOOL depthwise;
+@property (nonatomic, readonly) BOOL depthWise;
 @property (nonatomic, retain, readonly, nullable) NSString *weight;
 @property (nonatomic, assign, readonly) NSRange weightRange;
 
@@ -226,13 +227,10 @@ Class LayerWithType(NSString *type);
 
 @interface MIArithmeticLayerDescriptor : MetalTensorLayerDescriptor
 
-@property (nonatomic, readonly) DataShape dataShape;
 @property (nonatomic, readonly) NSInteger channelOffset;
 @property (nonatomic, strong, readonly) NSString *arithmetic;
 @property (nonatomic, strong, readonly) NSString *secondaryImage;
 @property (nonatomic, readonly) BOOL normalized;
-
-- (DataShape *)dataShapeRef;
 
 @end
 
@@ -246,10 +244,8 @@ Class LayerWithType(NSString *type);
 
 @interface MetalTensorNeuronLayerDescriptor : MetalTensorLayerDescriptor
 
-@property (nonatomic, readonly) DataShape dataShape;
 @property (nonatomic, readonly) NeuronType neuronType;
 
-- (DataShape *)dataShapeRef;
 - (NeuronType *)neuronTypeRef;
 
 @end
@@ -266,9 +262,10 @@ Class LayerWithType(NSString *type);
 
 @property (nonatomic, readonly) KernelShape kernelShape;
 @property (nonatomic, readonly) NeuronType neuronType;
-@property (nonatomic, readonly) MPSOffset offset;
+@property (nonatomic, readonly) MTPaddingMode padding;
 @property (nonatomic, readonly) MTLInt2 kernelOffset;
 
+@property (nonatomic, readonly) BOOL depthWise;
 @property (nonatomic, retain, readonly, nullable) NSString *weight;
 @property (nonatomic, assign, readonly) NSRange weightRange;
 

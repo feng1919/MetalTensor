@@ -12,9 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MetalTensorOutputLayer : MetalTensorLayer
 
-@property (nonatomic, strong) MPSImage *outputImage;
-
-- (instancetype)initWithOutputShape:(DataShape *)outputShape;
+@property (nonatomic, strong, readonly) MPSImage *outputImage;
 
 @end
 

@@ -16,10 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) id<MPSCNNBatchNormalizationDataSource> dataSource;
 @property (nonatomic, assign) float epsilon;//default 0.001
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-                  kernelDataSource:(id<MPSCNNBatchNormalizationDataSource>)dataSource;
-
 @end
 
 NS_ASSUME_NONNULL_END

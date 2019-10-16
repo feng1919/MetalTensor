@@ -33,21 +33,12 @@
 
 @optional
 
-- (void)loadWeights:(NSData *)weights
-        kernelShape:(KernelShape *)kernelShape
-         neuronType:(NeuronType *)neuronType
-          depthWise:(BOOL)depthWise;
+- (void)loadWeights:(NSData *)weights;
 
 - (void)loadWeights:(NSString *)weights
-              range:(NSRange *)range
-        kernelShape:(KernelShape *)kernelShape
-         neuronType:(NeuronType *)neuronType
-          depthWise:(BOOL)depthWise;
+              range:(NSRange *)range;
 
 - (void)loadWeightsList:(NSArray<NSString *> *)weightsList
-              rangeList:(NSRange *)rangeList
-           kernelShapes:(KernelShape *)kernelShapes
-            neuronTypes:(NeuronType *)neuronTypes
-             depthWises:(BOOL *)depthWises;
+              rangeList:(NSRange *)rangeList;
 
 @end

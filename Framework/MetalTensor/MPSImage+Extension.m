@@ -132,6 +132,20 @@ NSString *StringWithNeuronType(MPSCNNNeuronType neuron)
     return @"none";
 }
 
+MTPaddingMode PaddingModeFromString(NSString *padding) {
+    if ([padding isEqualToString:@"same"]) {
+        return MTPaddingMode_tfsame;
+    }
+    if ([padding isEqualToString:@"valid"]) {
+        return MTPaddingMode_tfvalid;
+    }
+    if ([padding isEqualToString:@"full"]) {
+        return MTPaddingMode_tffull;
+    }
+    assert(0);
+    return MTPaddingMode_tfsame;
+}
+
 
 NSString *NSStringFromDataShape(DataShape *dataShape) {
     return [NSString stringWithFormat:@"(%d, %d, %d)", dataShape->row, dataShape->column, dataShape->depth];

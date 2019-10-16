@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) MIMPSImage *outputImage;
 
-- (instancetype)initWithOutputShape:(DataShape *)outputShape;
+- (instancetype)initWithInputShape:(DataShape *)inputShape;
 
 - (void)inputTexture:(id<MTLTexture>)bgraU8Texture;
 - (void)processOnCommandBuffer:(id<MTLCommandBuffer>)cmdBuf;

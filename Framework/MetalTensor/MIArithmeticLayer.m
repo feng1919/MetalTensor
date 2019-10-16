@@ -7,69 +7,57 @@
 //
 
 #import "MIArithmeticLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImageCache.h"
 
 @implementation MIArithmeticLayer
 
-+ (instancetype)additionArithmeticLayerWithDataShape:(DataShape *)dataShape {
++ (instancetype)arithmeticLayerWithDataShape:(DataShape *)dataShape {
     DataShape *inputShapes[2] = {dataShape, dataShape};
-    MIArithmeticLayer *layer = [[MIArithmeticLayer alloc] initWithInputShapes1:inputShapes size:2 outputShape:dataShape];
-    layer->dataShape = *dataShape;
-    layer->arithmetic = [[MPSCNNAdd alloc] initWithDevice:[MetalDevice sharedMTLDevice]];
-    layer->arithmetic.primaryScale = 1.0f;
-    layer->arithmetic.secondaryScale = 1.0f;
-    layer->arithmetic.bias = 0.0f;
-    layer->arithmetic.primaryStrideInPixelsX = 1;
-    layer->arithmetic.primaryStrideInPixelsY = 1;
-    layer->arithmetic.primaryStrideInFeatureChannels = 1;
-    return layer;
+    return [[MIArithmeticLayer alloc] initWithInputShapes1:inputShapes size:2];
 }
 
-+ (instancetype)subtractionArithmeticLayerWithDataShape:(DataShape *)dataShape {
-    DataShape *inputShapes[2] = {dataShape, dataShape};
-    MIArithmeticLayer *layer = [[MIArithmeticLayer alloc] initWithInputShapes1:inputShapes size:2 outputShape:dataShape];
-    layer->dataShape = *dataShape;
-    layer->arithmetic = [[MPSCNNSubtract alloc] initWithDevice:[MetalDevice sharedMTLDevice]];
-    layer->arithmetic.primaryScale = 1.0f;
-    layer->arithmetic.secondaryScale = 1.0f;
-    layer->arithmetic.bias = 0.0f;
-    layer->arithmetic.primaryStrideInPixelsX = 1;
-    layer->arithmetic.primaryStrideInPixelsY = 1;
-    layer->arithmetic.primaryStrideInFeatureChannels = 1;
-    return layer;
+- (void)initializeArithmetic {
+    
+    NSParameterAssert(_arithmeticType.length > 0);
+    NSParameterAssert(_device);
+    
+    Class arithmeticClass = [MIArithmeticLayer arithmeticWithType:_arithmeticType];
+    _arithmetic = [[arithmeticClass alloc] initWithDevice:_device];
+    _arithmetic.primaryScale = 1.0f;
+    _arithmetic.bias = 0.0f;
+    _arithmetic.primaryStrideInPixelsX = 1;
+    _arithmetic.primaryStrideInPixelsY = 1;
+    _arithmetic.primaryStrideInFeatureChannels = 1;
+    _arithmetic.secondaryScale = 1.0f;
+    _arithmetic.secondaryStrideInPixelsX = 1;
+    _arithmetic.secondaryStrideInPixelsY = 1;
+    _arithmetic.secondaryStrideInFeatureChannels = 1;
+    _arithmetic.destinationFeatureChannelOffset = _channelOffset;
 }
 
-+ (instancetype)multiplicationArithmeticLayerWithDataShape:(DataShape *)dataShape {
-    DataShape *inputShapes[2] = {dataShape, dataShape};
-    MIArithmeticLayer *layer = [[MIArithmeticLayer alloc] initWithInputShapes1:inputShapes size:2 outputShape:dataShape];
-    layer->dataShape = *dataShape;
-    layer->arithmetic = [[MPSCNNMultiply alloc] initWithDevice:[MetalDevice sharedMTLDevice]];
-    layer->arithmetic.primaryScale = 1.0f;
-    layer->arithmetic.secondaryScale = 1.0f;
-    layer->arithmetic.bias = 0.0f;
-    layer->arithmetic.primaryStrideInPixelsX = 1;
-    layer->arithmetic.primaryStrideInPixelsY = 1;
-    layer->arithmetic.primaryStrideInFeatureChannels = 1;
-    return layer;
+- (void)compile:(id<MTLDevice>)device {
+    [super compile:device];
+    
+    [self initializeArithmetic];
 }
 
-+ (instancetype)divisionArithmeticLayerWithDataShape:(DataShape *)dataShape {
-    DataShape *inputShapes[2] = {dataShape, dataShape};
-    MIArithmeticLayer *layer = [[MIArithmeticLayer alloc] initWithInputShapes1:inputShapes size:2 outputShape:dataShape];
-    layer->dataShape = *dataShape;
-    layer->arithmetic = [[MPSCNNDivide alloc] initWithDevice:[MetalDevice sharedMTLDevice]];
-    layer->arithmetic.primaryScale = 1.0f;
-    layer->arithmetic.secondaryScale = 1.0f;
-    layer->arithmetic.bias = 0.0f;
-    layer->arithmetic.primaryStrideInPixelsX = 1;
-    layer->arithmetic.primaryStrideInPixelsY = 1;
-    layer->arithmetic.primaryStrideInFeatureChannels = 1;
-    return layer;
+- (void)setChannelOffset:(NSInteger)channelOffset {
+    _channelOffset = channelOffset;
+    _arithmetic.destinationFeatureChannelOffset = channelOffset;
+}
+
+- (void)setArithmeticType:(NSString *)arithmeticType {
+    if (![_arithmeticType isEqualToString:arithmeticType]) {
+        _arithmeticType = arithmeticType;
+        
+        if (_device) {
+            [self initializeArithmetic];
+        }
+    }
 }
 
 - (void)setInputImage:(MITemporaryImage *)newInputImage atIndex:(NSInteger)imageIndex {
-    NSAssert(DataShapesTheSame(newInputImage.shape, &dataShape), @"Invalid input tensor shape.");
+    NSAssert(DataShapesTheSame(newInputImage.shape, &_inputShapes[0]), @"Invalid input tensor shape.");
     [super setInputImage:newInputImage atIndex:imageIndex];
     if (_secondaryImage) {
         [super setInputImage:(MITemporaryImage * _Nonnull)_secondaryImage atIndex:1];
@@ -88,13 +76,29 @@
     
     _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:cmdBuf];
     [_outputTempImage newTemporaryImageForCommandBuffer:cmdBuf];
-    [arithmetic encodeToCommandBuffer:cmdBuf primaryImage:_inputs[@(0)].image secondaryImage:_inputs[@(1)].image destinationImage:_outputTempImage.image];
+    [_arithmetic encodeToCommandBuffer:cmdBuf
+                          primaryImage:_inputs[@(0)].image
+                        secondaryImage:_inputs[@(1)].image
+                      destinationImage:_outputTempImage.image];
     [self removeCachedImages];
     [self notifyTargetsAboutNewTempImage:cmdBuf];
 }
 
-- (void)setDestinationFeatureChannelOffset:(NSInteger)channelOffset {
-    [arithmetic setDestinationFeatureChannelOffset:channelOffset];
++ (Class)arithmeticWithType:(NSString *)arithmetic {
+    if ([arithmetic isEqualToString:@"addition"]) {
+        return [MPSCNNAdd class];
+    }
+    if ([arithmetic isEqualToString:@"divide"]) {
+        return [MPSCNNDivide class];
+    }
+    if ([arithmetic isEqualToString:@"subtract"]) {
+        return [MPSCNNSubtract class];
+    }
+    if ([arithmetic isEqualToString:@"multiply"]) {
+        return [MPSCNNMultiply class];
+    }
+    assert(0);
+    return nil;
 }
 
 @end

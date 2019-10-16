@@ -8,27 +8,24 @@
 
 #import "MetalTensorLayer.h"
 #import "MIConvolutionLayer.h"
+#import "MIDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ *  NOTE: ONLY support 'tensorflow-same' padding mode.
+ *
+ **/
+
 @interface MIInvertedResidualModule : MetalTensorLayer <MetalTensorWeights>
 
-@property (nonatomic, strong) id<MPSCNNConvolutionDataSource> expandDataSource;
-@property (nonatomic, strong) id<MPSCNNConvolutionDataSource> depthWiseDataSource;
-@property (nonatomic, strong) id<MPSCNNConvolutionDataSource> projectDataSource;
+@property (nonatomic, strong) MICNNKernelDataSource *expandDataSource;
+@property (nonatomic, strong) MICNNKernelDataSource *depthWiseDataSource;
+@property (nonatomic, strong) MICNNKernelDataSource *projectDataSource;
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-                      dwInputShape:(DataShape *)dwInputShape
-                     dwOutputShape:(DataShape *)dwOutputShape;
-
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-                      dwInputShape:(DataShape *)dwInputShape
-                     dwOutputShape:(DataShape *)dwOutputShape
-                  expandDataSource:(id<MPSCNNConvolutionDataSource>)expandDataSource
-               depthWiseDataSource:(id<MPSCNNConvolutionDataSource>)depthWiseDataSource
-                 projectDataSource:(id<MPSCNNConvolutionDataSource>)projectDataSource;
+@property (nonatomic, readonly) KernelShape *kernels;
+@property (nonatomic, readonly) NeuronType *neurons;
+@property (nonatomic, assign) MPSOffset offset;
 
 - (MIConvolutionLayer *)expandComponent;
 - (MIConvolutionLayer *)depthWiseComponent;
@@ -37,9 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 MIInvertedResidualModule *MakeInvertedResidualModule(NSString *expand,
                                                      NSString *depthwise,
                                                      NSString *project,
-                                                     KernelShape * _Nonnull * _Nonnull kernel,
-                                                     NeuronType * _Nonnull * _Nonnull neuron,
-                                                     DataShape *_Nonnull * _Nonnull shape);
+                                                     KernelShape * _Nonnull kernels,
+                                                     NeuronType * _Nonnull neurons,
+                                                     DataShape *_Nonnull inputShape);
 
 @end
 

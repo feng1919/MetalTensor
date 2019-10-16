@@ -71,6 +71,11 @@ static int _METAL_VERBOSE = 0;
     return self.label;
 }
 
+- (void)compile:(id<MTLDevice>)device {
+    // Preparing for the computation.
+    _device = device;
+}
+
 #pragma mark - Managing targets
 
 - (MITemporaryImage *)outputTempImage {

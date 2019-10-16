@@ -31,7 +31,7 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
     NSDictionary *_networkDesc;
     MetalTensorInputLayer *_inputLayer;
     NSMutableArray<MetalTensorOutputLayer *> *_outputLayers;
-    NSMutableDictionary<NSString *, MetalTensorLayer *> *_allLayers;
+    NSMutableDictionary<NSString *, MetalTensorNode *> *_allLayers;
     NSMutableDictionary<NSString *, MetalTensorLayerDescriptor *> *_allLayerDescriptors;
     NSString *_reuseIdentifier;
     
@@ -117,8 +117,8 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 - (MTLUInt2)inputSize;    // network input image size.
 - (MetalTensorInputLayer *)inputLayer;
 - (NSArray<MetalTensorOutputLayer *> *)outputLayers;
-- (NSArray<MetalTensorLayer *> *)allLayers;
-- (MetalTensorLayer *)layerWithName:(NSString *)name;
+- (NSArray<MetalTensorNode *> *)allLayers;
+- (MetalTensorNode *)layerWithName:(NSString *)name;
 - (MetalTensorLayerDescriptor *)layerDescriptorWithName:(NSString *)name;
 
 #ifdef DEBUG

@@ -13,11 +13,16 @@
 
 @implementation MetalTensorLayer
 
-- (instancetype)initWithInputShapes1:(DataShape *_Nonnull*_Nonnull)inputShapes size:(int)size outputShape:(DataShape *)outputShape {
+- (instancetype)init {
+    NSAssert(NO, @"Invalid initialize method.");
+    return nil;
+}
+
+- (instancetype)initWithInputShapes1:(DataShape *_Nonnull*_Nonnull)inputShapes size:(int)size {
     
-    if (self = [super initWithOutputShape:outputShape]) {
+    if (self = [super init]) {
         
-        NSAssert(size > 0, @"Invalid inputs number, if layer don't have any input, use -initWithOutputShape:.");
+        NSAssert(size > 0, @"Invalid inputs number, if layer don't have any input, use MetalTensorNode.");
         
         _inputShapes = malloc(size * sizeof(DataShape));
         for (int i = 0; i < size; i++) {
@@ -39,16 +44,19 @@
             }
         }
         
-        DB_TRACE(-_verbose+2, "\n%s init [%s] --> %s", self.labelUTF8, string.UTF8String, NSStringFromDataShape(outputShape).UTF8String);
+        DB_TRACE(-_verbose+2, "\n%s init [%s]", self.labelUTF8, string.UTF8String);
 #endif
         
+        [self initialize];
     }
     return self;
 }
 
-- (instancetype)initWithInputShapes:(DataShape *_Nonnull)inputShapes size:(int)size outputShape:(DataShape *)outputShape {
+- (instancetype)initWithInputShapes:(DataShape *_Nonnull)inputShapes size:(int)size {
     
-    if (self = [super initWithOutputShape:outputShape]) {
+    if (self = [super init]) {
+        
+        NSAssert(size > 0, @"Invalid inputs number, if layer don't have any input, use MetalTensorNode.");
         
         _inputShapes = malloc(size * sizeof(DataShape));
         npmemcpy(_inputShapes, inputShapes, size*sizeof(DataShape));
@@ -68,15 +76,20 @@
             }
         }
         
-        DB_TRACE(-_verbose+2, "\n%s init [%s] --> %s", self.labelUTF8, string.UTF8String, NSStringFromDataShape(outputShape).UTF8String);
+        DB_TRACE(-_verbose+2, "\n%s init [%s]", self.labelUTF8, string.UTF8String);
 #endif
         
+        [self initialize];
     }
     return self;
 }
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape outputShape:(DataShape *)outputShape {
-    return [self initWithInputShapes:inputShape size:1 outputShape:outputShape];
+- (instancetype)initWithInputShape:(DataShape *)inputShape {
+    return [self initWithInputShapes:inputShape size:1];
+}
+
+- (void)initialize {
+    
 }
 
 - (void)dealloc {
@@ -88,6 +101,16 @@
     
     free(_reservedFlags);
     _reservedFlags = NULL;
+}
+
+#pragma mark - GET
+
+- (DataShape *)inputShapes {
+    return _inputShapes;
+}
+
+- (int)numOfInputs {
+    return _numOfInputs;
 }
 
 #pragma mark - Management of input indices
@@ -123,6 +146,12 @@
 
 - (void)releaseTextureIndex:(NSInteger)index {
     _reservedFlags[index] = NO;
+}
+
+- (void)compile:(id<MTLDevice>)device {
+    [super compile:device];
+    NSParameterAssert(_numOfInputs > 0);
+    _outputShape = _inputShapes[0];
 }
 
 #pragma mark - MetalLayerInput delegate

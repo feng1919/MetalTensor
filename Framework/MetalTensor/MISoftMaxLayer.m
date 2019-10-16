@@ -18,13 +18,15 @@
 
 @implementation MISoftMaxLayer
 
+- (void)compile:(id<MTLDevice>)device {
+    [super compile:device];
+    
+    _softMax = [[MPSCNNSoftMax alloc] initWithDevice:device];
+}
+
 - (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
 
-    if (_softMax == nil) {
-        _softMax = [[MPSCNNSoftMax alloc] initWithDevice:[MetalDevice sharedMTLDevice]];
-    }
-    
     _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
     [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];
     [_softMax encodeToCommandBuffer:commandBuffer

@@ -14,29 +14,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MISeparableConvolutionLayer : MetalTensorLayer <MetalTensorWeights>
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape;
+@property (nonatomic, strong) MICNNKernelDataSource *dataSourceDepthWise;
+@property (nonatomic, strong) MICNNKernelDataSource *dataSourceProject;
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                        interShape:(DataShape *)interShape
-                       outputShape:(DataShape *)outputShape;
-
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-               depthwiseKernelData:(id<MPSCNNConvolutionDataSource>)dataSource1
-                 projectKernelData:(id<MPSCNNConvolutionDataSource>)dataSource2;
-
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                        interShape:(DataShape *)interShape
-                       outputShape:(DataShape *)outputShape
-               depthwiseKernelData:(id<MPSCNNConvolutionDataSource>)dataSource1
-                 projectKernelData:(id<MPSCNNConvolutionDataSource>)dataSource2;
+@property (nonatomic, readonly) KernelShape *kernels;
+@property (nonatomic, readonly) NeuronType *neurons;
+@property (nonatomic, assign) MPSOffset offset;
+@property (nonatomic, assign) MTPaddingMode padding;
 
 - (MIConvolutionLayer *)depthwiseComponent;
 - (MIConvolutionLayer *)projectComponent;
 
 MISeparableConvolutionLayer *MakeSeparableConvolutionLayer(DataShape *input,
-                                                           DataShape *output,
+                                                           KernelShape *kernels,
+                                                           NeuronType *neurons,
                                                            MICNNKernelDataSource *depthWiseData,
                                                            MICNNKernelDataSource *pointWiseData,
                                                            NSString * __nullable name);

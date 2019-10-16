@@ -11,46 +11,47 @@
 #import "MITemporaryImageCache.h"
 
 @interface MIBatchNormalizationLayer() {
-    MPSCNNBatchNormalization *bn;
+    MPSCNNBatchNormalization *_bn;
 }
 
 @end
 
 @implementation MIBatchNormalizationLayer
 
-- (instancetype)init {
-    if (self = [super init]) {
-        _edgeMode = MPSImageEdgeModeZero;
-        _epsilon = 0.001;
-    }
-    return self;
+- (void)initialize {
+    _edgeMode = MPSImageEdgeModeZero;
+    _epsilon = 0.001;
 }
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape
-                      kernelDataSource:(id<MPSCNNBatchNormalizationDataSource>)dataSource {
-    if (self = [super initWithInputShape:inputShape outputShape:outputShape]) {
-        _dataSource = dataSource;
-        _edgeMode = MPSImageEdgeModeZero;
-        _epsilon = 0.001;
+- (void)compile:(id<MTLDevice>)device {
+    
+    [super compile:device];
+    
+    if (_dataSource) {
+        _bn = [[MPSCNNBatchNormalization alloc] initWithDevice:_device dataSource:_dataSource];
+        _bn.epsilon = _epsilon;
+        _bn.edgeMode = _edgeMode;
     }
-    return self;
+}
+
+- (void)setDataSource:(id<MPSCNNBatchNormalizationDataSource>)dataSource {
+    _dataSource = dataSource;
+    
+    if (_device) {
+        _bn = [[MPSCNNBatchNormalization alloc] initWithDevice:_device dataSource:_dataSource];
+        _bn.epsilon = _epsilon;
+        _bn.edgeMode = _edgeMode;
+    }
 }
 
 - (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     NSAssert(_dataSource != nil, @"The weights has not been set.");
-    if (bn == nil) {
-        bn = [[MPSCNNBatchNormalization alloc] initWithDevice:[MetalDevice sharedMTLDevice]
-                                                   dataSource:_dataSource];
-        bn.epsilon = _epsilon;
-        bn.edgeMode = _edgeMode;
-    }
     
     _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
     [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];
-    [bn encodeToCommandBuffer:commandBuffer
-                  sourceImage:_inputs[@(0)].image
-             destinationImage:_outputTempImage.image];
+    [_bn encodeToCommandBuffer:commandBuffer
+                   sourceImage:_inputs[@(0)].image
+              destinationImage:_outputTempImage.image];
     
     [self removeCachedImages];
     

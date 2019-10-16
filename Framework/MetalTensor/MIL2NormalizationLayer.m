@@ -19,54 +19,41 @@
 
 @implementation MIL2NormalizationLayer
 
-- (instancetype)init {
-    if (self = [super init]) {
-        _kernelWidth = 2;
-        _kernelHeight = 2;
-        _strideInPixelsX = 2;
-        _strideInPixelsY = 2;
-        _offset.x = 1;
-        _offset.y = 1;
-    }
-    return self;
+- (void)initialize {
+    _kernel = KernelShapeMake(2, 2, 1, 1, 2);
 }
 
-- (instancetype)initWithOutputShape:(DataShape *)outputShape {
-    if (self = [super initWithOutputShape:outputShape]) {
-        _kernelWidth = 2;
-        _kernelHeight = 2;
-        _strideInPixelsX = 2;
-        _strideInPixelsY = 2;
-        _offset.x = 1;
-        _offset.y = 1;
-    }
-    return self;
+- (void)compile:(id<MTLDevice>)device {
+    [super compile:device];
+    
+    NSParameterAssert(_kernel.stride > 0);
+    
+    _outputShape.column = (_inputShapes[0].column + _kernel.stride - 1) / _kernel.stride;
+    _outputShape.row = (_inputShapes[0].row + _kernel.stride - 1) / _kernel.stride;
+    _outputShape.depth = _inputShapes[0].depth;
+    
+    _l2Normalization = [[MPSCNNPoolingL2Norm alloc] initWithDevice:_device
+                                                       kernelWidth:_kernel.column
+                                                      kernelHeight:_kernel.row
+                                                   strideInPixelsX:_kernel.stride
+                                                   strideInPixelsY:_kernel.stride];
+    _l2Normalization.offset = _offset;
 }
 
-- (instancetype)initWithInputShape:(DataShape *)inputShape
-                       outputShape:(DataShape *)outputShape {
-    if (self = [super initWithInputShape:inputShape outputShape:outputShape]) {
-        _kernelWidth = inputShape->column;
-        _kernelHeight = inputShape->row;
-        _strideInPixelsX = 1;
-        _strideInPixelsY = 1;
-        _offset.x = (inputShape->column-1)>>1;
-        _offset.y = (inputShape->row-1)>>1;
-    }
-    return self;
+- (void)setOffset:(MPSOffset)offset {
+    _offset = offset;
+    _l2Normalization.offset = _offset;
+}
+
+- (void)setKernel:(KernelShape)kernel {
+    
+    NSParameterAssert(kernel.stride > 0);
+    
+    _kernel = kernel;
 }
 
 - (void)processTensorWithCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
-    
-    if (_l2Normalization == nil) {
-        _l2Normalization = [[MPSCNNPoolingL2Norm alloc] initWithDevice:[MetalDevice sharedMTLDevice]
-                                                          kernelWidth:_kernelWidth
-                                                         kernelHeight:_kernelHeight
-                                                      strideInPixelsX:_strideInPixelsX
-                                                      strideInPixelsY:_strideInPixelsY];
-        _l2Normalization.offset = _offset;
-    }
     
     _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
     [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];

@@ -7,7 +7,6 @@
 //
 
 #import "MetalTensorNeuronLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImageCache.h"
 
 @interface MetalTensorNeuronLayer() {
@@ -18,15 +17,27 @@
 
 @implementation MetalTensorNeuronLayer
 
-- (instancetype)initWithDataShape:(DataShape *)dataShape neuronType:(NeuronType)neuronType {
-    if (self = [super initWithInputShape:dataShape outputShape:dataShape]) {
-        _neuronType = neuronType;
-        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:neuronType.neuron a:neuronType.a b:neuronType.b c:neuronType.c];
-        _neuron = [[MPSCNNNeuron alloc] initWithDevice:[MetalDevice sharedMTLDevice] neuronDescriptor:neuronDesc];
+- (void)compile:(id<MTLDevice>)device {
 
-        DB_TRACE(-_verbose+2, "\n%s init --> %s", self.labelUTF8, NSStringFromDataShape(dataShape).UTF8String);
+    [super compile:device];
+    
+    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:_neuronType.neuron
+                                                                                         a:_neuronType.a
+                                                                                         b:_neuronType.b
+                                                                                         c:_neuronType.c];
+    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
+}
+
+- (void)setNeuronType:(NeuronType)neuronType {
+    _neuronType = neuronType;
+    
+    if (_device) {
+        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:_neuronType.neuron
+                                                                                             a:_neuronType.a
+                                                                                             b:_neuronType.b
+                                                                                             c:_neuronType.c];
+        _neuron = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
     }
-    return self;
 }
 
 - (void)setInputImage:(MITemporaryImage *)newInputImage atIndex:(NSInteger)imageIndex {
@@ -40,8 +51,8 @@
     _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:cmdBuf];
     [_outputTempImage newTemporaryImageForCommandBuffer:cmdBuf];
     [_neuron encodeToCommandBuffer:cmdBuf
-                      sourceImage:_inputs[@(0)].image
-                 destinationImage:_outputTempImage.image];
+                       sourceImage:_inputs[@(0)].image
+                  destinationImage:_outputTempImage.image];
     [self removeCachedImages];
     
     [self notifyTargetsAboutNewTempImage:cmdBuf];

@@ -7,22 +7,30 @@
 //
 
 #import "MetalTensorInputLayer.h"
-#import <MetalImage/MetalDevice.h>
 
 @implementation MetalTensorInputLayer
 
-- (instancetype)initWithOutputShape:(DataShape *)outputShape {
-    if (self = [super initWithOutputShape:outputShape]) {
-        _outputImage = [[MIMPSImage alloc] initWithShape:&_outputShape];
-        [_outputImage setReferenceCountingEnable:NO];
+- (instancetype)initWithInputShape:(DataShape *)inputShape {
+    if (self = [super init]) {
         
-        MPSImageDescriptor *descriptor = ImageDescriptor(outputShape);
-        descriptor.storageMode = MTLStorageModeShared;
-        _outputImage.mpsImage = [[MPSImage alloc] initWithDevice:[MetalDevice sharedMTLDevice] imageDescriptor:descriptor];
+        _outputShape = *inputShape;
 
-        DB_TRACE(-_verbose+2, "\n%s init --> %s", self.labelUTF8, NSStringFromDataShape(outputShape).UTF8String);
+        DB_TRACE(-_verbose+2, "\n%s init --> %s", self.labelUTF8, NSStringFromDataShape(&_outputShape).UTF8String);
     }
     return self;
+}
+
+- (void)compile:(id<MTLDevice>)device {
+    
+    [super compile:device];
+    
+    _outputImage = [[MIMPSImage alloc] initWithShape:&_outputShape];
+    [_outputImage setReferenceCountingEnable:NO];
+    
+    MPSImageDescriptor *descriptor = ImageDescriptor(&_outputShape);
+    descriptor.storageMode = MTLStorageModeShared;
+    _outputImage.mpsImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:descriptor];
+
 }
 
 - (void)inputTexture:(id<MTLTexture>)bgraU8Texture {
