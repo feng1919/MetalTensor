@@ -7,7 +7,6 @@
 //
 
 #import "MITransposeConvolutionLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImageCache.h"
 #import "MIDataSource.h"
 

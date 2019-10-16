@@ -7,7 +7,6 @@
 //
 
 #import "MIL2NormalizationLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImageCache.h"
 
 @interface MIL2NormalizationLayer() {

@@ -9,7 +9,6 @@
 #import "MetalTensorLayerDescriptor.h"
 #import "NSString+Extension.h"
 #import "MIDataSource.h"
-#import <MetalImage/MetalDevice.h>
 #include "numpy.h"
 
 Class DescriptorWithType(NSString *type)

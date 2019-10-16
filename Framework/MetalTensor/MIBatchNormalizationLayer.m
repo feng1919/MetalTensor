@@ -7,7 +7,6 @@
 //
 
 #import "MIBatchNormalizationLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImageCache.h"
 
 @interface MIBatchNormalizationLayer() {

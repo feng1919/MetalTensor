@@ -7,7 +7,6 @@
 //
 
 #import "MIPoolingMaxLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImageCache.h"
 
 @interface MIPoolingMaxLayer() {

@@ -7,7 +7,6 @@
 //
 
 #import "MIReshapeLayer.h"
-#import <MetalImage/MetalDevice.h>
 #import "MITemporaryImage.h"
 #import "MITemporaryImageCache.h"
 
