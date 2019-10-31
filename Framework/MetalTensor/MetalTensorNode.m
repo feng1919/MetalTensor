@@ -21,24 +21,6 @@ static int _METAL_VERBOSE = 0;
 }
 //#endif
 
-- (id)initWithOutputShape:(DataShape *)outputShape
-{
-    NSParameterAssert(outputShape!=NULL);
-    if (!(self = [super init]))
-    {
-        return nil;
-    }
-    
-//#ifdef DEBUG
-    _verbose = _METAL_VERBOSE;
-//#endif
-    _outputShape = outputShape[0];
-    _targets = [[NSMutableArray alloc] init];
-    _targetTempImageIndices = [[NSMutableArray alloc] init];
-    
-    return self;
-}
-
 - (instancetype)init {
     if (!(self = [super init]))
     {

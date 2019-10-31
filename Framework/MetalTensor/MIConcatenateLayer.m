@@ -35,8 +35,10 @@
 
 - (void)dealloc {
     
-    free(_offsets);
-    _offsets = NULL;
+    if (_offsets) {
+        free(_offsets);
+        _offsets = NULL;
+    }
 }
 
 - (DataShape *)tensorShape {

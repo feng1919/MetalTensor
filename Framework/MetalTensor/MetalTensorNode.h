@@ -39,10 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) DataShape outputShape;
 @property (nonatomic, strong) MITemporaryImage *outputTempImage;
 
-//- (instancetype)initWithOutputShape:(DataShape *)outputShape;
 - (DataShape *)outputShapeRef;
 
-- (void)compile:(id<MTLDevice>)device;
+- (void)compile:(id<MTLDevice>)device NS_REQUIRES_SUPER;
 
 - (void)removeOutputTempImage;
 - (void)setOutputTempImageToTargets;

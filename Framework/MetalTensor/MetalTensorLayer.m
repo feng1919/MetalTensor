@@ -150,6 +150,7 @@
 
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
+    
     NSParameterAssert(_numOfInputs > 0);
     _outputShape = _inputShapes[0];
 }
