@@ -261,7 +261,7 @@ int trans_conv_output_length(int input_length, int kernel, int stride, MTPadding
     int kernel_size = kernel + (kernel - 1) * (dilation - 1);
     int dim_size;
     
-    switch (MTPaddingMode_tfvalid) {
+    switch (padding) {
         case MTPaddingMode_tfvalid:
             dim_size = input_length * stride + fmaxl(kernel_size - stride, 0);
             break;
