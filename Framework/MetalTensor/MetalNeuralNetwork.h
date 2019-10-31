@@ -8,7 +8,7 @@
 
 /*
  *  Inference tools for thrid part trained neural networks, such as
- *  Keras, tensorflow, thenos, caffe and etc,.
+ *  Keras, tensorflow, Theano, caffe and etc,.
  *
  *  HOW TO USE?
  *  There are some examples, demonstrated the usage.
