@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import <MetalImage/MetalImage.h>
 #import <MetalTensor/FPSCounter.h>
+#import "PortraitSegmentFilter.h"
 
 @interface ViewController ()
 
@@ -16,6 +17,7 @@
 
 @property (nonatomic, strong) MetalImageView *metalView;
 @property (nonatomic, strong) MetalImageVideoCamera *videoCamera;
+@property (nonatomic, strong) NSTimer *timer;
 
 @end
 
@@ -36,7 +38,7 @@
     
     [self.view addSubview:self.metalView];
     
-    self.videoCamera = [[MetalImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionBack];
+    self.videoCamera = [[MetalImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1920x1080 cameraPosition:AVCaptureDevicePositionFront];
     self.videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
     self.videoCamera.horizontallyMirrorFrontFacingCamera = YES;
     self.videoCamera.horizontallyMirrorRearFacingCamera = NO;
@@ -54,12 +56,30 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    [self.videoCamera addTarget:self.metalView];
+    PortraitSegmentFilter *renderFilter = [[PortraitSegmentFilter alloc] init];
+    [renderFilter createNet];
+    
+    MetalImageFilter *lens = [[MetalImageFilter alloc] init];
+    
+    MICropFilter *cropFilter = [[MICropFilter alloc] initWithCropRegion:CGRectMake(0, 420.0f/1920.0f, 1.0f, 1.0f-840.0f/1920.0f)];
+    
+    [self.videoCamera addTarget:lens];
+    [lens addTarget:cropFilter];
+    [cropFilter addTarget:renderFilter];
+    [renderFilter addTarget:self.metalView];
 
     [self.view bringSubviewToFront:self.labelFPS];
     
     [self.videoCamera performSelector:@selector(startCameraCapture) withObject:nil afterDelay:0.0f];
+    
+    _timer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(updateFPS) userInfo:nil repeats:YES];
         
+}
+
+- (void)updateFPS {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        self.labelFPS.text = [NSString stringWithFormat:@"%d FPS", [FPSCounter sharedCounter].FPS];
+    }];
 }
 
 - (BOOL)prefersStatusBarHidden {

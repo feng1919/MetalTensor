@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>input</key>
+	<dict>
+		<key>inputs</key>
+		<string>224, 224, 3</string>
+		<key>targets</key>
+		<string>preprocess</string>
+		<key>type</key>
+		<string>input</string>
+	</dict>
+	<key>preprocess</key>
+	<dict>
+		<key>inputs</key>
+		<string>224, 224, 3</string>
+		<key>kernel</key>
+		<string>1, 1</string>
+		<key>filters</key>
+		<string>3</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>SWAP_BR.bin</string>
+		<key>activation</key>
+		<string>linear, 2.0, -1.0</string>
+		<key>targets</key>
+		<string>conv0</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>conv0</key>
+	<dict>
+		<key>inputs</key>
+		<string>224, 224, 3</string>
+		<key>kernel</key>
+		<string>5</string>
+		<key>filters</key>
+		<string>8</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>weight</key>
+		<string>conv_0</string>
+		<key>activation</key>
+		<string>relu</string>
+		<key>targets</key>
+		<string>block_0, concatenate_0</string>
+		<key>indices</key>
+		<string>0, 1</string>
+	</dict>
+	<key>block_0</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>112, 112, 8</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>8</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_1, concatenate_12</string>
+		<key>indices</key>
+		<string>0, 1</string>
+		<key>weights</key>
+		<string>block_0_expand, block_0_depthwise, block_0_project</string>
+	</dict>
+	<key>block_1</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>112, 112, 8</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>16</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>targets</key>
+		<string>block_2</string>
+		<key>weights</key>
+		<string>block_1_expand, block_1_depthwise, block_1_project</string>
+	</dict>
+	<key>block_2</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>56, 56, 16</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>16</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_3, concatenate_11</string>
+		<key>indices</key>
+		<string>0, 1</string>
+		<key>weights</key>
+		<string>block_2_expand, block_2_depthwise, block_2_project</string>
+	</dict>
+	<key>block_3</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>56, 56, 16</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>targets</key>
+		<string>block_4</string>
+		<key>weights</key>
+		<string>block_3_expand, block_3_depthwise, block_3_project</string>
+	</dict>
+	<key>block_4</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>28, 28, 24</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_5, concatenate_10</string>
+		<key>indices</key>
+		<string>0, 1</string>
+		<key>weights</key>
+		<string>block_4_expand, block_4_depthwise, block_4_project</string>
+	</dict>
+	<key>block_5</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>28, 28, 24</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>targets</key>
+		<string>block_6</string>
+		<key>weights</key>
+		<string>block_5_expand, block_5_depthwise, block_5_project</string>
+	</dict>
+	<key>block_6</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>14, 14, 32</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_7, concatenate_9</string>
+		<key>indices</key>
+		<string>0, 1</string>
+		<key>weights</key>
+		<string>block_6_expand, block_6_depthwise, block_6_project</string>
+	</dict>
+	<key>block_7</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>14, 14, 32</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>40</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>targets</key>
+		<string>block_8</string>
+		<key>weights</key>
+		<string>block_7_expand, block_7_depthwise, block_7_project</string>
+	</dict>
+	<key>block_8</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>7, 7, 40</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>40</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>transpose_9</string>
+		<key>weights</key>
+		<string>block_8_expand, block_8_depthwise, block_8_project</string>
+	</dict>
+	<key>transpose_9</key>
+	<dict>
+		<key>inputs</key>
+		<string>7, 7, 40</string>
+		<key>type</key>
+		<string>trans_conv</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>40</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>weight</key>
+		<string>transpose_9</string>
+		<key>targets</key>
+		<string>concatenate_9</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>concatenate_9</key>
+	<dict>
+		<key>inputs</key>
+		<string>14, 14, 40; 14, 14, 32</string>
+		<key>type</key>
+		<string>concatenate</string>
+		<key>targets</key>
+		<string>block_9</string>
+	</dict>
+	<key>block_9</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>14, 14, 72</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>40</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>transpose_10</string>
+		<key>weights</key>
+		<string>block_9_expand, block_9_depthwise, block_9_project</string>
+	</dict>
+	<key>transpose_10</key>
+	<dict>
+		<key>inputs</key>
+		<string>14, 14, 40</string>
+		<key>type</key>
+		<string>trans_conv</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>weight</key>
+		<string>transpose_10</string>
+		<key>targets</key>
+		<string>concatenate_10</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>concatenate_10</key>
+	<dict>
+		<key>inputs</key>
+		<string>28, 28, 32; 28, 28, 24</string>
+		<key>type</key>
+		<string>concatenate</string>
+		<key>targets</key>
+		<string>block_10</string>
+	</dict>
+	<key>block_10</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>28, 28, 56</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>transpose_11</string>
+		<key>weights</key>
+		<string>block_10_expand, block_10_depthwise, block_10_project</string>
+	</dict>
+	<key>transpose_11</key>
+	<dict>
+		<key>inputs</key>
+		<string>28, 28, 32</string>
+		<key>type</key>
+		<string>trans_conv</string>
+		<key>kernel</key>
+		<string>3, 3</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>weight</key>
+		<string>transpose_11</string>
+		<key>targets</key>
+		<string>concatenate_11</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>concatenate_11</key>
+	<dict>
+		<key>inputs</key>
+		<string>56, 56, 24; 56, 56, 16</string>
+		<key>type</key>
+		<string>concatenate</string>
+		<key>targets</key>
+		<string>block_11</string>
+	</dict>
+	<key>block_11</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>56, 56, 40</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>transpose_12</string>
+		<key>weights</key>
+		<string>block_11_expand, block_11_depthwise, block_11_project</string>
+	</dict>
+	<key>transpose_12</key>
+	<dict>
+		<key>inputs</key>
+		<string>56, 56, 24</string>
+		<key>type</key>
+		<string>trans_conv</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>16</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>weight</key>
+		<string>transpose_12</string>
+		<key>targets</key>
+		<string>concatenate_12</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>concatenate_12</key>
+	<dict>
+		<key>inputs</key>
+		<string>112, 112, 16; 112, 112, 8</string>
+		<key>type</key>
+		<string>concatenate</string>
+		<key>targets</key>
+		<string>block_12</string>
+	</dict>
+	<key>block_12</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>112, 112, 24</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>16</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>concatenate_0</string>
+		<key>weights</key>
+		<string>block_12_expand, block_12_depthwise, block_12_project</string>
+	</dict>
+	<key>concatenate_0</key>
+	<dict>
+		<key>inputs</key>
+		<string>112, 112, 16; 112, 112, 8</string>
+		<key>type</key>
+		<string>concatenate</string>
+		<key>targets</key>
+		<string>block_13</string>
+	</dict>
+	<key>block_13</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>112, 112, 24</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>8</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>transpose_0</string>
+		<key>weights</key>
+		<string>block_13_expand, block_13_depthwise, block_13_project</string>
+	</dict>
+	<key>transpose_0</key>
+	<dict>
+		<key>inputs</key>
+		<string>112, 112, 8</string>
+		<key>type</key>
+		<string>trans_conv</string>
+		<key>kernel</key>
+		<string>2, 2</string>
+		<key>filters</key>
+		<string>8</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>weight</key>
+		<string>transpose_0</string>
+		<key>targets</key>
+		<string>compress</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>compress</key>
+	<dict>
+		<key>inputs</key>
+		<string>224, 224, 8</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>1</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>compress</string>
+		<key>activation</key>
+		<string>sigmod</string>
+		<key>targets</key>
+		<string>output</string>
+	</dict>
+	<key>output</key>
+	<dict>
+		<key>inputs</key>
+		<string>224, 224, 1</string>
+		<key>type</key>
+		<string>output</string>
+	</dict>
+</dict>
+</plist>

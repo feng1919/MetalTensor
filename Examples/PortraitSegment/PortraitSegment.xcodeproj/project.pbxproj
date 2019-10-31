@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5AB8399A236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5AB83990236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.bin */; };
+		5AB8399B236AC9CB00A6C9CF /* PortraitRenderShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5AB83992236AC9CB00A6C9CF /* PortraitRenderShader.metal */; };
+		5AB8399C236AC9CB00A6C9CF /* PortraitSegmentNet.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB83993236AC9CB00A6C9CF /* PortraitSegmentNet.m */; };
+		5AB8399D236AC9CB00A6C9CF /* PortraitSegmentNet.0.5 in Resources */ = {isa = PBXBuildFile; fileRef = 5AB83994236AC9CB00A6C9CF /* PortraitSegmentNet.0.5 */; };
+		5AB8399E236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.json in Resources */ = {isa = PBXBuildFile; fileRef = 5AB83995236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.json */; };
+		5AB8399F236AC9CB00A6C9CF /* PortraitSegmentFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB83998236AC9CB00A6C9CF /* PortraitSegmentFilter.m */; };
+		5AB839A0236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5AB83999236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist */; };
+		5AB839A2236ADE5A00A6C9CF /* SWAP_BR.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5AB839A1236ADE5A00A6C9CF /* SWAP_BR.bin */; };
 		5ACC082023506B83004CD815 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACC081F23506B83004CD815 /* AppDelegate.m */; };
 		5ACC082623506B83004CD815 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACC082523506B83004CD815 /* ViewController.m */; };
 		5ACC082B23506B85004CD815 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ACC082A23506B85004CD815 /* Assets.xcassets */; };
@@ -44,6 +52,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5AB83990236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = PortraitSegmentNet.0.5.bin; sourceTree = "<group>"; };
+		5AB83992236AC9CB00A6C9CF /* PortraitRenderShader.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = PortraitRenderShader.metal; sourceTree = "<group>"; };
+		5AB83993236AC9CB00A6C9CF /* PortraitSegmentNet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PortraitSegmentNet.m; sourceTree = "<group>"; };
+		5AB83994236AC9CB00A6C9CF /* PortraitSegmentNet.0.5 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PortraitSegmentNet.0.5; sourceTree = "<group>"; };
+		5AB83995236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = PortraitSegmentNet.0.5.json; sourceTree = "<group>"; };
+		5AB83996236AC9CB00A6C9CF /* PortraitSegmentNet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PortraitSegmentNet.h; sourceTree = "<group>"; };
+		5AB83997236AC9CB00A6C9CF /* PortraitSegmentFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PortraitSegmentFilter.h; sourceTree = "<group>"; };
+		5AB83998236AC9CB00A6C9CF /* PortraitSegmentFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PortraitSegmentFilter.m; sourceTree = "<group>"; };
+		5AB83999236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PortraitSegmentNet.0.5.plist; sourceTree = "<group>"; };
+		5AB839A1236ADE5A00A6C9CF /* SWAP_BR.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = SWAP_BR.bin; sourceTree = "<group>"; };
 		5ACC081B23506B83004CD815 /* PortraitSegment.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PortraitSegment.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ACC081E23506B83004CD815 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5ACC081F23506B83004CD815 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -96,6 +114,16 @@
 				5ACC081F23506B83004CD815 /* AppDelegate.m */,
 				5ACC082423506B83004CD815 /* ViewController.h */,
 				5ACC082523506B83004CD815 /* ViewController.m */,
+				5AB83992236AC9CB00A6C9CF /* PortraitRenderShader.metal */,
+				5AB83994236AC9CB00A6C9CF /* PortraitSegmentNet.0.5 */,
+				5AB83990236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.bin */,
+				5AB83995236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.json */,
+				5AB83999236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist */,
+				5AB83996236AC9CB00A6C9CF /* PortraitSegmentNet.h */,
+				5AB83993236AC9CB00A6C9CF /* PortraitSegmentNet.m */,
+				5AB83997236AC9CB00A6C9CF /* PortraitSegmentFilter.h */,
+				5AB83998236AC9CB00A6C9CF /* PortraitSegmentFilter.m */,
+				5AB839A1236ADE5A00A6C9CF /* SWAP_BR.bin */,
 				5ACC082A23506B85004CD815 /* Assets.xcassets */,
 				5ACC082C23506B85004CD815 /* LaunchScreen.storyboard */,
 				5ACC082F23506B85004CD815 /* Info.plist */,
@@ -193,7 +221,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AB8399E236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.json in Resources */,
+				5AB8399A236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.bin in Resources */,
 				5ACC082E23506B85004CD815 /* LaunchScreen.storyboard in Resources */,
+				5AB8399D236AC9CB00A6C9CF /* PortraitSegmentNet.0.5 in Resources */,
+				5AB839A0236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist in Resources */,
+				5AB839A2236ADE5A00A6C9CF /* SWAP_BR.bin in Resources */,
 				5ACC082B23506B85004CD815 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -205,8 +238,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AB8399F236AC9CB00A6C9CF /* PortraitSegmentFilter.m in Sources */,
+				5AB8399C236AC9CB00A6C9CF /* PortraitSegmentNet.m in Sources */,
 				5ACC082623506B83004CD815 /* ViewController.m in Sources */,
 				5ACC082023506B83004CD815 /* AppDelegate.m in Sources */,
+				5AB8399B236AC9CB00A6C9CF /* PortraitRenderShader.metal in Sources */,
 				5ACC083123506B85004CD815 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,6 +375,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -362,6 +399,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_ASSET_PATHS = "";
