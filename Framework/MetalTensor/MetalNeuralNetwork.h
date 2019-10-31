@@ -6,6 +6,15 @@
 //  Copyright © 2019 fengshi. All rights reserved.
 //
 
+/*
+ *  Inference tools for thrid part trained neural networks, such as
+ *  Keras, tensorflow, thenos, caffe and etc,.
+ *
+ *  HOW TO USE?
+ *  There are some examples, demonstrated the usage.
+ *
+ */
+
 #import <Foundation/Foundation.h>
 #import "MetalTensorInputLayer.h"
 #import "MetalTensorOutputLayer.h"
@@ -19,8 +28,10 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 /*
  *  A MetalNeuralNetwork instance is a MetalImage node,
  *  which may connect to the MetalImage's rendering and
- *  parallel computation chain, and takes a MetalImageTexture
- *  as an input, also output to the targets.
+ *  parallel computation pipeline, and takes a MetalImageTexture
+ *  as an input, also may output to the targets.
+ *
+ *  One may sub class of this for customise need.
  *
  */
 
@@ -29,21 +40,39 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 @protected
     // NETWORK
     NSDictionary *_networkDesc;
+    
+    // Typically, there is only one input tensor.
     MetalTensorInputLayer *_inputLayer;
+    
+    // All of the output layers
     NSMutableArray<MetalTensorOutputLayer *> *_outputLayers;
+    
+    // All of the layers, including the input layer and the output layers.
+    // The key of the dictionary is layer name.
     NSMutableDictionary<NSString *, MetalTensorNode *> *_allLayers;
+    
+    // If the neural network were built up from a plist file,
+    // the informations of plist are stored in this dictionary.
+    // This may be empty, if it is not built up from plist.
     NSMutableDictionary<NSString *, MetalTensorLayerDescriptor *> *_allLayerDescriptors;
+    
+    // There may be several neural networks running in memory,
+    // The reuse identifier is used to keep the individual neural network
+    // memory-safety from the others.
+    // Typically one just leave it alone.
     NSString *_reuseIdentifier;
     
     // sync between network and MetalImage
     dispatch_semaphore_t  _network_semaphore;
     dispatch_queue_t _network_queue;
     
+    // input texture from MetalImage
     MetalImageTexture *_inputTexture;
 }
 
 /*
  *  Callbacks for the custom tasks.
+ *
  */
 @property (nonatomic, copy) NetworkCallback _Nullable scheduledHandler;
 @property (nonatomic, copy) NetworkCallback _Nullable completedHandler;
@@ -79,7 +108,7 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 
 /*
- *  Build up the whole model.
+ *  Build up the entire model.
  *  1. Create and initialize each layer.
  *  2. Load the weights for the layers if there were.
  *  3. Connect the layers.
@@ -106,8 +135,12 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 
 /*
  *  Do the prediction, and callbacks.
- *  NOTE: The input texture will throw to the network directly,
- *        so it's your duty to make the preprocessing if needed.
+ *  NOTE: The input texture will throw into the network directly,
+ *        so one should preprocess the texture if needed.
+ *
+ *  There are some preprocessing tricks demonstrating in the examples,
+ *  enjoy yourself :)
+ *
  */
 - (void)predict:(id<MTLTexture>)bgraU8Texture;
 
@@ -123,7 +156,7 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 
 #ifdef DEBUG
 // for debug
-@property (nonatomic, assign) int verbose; // If you need the detail of running
+@property (nonatomic, assign) int verbose; // If one need the detail of running
 
 - (void)setNeuronType:(NeuronType *)neuronType forLayerNamed:(NSString *)name; // call before compile
 - (MetalTensorOutputLayer *)outputLayerWithName:(NSString *)layerName;
