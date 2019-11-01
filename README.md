@@ -6,3 +6,6 @@ A metal graphical rendering framework, accelerated by GPU. https://github.com/fe
 
 # NOTE
 All metal codes run on devices only, not support simulators.
+
+# HOW TO USE?
+There are some example projects demonstrating the usages.
