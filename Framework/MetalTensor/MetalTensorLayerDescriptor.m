@@ -928,11 +928,11 @@ Class LayerWithType(NSString *type)
         }
         
         if (dictionary[@"padding"]) {
-            _padding = PaddingModeFromString(dictionary[@"padding"]);
+            _padding = TransposePaddingModeFromString(dictionary[@"padding"]);
         }
         else {
             // If the padding mode is not specified, we use 'tensorflow same'.
-            _padding = MTPaddingMode_tfsame;
+            _padding = MTPaddingMode_tfsame_trans;
         }
         
         _depthWise = [dictionary[@"depthwise"] boolValue];

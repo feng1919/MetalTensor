@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MIPaddingItem;
 extern MIPaddingItem *MPSPaddingTensorFlowSame;
+extern MIPaddingItem *MPSPaddingTensorFlowSameTransposee;
 extern MIPaddingItem *MPSPaddingValid;
 extern MIPaddingItem *MPSPaddingFull;
 

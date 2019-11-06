@@ -9,6 +9,7 @@
 #import "MIPaddingItem.h"
 
 MIPaddingItem *MPSPaddingTensorFlowSame = nil;
+MIPaddingItem *MPSPaddingTensorFlowSameTransposee = nil;
 MIPaddingItem *MPSPaddingValid = nil;
 MIPaddingItem *MPSPaddingFull = nil;
 
@@ -17,22 +18,31 @@ MIPaddingItem *MPSPaddingFull = nil;
 + (void)initialize {
     if (self == [MIPaddingItem class]) {
         MPSPaddingTensorFlowSame = [[MIPaddingItem alloc] initWithPaddingMode:MTPaddingMode_tfsame];
-        MPSPaddingValid = [[MIPaddingItem alloc] initWithPaddingMode:MTPaddingMode_tfvalid];
-        MPSPaddingFull = [[MIPaddingItem alloc] initWithPaddingMode:MTPaddingMode_tffull];
+        MPSPaddingTensorFlowSameTransposee = [[MIPaddingItem alloc] initWithPaddingMode:MTPaddingMode_tfsame_trans];
+        MPSPaddingValid = [[MIPaddingItem alloc] initWithPaddingMode:MTPaddingMode_valid];
+        MPSPaddingFull = [[MIPaddingItem alloc] initWithPaddingMode:MTPaddingMode_full];
     }
 }
 
 MIPaddingItem *SharedPaddingItemWithMode(MTPaddingMode mode) {
+    if (MPSPaddingTensorFlowSame == nil) {
+        [MIPaddingItem load];
+    }
+    
     switch (mode) {
         case MTPaddingMode_tfsame:
             return MPSPaddingTensorFlowSame;
             break;
             
-        case MTPaddingMode_tffull:
+        case MTPaddingMode_tfsame_trans:
+            return MPSPaddingTensorFlowSameTransposee;
+            break;
+            
+        case MTPaddingMode_full:
             return MPSPaddingFull;
             break;
         
-        case MTPaddingMode_tfvalid:
+        case MTPaddingMode_valid:
             return MPSPaddingValid;
             break;
             
@@ -56,11 +66,14 @@ MIPaddingItem *SharedPaddingItemWithMode(MTPaddingMode mode) {
             return (MPSNNPaddingMethodAlignCentered | MPSNNPaddingMethodAddRemainderToBottomRight | MPSNNPaddingMethodSizeSame);
             break;
             
-        case MTPaddingMode_tfvalid:
+        case MTPaddingMode_tfsame_trans:
+            return (MPSNNPaddingMethodAlignCentered | MPSNNPaddingMethodAddRemainderToTopLeft | MPSNNPaddingMethodSizeSame);
+            
+        case MTPaddingMode_valid:
             return (MPSNNPaddingMethodAlignCentered | MPSNNPaddingMethodSizeValidOnly);
             break;
             
-        case MTPaddingMode_tffull:
+        case MTPaddingMode_full:
             return (MPSNNPaddingMethodAlignCentered | MPSNNPaddingMethodSizeFull |
                     MPSNNPaddingMethodAddRemainderToTopLeft | MPSNNPaddingMethodAddRemainderToBottomRight);
             break;
@@ -74,20 +87,28 @@ MIPaddingItem *SharedPaddingItemWithMode(MTPaddingMode mode) {
 - (NSString *)label {
     switch (_padding) {
         case MTPaddingMode_tfsame:
-            return @"AlignCentered | AddRemainderToBottomRight | SizeSame";
+            return @"MIPaddingItem( AlignCentered | AddRemainderToBottomRight | SizeSame)";
             break;
             
-        case MTPaddingMode_tfvalid:
-            return @"AlignCentered | SizeValidOnly)";
+        case MTPaddingMode_tfsame_trans:
+            return @"MIPaddingItem( AlignCentered | AddRemainderToTopLeft | SizeSame)";
             break;
             
-        case MTPaddingMode_tffull:
-            return @"AlignCentered | SizeFull | AddRemainderToTopLeft | AddRemainderToBottomRight)";
+        case MTPaddingMode_valid:
+            return @"MIPaddingItem( AlignCentered | SizeValidOnly)";
+            break;
+            
+        case MTPaddingMode_full:
+            return @"MIPaddingItem( AlignCentered | SizeFull | AddRemainderToTopLeft | AddRemainderToBottomRight)";
             
         default:
-            return @"AlignCentered | AddRemainderToTopLeft | SizeSame";
+            return @"MIPaddingItem( AlignCentered | AddRemainderToTopLeft | SizeSame)";
             break;
     }
+}
+
+- (NSString *)description {
+    return self.label;
 }
 
 + (BOOL)supportsSecureCoding {
@@ -100,7 +121,7 @@ MIPaddingItem *SharedPaddingItemWithMode(MTPaddingMode mode) {
 
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
     if (self = [super init]) {
-        self->_padding = [coder decodeIntForKey:@"padding"];
+        _padding = [coder decodeIntForKey:@"padding"];
     }
     return self;
 }

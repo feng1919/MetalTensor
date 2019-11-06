@@ -46,8 +46,9 @@ bool KernelShapesTheSame(KernelShape *s1, KernelShape *s2);
 
 typedef enum MTPaddingMode{
     MTPaddingMode_tfsame = 0,
-    MTPaddingMode_tfvalid = 1,
-    MTPaddingMode_tffull = 2,
+    MTPaddingMode_valid = 1,
+    MTPaddingMode_full = 2,
+    MTPaddingMode_tfsame_trans = 3,
 }MTPaddingMode;
 int conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding);
 int conv_offset(int kernel, int stride);

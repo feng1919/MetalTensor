@@ -234,11 +234,11 @@ int conv_output_length(int input_length, int kernel, int stride, MTPaddingMode p
             output_length = input_length;
             break;
             
-        case MTPaddingMode_tfvalid:
+        case MTPaddingMode_valid:
             output_length = input_length - dilated_filter_size + 1;
             break;
             
-        case MTPaddingMode_tffull:
+        case MTPaddingMode_full:
             output_length = input_length + dilated_filter_size - 1;
             break;
             
@@ -262,15 +262,15 @@ int trans_conv_output_length(int input_length, int kernel, int stride, MTPadding
     int dim_size;
     
     switch (padding) {
-        case MTPaddingMode_tfvalid:
+        case MTPaddingMode_valid:
             dim_size = input_length * stride + fmaxl(kernel_size - stride, 0);
             break;
         
-        case MTPaddingMode_tffull:
+        case MTPaddingMode_full:
             dim_size = input_length * stride - (stride + kernel_size - 2);
             break;
             
-        case MTPaddingMode_tfsame:
+        case MTPaddingMode_tfsame_trans:
             dim_size = input_length * stride;
             break;
             
