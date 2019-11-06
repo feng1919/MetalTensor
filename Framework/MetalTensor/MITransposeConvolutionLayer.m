@@ -9,6 +9,7 @@
 #import "MITransposeConvolutionLayer.h"
 #import "MITemporaryImageCache.h"
 #import "MIDataSource.h"
+#import "MIPaddingItem.h"
 
 @interface MITransposeConvolutionLayer() {
     
@@ -22,9 +23,6 @@
 - (void)initialize {
 
     _edgeMode = MPSImageEdgeModeZero;
-    _offset.x = 0;
-    _offset.y = 0;
-    _offset.z = 0;
     _neuron.neuron = MPSCNNNeuronTypeNone;
     _neuron.a = 0.0f;
     _neuron.b = 0.0f;
@@ -45,9 +43,7 @@
         
         _convolution = [[MPSCNNConvolutionTranspose alloc] initWithDevice:device weights:_dataSource];
         _convolution.edgeMode = _edgeMode;
-        [_convolution setOffset:_offset];
-        [_convolution setKernelOffsetX:_kernelOffset.x];
-        [_convolution setKernelOffsetY:_kernelOffset.y];
+        [_convolution setPadding:SharedPaddingItemWithMode(_padding)];
     }
 }
 
@@ -67,20 +63,9 @@
     [self notifyTargetsAboutNewTempImage:commandBuffer];
 }
 
-- (void)setOffset:(MPSOffset)offset {
-    _offset = offset;
-    [_convolution setOffset:_offset];
-}
-
 - (void)setEdgeMode:(MPSImageEdgeMode)edgeMode {
     _edgeMode = edgeMode;
     [_convolution setEdgeMode:_edgeMode];
-}
-
-- (void)setKernelOffset:(MTLInt2)kernelOffset {
-    _kernelOffset = kernelOffset;
-    [_convolution setKernelOffsetX:kernelOffset.x];
-    [_convolution setKernelOffsetY:kernelOffset.y];
 }
 
 - (void)setDataSource:(id<MPSCNNConvolutionDataSource>)dataSource {
@@ -93,9 +78,7 @@
         
         _convolution = [[MPSCNNConvolutionTranspose alloc] initWithDevice:_device weights:_dataSource];
         _convolution.edgeMode = _edgeMode;
-        [_convolution setOffset:_offset];
-        [_convolution setKernelOffsetX:_kernelOffset.x];
-        [_convolution setKernelOffsetY:_kernelOffset.y];
+        [_convolution setPadding:SharedPaddingItemWithMode(_padding)];
     }
 }
 

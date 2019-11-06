@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) KernelShape *kernels;
 @property (nonatomic, readonly) NeuronType *neurons;
-@property (nonatomic, assign) MPSOffset offset;
 @property (nonatomic, assign) MTPaddingMode padding;
 
 - (MIConvolutionLayer *)depthwiseComponent;

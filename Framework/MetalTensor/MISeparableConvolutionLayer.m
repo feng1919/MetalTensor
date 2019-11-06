@@ -23,9 +23,6 @@
     _kernels = malloc(2 * sizeof(KernelShape));
     _neurons = malloc(2 * sizeof(NeuronType));
     _padding = MTPaddingMode_tfsame;
-    _offset.x = 0;
-    _offset.y = 0;
-    _offset.z = 0;
 }
 
 - (void)dealloc {
@@ -48,7 +45,6 @@
     _depthwise.kernel = _kernels[0];
     _depthwise.neuron = _neurons[0];
     _depthwise.depthWise = YES;
-    _depthwise.offset = _offset;
     _depthwise.padding = _padding;
     _depthwise.dataSource = _dataSourceDepthWise;
     [_depthwise compile:device];
@@ -66,11 +62,6 @@
     _outputShape = _project.outputShape;
     
     [self setLabel:_label];
-}
-
-- (void)setOffset:(MPSOffset)offset {
-    _offset = offset;
-    [_depthwise setOffset:_offset];
 }
 
 - (void)setPadding:(MTPaddingMode)padding {
@@ -168,11 +159,6 @@ MISeparableConvolutionLayer *MakeSeparableConvolutionLayer(DataShape *input,
     separableLayer.dataSourceDepthWise = depthWiseData;
     npmemcpy(separableLayer.kernels, kernels, 2 * sizeof(KernelShape));
     npmemcpy(separableLayer.neurons, neurons, 2 * sizeof(NeuronType));
-    MPSOffset offset;
-    offset.x = conv_offset(kernels[0].column, kernels[0].stride);
-    offset.y = conv_offset(kernels[0].row, kernels[0].stride);
-    offset.z = 0;
-    [separableLayer setOffset:offset];
     separableLayer.label = name;
     return separableLayer;
 }

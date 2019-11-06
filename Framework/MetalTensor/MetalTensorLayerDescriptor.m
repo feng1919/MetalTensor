@@ -216,19 +216,6 @@ Class LayerWithType(NSString *type)
             _padding = MTPaddingMode_tfsame;
         }
         
-        if (dictionary[@"offset"]) {
-            NSArray<NSString *> *offsetList = [dictionary[@"offset"] nonEmptyComponentsSeparatedByString:@","];
-            NSAssert(offsetList.count == 3, @"Invliad offset number: '%@'", dictionary[@"offset"]);
-            _offset.x = [offsetList[0] intValue];
-            _offset.y = [offsetList[1] intValue];
-            _offset.z = [offsetList[2] intValue];
-        }
-        else {
-            _offset.x = conv_offset(_kernelShape.column, _kernelShape.stride);
-            _offset.y = conv_offset(_kernelShape.row, _kernelShape.stride);
-            _offset.z = 0;
-        }
-        
         _depthWise = [dictionary[@"depthwise"] boolValue];
         
         NSParameterAssert(dictionary[@"weight"]);
@@ -273,7 +260,6 @@ Class LayerWithType(NSString *type)
         self.neuron = convDesc.neuronType;
         self.padding = convDesc.padding;
         self.depthWise = convDesc.depthWise;
-        self.offset = convDesc.offset;
         self.edgeMode = MPSImageEdgeModeZero;
         [self setLabel:convDesc.name];
         
@@ -462,19 +448,6 @@ Class LayerWithType(NSString *type)
             _weights = [NSArray arrayWithArray:array];
         }
         
-        if (dictionary[@"offset"]) {
-            NSArray<NSString *> *offsetList = [dictionary[@"offset"] nonEmptyComponentsSeparatedByString:@","];
-            NSAssert(offsetList.count == 3, @"Invliad offset number: '%@'", dictionary[@"offset"]);
-            _offset.x = [offsetList[0] intValue];
-            _offset.y = [offsetList[1] intValue];
-            _offset.z = [offsetList[2] intValue];
-        }
-        else {
-            _offset.x = conv_offset(kernel.x, _stride);
-            _offset.y = conv_offset(kernel.y, _stride);
-            _offset.z = 0;
-        }
-        
         _weightRanges = malloc(3*sizeof(NSRange));
         if (dictionary[@"weight_ranges"]) {
             NSArray<NSString *> *rangeList = [dictionary[@"weight_ranges"] nonEmptyComponentsSeparatedByString:@";"];
@@ -534,7 +507,6 @@ Class LayerWithType(NSString *type)
         
         npmemcpy(self.kernels, kernels, 3 * sizeof(KernelShape));
         npmemcpy(self.neurons, neurons, 3 * sizeof(NeuronType));
-        self.offset = irmDesc.offset;
         self.label = irmDesc.name;
         
         NSString *weightPath = [[NSBundle mainBundle] pathForResource:irmDesc.weights[0] ofType:@"bin"];
@@ -963,17 +935,6 @@ Class LayerWithType(NSString *type)
             _padding = MTPaddingMode_tfsame;
         }
         
-        if (dictionary[@"offset"]) {
-            NSArray<NSString *> *offsetList = [dictionary[@"offset"] nonEmptyComponentsSeparatedByString:@","];
-            NSAssert(offsetList.count == 2, @"Invliad offset number: '%@'", dictionary[@"offset"]);
-            _kernelOffset.x = [offsetList[0] intValue];
-            _kernelOffset.y = [offsetList[1] intValue];
-        }
-        else {
-            _kernelOffset.x = trans_conv_offset(_kernelShape.column, _kernelShape.stride);
-            _kernelOffset.y = trans_conv_offset(_kernelShape.row, _kernelShape.stride);
-        }
-        
         _depthWise = [dictionary[@"depthwise"] boolValue];
         
         NSParameterAssert(dictionary[@"weight"]);
@@ -1018,7 +979,6 @@ Class LayerWithType(NSString *type)
         self.neuron = convDesc.neuronType;
         self.padding = convDesc.padding;
         self.depthWise = convDesc.depthWise;
-        self.kernelOffset = convDesc.kernelOffset;
         self.edgeMode = MPSImageEdgeModeZero;
         [self setLabel:convDesc.name];
         

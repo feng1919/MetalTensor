@@ -18,8 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) MTPaddingMode padding;
 @property (nonatomic, assign) BOOL depthWise;
 @property (nonatomic, assign) MPSImageEdgeMode edgeMode;
-@property (nonatomic, assign) MPSOffset offset;
-@property (nonatomic, assign) MTLInt2 kernelOffset;
 @property (nonatomic, strong) MICNNKernelDataSource *dataSource;
 
 @end

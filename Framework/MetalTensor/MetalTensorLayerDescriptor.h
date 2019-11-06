@@ -69,7 +69,6 @@ Class LayerWithType(NSString *type);
 
 @property (nonatomic, readonly) KernelShape kernelShape;
 @property (nonatomic, readonly) NeuronType neuronType;
-@property (nonatomic, readonly) MPSOffset offset;
 @property (nonatomic, readonly) MTPaddingMode padding;
 
 @property (nonatomic, readonly) BOOL depthWise;
@@ -146,7 +145,6 @@ Class LayerWithType(NSString *type);
 
 @property (nonatomic, readonly) KernelShape *kernelShapes;
 @property (nonatomic, readonly) NeuronType *neuronTypes; // default: [relu6, relu6, none]
-@property (nonatomic, readonly) MPSOffset offset;
 @property (nonatomic, readonly, strong) NSArray<NSString *> *weights;
 @property (nonatomic, readonly) NSRange *weightRanges;
 
@@ -263,7 +261,6 @@ Class LayerWithType(NSString *type);
 @property (nonatomic, readonly) KernelShape kernelShape;
 @property (nonatomic, readonly) NeuronType neuronType;
 @property (nonatomic, readonly) MTPaddingMode padding;
-@property (nonatomic, readonly) MTLInt2 kernelOffset;
 
 @property (nonatomic, readonly) BOOL depthWise;
 @property (nonatomic, retain, readonly, nullable) NSString *weight;

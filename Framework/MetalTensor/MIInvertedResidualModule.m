@@ -28,9 +28,6 @@
 - (void)initialize {
     _kernels = malloc(3 * sizeof(KernelShape));
     _neurons = malloc(3 * sizeof(NeuronType));
-    _offset.x = 0;
-    _offset.y = 0;
-    _offset.z = 0;
 }
 
 - (void)dealloc {
@@ -61,7 +58,6 @@
     _convDepthWise.depthWise = YES;
     _convDepthWise.kernel = _kernels[1];
     _convDepthWise.neuron = _neurons[1];
-    [_convDepthWise setOffset:_offset];
     [_convDepthWise compile:device];
     
     _convProject = [[MIConvolutionLayer alloc] initWithInputShape:_convDepthWise.outputShapeRef];
@@ -95,11 +91,6 @@
              NSStringFromDataShape(_convExpand.outputShapeRef).UTF8String,
              NSStringFromDataShape(_convDepthWise.outputShapeRef).UTF8String,
              NSStringFromDataShape(_convProject.outputShapeRef).UTF8String);
-}
-
-- (void)setOffset:(MPSOffset)offset {
-    _offset = offset;
-    [_convDepthWise setOffset:_offset];
 }
 
 - (void)setLabel:(NSString *)label {
@@ -205,11 +196,7 @@ MIInvertedResidualModule *MakeInvertedResidualModule(NSString *expand,
     MIInvertedResidualModule *module = [[MIInvertedResidualModule alloc] initWithInputShape:inputShape];
     npmemcpy(module.kernels, kernels, 3 * sizeof(KernelShape));
     npmemcpy(module.neurons, neurons, 3 * sizeof(NeuronType));
-    MPSOffset offset;
-    offset.x = conv_offset(kernels[1].column, kernels[1].stride);
-    offset.y = conv_offset(kernels[1].row, kernels[1].stride);
-    offset.z = 0;
-    [module setOffset:offset];
+
     [module setExpandDataSource:MakeDataSource(expand, &kernels[0], &neurons[0])];
     [module setDepthWiseDataSource:MakeDataSource(depthwise, &kernels[1], &neurons[1])];
     [module setProjectDataSource:MakeDataSource(project, &kernels[2], &neurons[2])];
