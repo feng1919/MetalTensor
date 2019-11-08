@@ -23,7 +23,7 @@
 @implementation PortraitSegmentNet
 
 - (instancetype)init {
-    NSString *infoPlist = [[NSBundle mainBundle] pathForResource:@"PortraitSegmentNet.0.5" ofType:@"plist"];
+    NSString *infoPlist = [[NSBundle mainBundle] pathForResource:@"PortraitSegmentNet" ofType:@"plist"];
     self = [self initWithPlist:infoPlist];
     return self;
 }
@@ -35,8 +35,8 @@
 }
 
 - (void)loadWeights {
-    NSString *dataFile = [[NSBundle mainBundle] pathForResource:@"PortraitSegmentNet.0.5" ofType:@"bin"];
-    NSString *mapFile = [[NSBundle mainBundle] pathForResource:@"PortraitSegmentNet.0.5" ofType:@"json"];
+    NSString *dataFile = [[NSBundle mainBundle] pathForResource:@"PortraitSegmentNet" ofType:@"bin"];
+    NSString *mapFile = [[NSBundle mainBundle] pathForResource:@"PortraitSegmentNet" ofType:@"json"];
     [self loadWeights:dataFile mapFile:mapFile];
 }
 
@@ -86,7 +86,6 @@
 void clamp_mask(float16_t *mask, const unsigned int size)
 {
     const float16_t threshold = 0.1f;
-    const float16_t epsilon = 1e-4;
     float16_t std = 1.0f-threshold*2.0f;
     
     for (int i = 0; i < size; i++) {
@@ -94,7 +93,7 @@ void clamp_mask(float16_t *mask, const unsigned int size)
         mask[i] -= threshold;
         mask[i] /= std;
         
-        mask[i] = fminf(fmaxf(mask[i], epsilon), 1.0f-epsilon);
+        mask[i] = fminf(fmaxf(mask[i], 0.0f), 1.0f);
     }
 }
 

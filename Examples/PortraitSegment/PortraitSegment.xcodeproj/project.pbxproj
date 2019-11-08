@@ -15,6 +15,10 @@
 		5AB8399F236AC9CB00A6C9CF /* PortraitSegmentFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB83998236AC9CB00A6C9CF /* PortraitSegmentFilter.m */; };
 		5AB839A0236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5AB83999236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist */; };
 		5AB839A2236ADE5A00A6C9CF /* SWAP_BR.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5AB839A1236ADE5A00A6C9CF /* SWAP_BR.bin */; };
+		5AB839A923703E1F00A6C9CF /* PortraitSegmentNet.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5AB839A423703E1F00A6C9CF /* PortraitSegmentNet.bin */; };
+		5AB839AA23703E1F00A6C9CF /* PortraitSegmentNet.json in Resources */ = {isa = PBXBuildFile; fileRef = 5AB839A623703E1F00A6C9CF /* PortraitSegmentNet.json */; };
+		5AB839AB23703E1F00A6C9CF /* PortraitSegmentNet in Resources */ = {isa = PBXBuildFile; fileRef = 5AB839A723703E1F00A6C9CF /* PortraitSegmentNet */; };
+		5AB839AC23703E1F00A6C9CF /* PortraitSegmentNet.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5AB839A823703E1F00A6C9CF /* PortraitSegmentNet.plist */; };
 		5ACC082023506B83004CD815 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACC081F23506B83004CD815 /* AppDelegate.m */; };
 		5ACC082623506B83004CD815 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACC082523506B83004CD815 /* ViewController.m */; };
 		5ACC082B23506B85004CD815 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ACC082A23506B85004CD815 /* Assets.xcassets */; };
@@ -62,6 +66,10 @@
 		5AB83998236AC9CB00A6C9CF /* PortraitSegmentFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PortraitSegmentFilter.m; sourceTree = "<group>"; };
 		5AB83999236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PortraitSegmentNet.0.5.plist; sourceTree = "<group>"; };
 		5AB839A1236ADE5A00A6C9CF /* SWAP_BR.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = SWAP_BR.bin; sourceTree = "<group>"; };
+		5AB839A423703E1F00A6C9CF /* PortraitSegmentNet.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = PortraitSegmentNet.bin; sourceTree = "<group>"; };
+		5AB839A623703E1F00A6C9CF /* PortraitSegmentNet.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = PortraitSegmentNet.json; sourceTree = "<group>"; };
+		5AB839A723703E1F00A6C9CF /* PortraitSegmentNet */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PortraitSegmentNet; sourceTree = "<group>"; };
+		5AB839A823703E1F00A6C9CF /* PortraitSegmentNet.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PortraitSegmentNet.plist; sourceTree = "<group>"; };
 		5ACC081B23506B83004CD815 /* PortraitSegment.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PortraitSegment.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ACC081E23506B83004CD815 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5ACC081F23506B83004CD815 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -119,6 +127,10 @@
 				5AB83990236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.bin */,
 				5AB83995236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.json */,
 				5AB83999236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist */,
+				5AB839A723703E1F00A6C9CF /* PortraitSegmentNet */,
+				5AB839A423703E1F00A6C9CF /* PortraitSegmentNet.bin */,
+				5AB839A623703E1F00A6C9CF /* PortraitSegmentNet.json */,
+				5AB839A823703E1F00A6C9CF /* PortraitSegmentNet.plist */,
 				5AB83996236AC9CB00A6C9CF /* PortraitSegmentNet.h */,
 				5AB83993236AC9CB00A6C9CF /* PortraitSegmentNet.m */,
 				5AB83997236AC9CB00A6C9CF /* PortraitSegmentFilter.h */,
@@ -222,9 +234,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AB8399E236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.json in Resources */,
+				5AB839AB23703E1F00A6C9CF /* PortraitSegmentNet in Resources */,
+				5AB839AC23703E1F00A6C9CF /* PortraitSegmentNet.plist in Resources */,
 				5AB8399A236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.bin in Resources */,
 				5ACC082E23506B85004CD815 /* LaunchScreen.storyboard in Resources */,
 				5AB8399D236AC9CB00A6C9CF /* PortraitSegmentNet.0.5 in Resources */,
+				5AB839A923703E1F00A6C9CF /* PortraitSegmentNet.bin in Resources */,
+				5AB839AA23703E1F00A6C9CF /* PortraitSegmentNet.json in Resources */,
 				5AB839A0236AC9CB00A6C9CF /* PortraitSegmentNet.0.5.plist in Resources */,
 				5AB839A2236ADE5A00A6C9CF /* SWAP_BR.bin in Resources */,
 				5ACC082B23506B85004CD815 /* Assets.xcassets in Resources */,
