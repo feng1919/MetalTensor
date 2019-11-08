@@ -28,6 +28,7 @@
 - (void)initialize {
     _kernels = malloc(3 * sizeof(KernelShape));
     _neurons = malloc(3 * sizeof(NeuronType));
+    _offset = MTLInt2Make(0, 0);
 }
 
 - (void)dealloc {
@@ -56,6 +57,7 @@
     _convDepthWise = [[MIConvolutionLayer alloc] initWithInputShape:_convExpand.outputShapeRef];
     _convDepthWise.padding = MTPaddingMode_tfsame;
     _convDepthWise.depthWise = YES;
+    _convDepthWise.offset = _offset;
     _convDepthWise.kernel = _kernels[1];
     _convDepthWise.neuron = _neurons[1];
     [_convDepthWise compile:device];
@@ -100,6 +102,11 @@
     [_convDepthWise setLabel:[NSString stringWithFormat:@"%@_depthwise", label]];
     [_convProject setLabel:[NSString stringWithFormat:@"%@_project", label]];
     [_addition setLabel:[NSString stringWithFormat:@"%@_addition", label]];
+}
+
+- (void)setOffset:(MTLInt2)offset {
+    _offset = offset;
+    _convDepthWise.offset = offset;
 }
 
 #ifdef DEBUG

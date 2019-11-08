@@ -43,17 +43,16 @@ bool KernelShapeValid(KernelShape *s);
 bool KernelShapesTheSame(KernelShape *s1, KernelShape *s2);
 
 
-
 typedef enum MTPaddingMode{
     MTPaddingMode_tfsame = 0,
-    MTPaddingMode_valid = 1,
-    MTPaddingMode_full = 2,
-    MTPaddingMode_tfsame_trans = 3,
+    MTPaddingMode_valid = -1,
+    MTPaddingMode_full = 1,
 }MTPaddingMode;
 int conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding);
-int conv_offset(int kernel, int stride);
+int conv_offset(int kernel, int stride, MTPaddingMode padding);
 int trans_conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding);
-int trans_conv_offset(int kernel, int stride);
+int trans_conv_offset(int kernel, int stride, MTPaddingMode padding);
+
 int pooling_offset(int kernel);
 
 int make_divisible_8(int v);

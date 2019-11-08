@@ -70,6 +70,7 @@ Class LayerWithType(NSString *type);
 @property (nonatomic, readonly) KernelShape kernelShape;
 @property (nonatomic, readonly) NeuronType neuronType;
 @property (nonatomic, readonly) MTPaddingMode padding;
+@property (nonatomic, readonly) MTLInt2 offset;
 
 @property (nonatomic, readonly) BOOL depthWise;
 @property (nonatomic, retain, readonly, nullable) NSString *weight;
@@ -139,9 +140,10 @@ Class LayerWithType(NSString *type);
 
 @interface MIInvertedResidualModuleDescriptor : MetalTensorLayerDescriptor
 
-@property (nonatomic, readonly) int expansion;
-@property (nonatomic, readonly) int stride;
-@property (nonatomic, readonly) int filters;
+@property (nonatomic, readonly) MTLInt expansion;
+@property (nonatomic, readonly) MTLInt stride;
+@property (nonatomic, readonly) MTLInt filters;
+@property (nonatomic, readonly) MTLInt2 offset;
 
 @property (nonatomic, readonly) KernelShape *kernelShapes;
 @property (nonatomic, readonly) NeuronType *neuronTypes; // default: [relu6, relu6, none]
@@ -261,6 +263,7 @@ Class LayerWithType(NSString *type);
 @property (nonatomic, readonly) KernelShape kernelShape;
 @property (nonatomic, readonly) NeuronType neuronType;
 @property (nonatomic, readonly) MTPaddingMode padding;
+@property (nonatomic, readonly) MTLInt2 offset;
 
 @property (nonatomic, readonly) BOOL depthWise;
 @property (nonatomic, retain, readonly, nullable) NSString *weight;

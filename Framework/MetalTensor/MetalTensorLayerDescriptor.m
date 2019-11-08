@@ -216,6 +216,17 @@ Class LayerWithType(NSString *type)
             _padding = MTPaddingMode_tfsame;
         }
         
+        if (dictionary[@"offset"]) {
+            NSArray<NSString *> *offsetList = [dictionary[@"offset"] nonEmptyComponentsSeparatedByString:@","];
+            NSAssert(offsetList.count == 2, @"Invliad offset number: '%@'", dictionary[@"offset"]);
+            _offset.x = [offsetList[0] intValue];
+            _offset.y = [offsetList[1] intValue];
+        }
+        else {
+            _offset.x = conv_offset(_kernelShape.column, _kernelShape.stride, _padding);
+            _offset.y = conv_offset(_kernelShape.row, _kernelShape.stride, _padding);
+        }
+        
         _depthWise = [dictionary[@"depthwise"] boolValue];
         
         NSParameterAssert(dictionary[@"weight"]);
@@ -260,6 +271,7 @@ Class LayerWithType(NSString *type)
         self.neuron = convDesc.neuronType;
         self.padding = convDesc.padding;
         self.depthWise = convDesc.depthWise;
+        self.offset = convDesc.offset;
         self.edgeMode = MPSImageEdgeModeZero;
         [self setLabel:convDesc.name];
         
@@ -413,6 +425,18 @@ Class LayerWithType(NSString *type)
         _kernelShapes[1] = KernelShapeMake(kernel.y, kernel.x, input_channels, 1, _stride);
         _kernelShapes[2] = KernelShapeMake(1, 1, input_channels, _filters, 1);
         
+        
+        if (dictionary[@"offset"]) {
+            NSArray<NSString *> *offsetList = [dictionary[@"offset"] nonEmptyComponentsSeparatedByString:@","];
+            NSAssert(offsetList.count == 2, @"Invliad offset number: '%@'", dictionary[@"offset"]);
+            _offset.x = [offsetList[0] intValue];
+            _offset.y = [offsetList[1] intValue];
+        }
+        else {
+            _offset.x = conv_offset(kernel.x, _stride, MTPaddingMode_tfsame);
+            _offset.y = conv_offset(kernel.y, _stride, MTPaddingMode_tfsame);
+        }
+        
         // If there were no neurons specified, we'll use [relu6, relu6, none] by default.
         _neuronTypes = malloc(3*sizeof(NeuronType));
         if (dictionary[@"neurons"]) {
@@ -508,6 +532,7 @@ Class LayerWithType(NSString *type)
         npmemcpy(self.kernels, kernels, 3 * sizeof(KernelShape));
         npmemcpy(self.neurons, neurons, 3 * sizeof(NeuronType));
         self.label = irmDesc.name;
+        self.offset = irmDesc.offset;
         
         NSString *weightPath = [[NSBundle mainBundle] pathForResource:irmDesc.weights[0] ofType:@"bin"];
         if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
@@ -928,11 +953,22 @@ Class LayerWithType(NSString *type)
         }
         
         if (dictionary[@"padding"]) {
-            _padding = TransposePaddingModeFromString(dictionary[@"padding"]);
+            _padding = PaddingModeFromString(dictionary[@"padding"]);
         }
         else {
             // If the padding mode is not specified, we use 'tensorflow same'.
-            _padding = MTPaddingMode_tfsame_trans;
+            _padding = MTPaddingMode_tfsame;
+        }
+        
+        if (dictionary[@"offset"]) {
+            NSArray<NSString *> *offsetList = [dictionary[@"offset"] nonEmptyComponentsSeparatedByString:@","];
+            NSAssert(offsetList.count == 2, @"Invliad offset number: '%@'", dictionary[@"offset"]);
+            _offset.x = [offsetList[0] intValue];
+            _offset.y = [offsetList[1] intValue];
+        }
+        else {
+            _offset.x = trans_conv_offset(_kernelShape.column, _kernelShape.stride, _padding);
+            _offset.y = trans_conv_offset(_kernelShape.row, _kernelShape.stride, _padding);
         }
         
         _depthWise = [dictionary[@"depthwise"] boolValue];
@@ -978,6 +1014,7 @@ Class LayerWithType(NSString *type)
         self.kernel = convDesc.kernelShape;
         self.neuron = convDesc.neuronType;
         self.padding = convDesc.padding;
+        self.offset = convDesc.offset;
         self.depthWise = convDesc.depthWise;
         self.edgeMode = MPSImageEdgeModeZero;
         [self setLabel:convDesc.name];

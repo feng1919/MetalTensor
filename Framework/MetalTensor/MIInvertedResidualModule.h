@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) MICNNKernelDataSource *depthWiseDataSource;
 @property (nonatomic, strong) MICNNKernelDataSource *projectDataSource;
 
+@property (nonatomic, assign) MTLInt2 offset;
+
 @property (nonatomic, readonly) KernelShape *kernels;
 @property (nonatomic, readonly) NeuronType *neurons;
 

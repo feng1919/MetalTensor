@@ -9,7 +9,6 @@
 #import "MITransposeConvolutionLayer.h"
 #import "MITemporaryImageCache.h"
 #import "MIDataSource.h"
-#import "MIPaddingItem.h"
 
 @interface MITransposeConvolutionLayer() {
     
@@ -28,6 +27,8 @@
     _neuron.b = 0.0f;
     _neuron.c = 0.0f;
     _depthWise = NO;
+    _offset.x = 0;
+    _offset.y = 0;
     
     DB_TRACE(-_verbose+2, "\n%s init %s", self.labelUTF8, NSStringFromDataShape(&_inputShapes[0]).UTF8String);
 }
@@ -43,7 +44,9 @@
         
         _convolution = [[MPSCNNConvolutionTranspose alloc] initWithDevice:device weights:_dataSource];
         _convolution.edgeMode = _edgeMode;
-        [_convolution setPadding:SharedPaddingItemWithMode(_padding)];
+        [_convolution setKernelOffsetX:_offset.x];
+        [_convolution setKernelOffsetY:_offset.y];
+        
     }
 }
 
@@ -68,6 +71,12 @@
     [_convolution setEdgeMode:_edgeMode];
 }
 
+- (void)setOffset:(MTLInt2)offset {
+    _offset = offset;
+    [_convolution setKernelOffsetX:offset.x];
+    [_convolution setKernelOffsetX:offset.y];
+}
+
 - (void)setDataSource:(id<MPSCNNConvolutionDataSource>)dataSource {
     NSParameterAssert(dataSource);
     _dataSource = dataSource;
@@ -78,7 +87,8 @@
         
         _convolution = [[MPSCNNConvolutionTranspose alloc] initWithDevice:_device weights:_dataSource];
         _convolution.edgeMode = _edgeMode;
-        [_convolution setPadding:SharedPaddingItemWithMode(_padding)];
+        [_convolution setKernelOffsetX:_offset.x];
+        [_convolution setKernelOffsetY:_offset.y];
     }
 }
 

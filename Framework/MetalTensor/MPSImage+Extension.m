@@ -146,20 +146,6 @@ MTPaddingMode PaddingModeFromString(NSString *padding) {
     return MTPaddingMode_tfsame;
 }
 
-MTPaddingMode TransposePaddingModeFromString(NSString *padding) {
-    if ([padding isEqualToString:@"same"]) {
-        return MTPaddingMode_tfsame_trans;
-    }
-    if ([padding isEqualToString:@"valid"]) {
-        return MTPaddingMode_valid;
-    }
-    if ([padding isEqualToString:@"full"]) {
-        return MTPaddingMode_full;
-    }
-    assert(0);
-    return MTPaddingMode_tfsame_trans;
-}
-
 NSString *NSStringFromDataShape(DataShape *dataShape) {
     return [NSString stringWithFormat:@"(%d, %d, %d)", dataShape->row, dataShape->column, dataShape->depth];
 }

@@ -9,7 +9,6 @@
 #import "MIConvolutionLayer.h"
 #import "MITemporaryImageCache.h"
 #import "MIDataSource.h"
-#import "MIPaddingItem.h"
 
 @interface MIConvolutionLayer() {
     
@@ -27,6 +26,8 @@
     _neuron.a = 0.0f;
     _neuron.b = 0.0f;
     _padding = MTPaddingMode_tfsame;
+    _offset.x = 0;
+    _offset.y = 0;
 }
 
 - (void)compile:(id<MTLDevice>)device {
@@ -39,7 +40,7 @@
     if (_dataSource) {
         _convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
         [_convolution setEdgeMode:_edgeMode];
-        [_convolution setPadding:SharedPaddingItemWithMode(_padding)];
+        [self setOffset:_offset];
     }
 }
 
@@ -64,6 +65,16 @@
     [_convolution setEdgeMode:_edgeMode];
 }
 
+- (void)setOffset:(MTLInt2)offset {
+    _offset = offset;
+
+    MPSOffset mpsOffset;
+    mpsOffset.x = _offset.x;
+    mpsOffset.y = _offset.y;
+    mpsOffset.z = 0;
+    [_convolution setOffset:mpsOffset];
+}
+
 - (void)setDataSource:(MICNNKernelDataSource *)dataSource {
     
     NSParameterAssert(dataSource);
@@ -75,7 +86,7 @@
     if (_device) {
         _convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
         [_convolution setEdgeMode:_edgeMode];
-        [_convolution setPadding:SharedPaddingItemWithMode(_padding)];
+        [self setOffset:_offset];
     }
 }
 

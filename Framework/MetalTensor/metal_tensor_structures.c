@@ -223,6 +223,7 @@ KernelShape KernelShapeMake(int row, int column, int depth, int kernel, int stri
     return k;
 }
 
+
 int conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding) {
     
     int dilation = 1;
@@ -251,8 +252,26 @@ int conv_output_length(int input_length, int kernel, int stride, MTPaddingMode p
     return (output_length + stride - 1) / stride;
 }
 
-int conv_offset(int kernel, int stride) {
-    return kernel % stride;
+int conv_offset(int kernel, int stride, MTPaddingMode padding) {
+    
+    switch (padding) {
+        case MTPaddingMode_tfsame:
+            return stride>>1;
+            break;
+        
+        case MTPaddingMode_valid:
+            return kernel > stride ? kernel>>1:stride>>1;
+            break;
+            
+        case MTPaddingMode_full:
+            return (stride>>1) - (kernel>>1);
+            break;
+            
+        default:
+            assert(0);
+            return 0;
+            break;
+    }
 }
 
 int trans_conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding) {
@@ -270,7 +289,7 @@ int trans_conv_output_length(int input_length, int kernel, int stride, MTPadding
             dim_size = input_length * stride - (stride + kernel_size - 2);
             break;
             
-        case MTPaddingMode_tfsame_trans:
+        case MTPaddingMode_tfsame:
             dim_size = input_length * stride;
             break;
             
@@ -283,8 +302,26 @@ int trans_conv_output_length(int input_length, int kernel, int stride, MTPadding
     return dim_size;
 }
 
-int trans_conv_offset(int kernel, int stride) {
-    return -1 * (kernel % stride);
+int trans_conv_offset(int kernel, int stride, MTPaddingMode padding) {
+    
+    switch (padding) {
+        case MTPaddingMode_tfsame:
+            return -(stride>>1);
+            break;
+        
+        case MTPaddingMode_valid:
+            return kernel > stride ? -(kernel>>1):-(stride>>1);
+            break;
+            
+        case MTPaddingMode_full:
+            return (kernel>>1) - (stride>>1);
+            break;
+            
+        default:
+            assert(0);
+            return 0;
+            break;
+    }
 }
 
 int pooling_offset(int kernel) {

@@ -28,7 +28,6 @@ NeuronType NeuronTypeMake(MPSCNNNeuronType n, float a, float b);
 NeuronType NeuronTypeMake1(MPSCNNNeuronType n, float a, float b, float c);
 
 MTPaddingMode PaddingModeFromString(NSString *padding);
-MTPaddingMode TransposePaddingModeFromString(NSString *padding);
 
 MPSCNNNeuronType NeuronTypeFromString(NSString *neuron);
 NSString *StringWithNeuronType(MPSCNNNeuronType neuron);

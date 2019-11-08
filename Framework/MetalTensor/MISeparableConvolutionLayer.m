@@ -46,6 +46,7 @@
     _depthwise.neuron = _neurons[0];
     _depthwise.depthWise = YES;
     _depthwise.padding = _padding;
+    _depthwise.offset = _offset;
     _depthwise.dataSource = _dataSourceDepthWise;
     [_depthwise compile:device];
     
@@ -67,6 +68,11 @@
 - (void)setPadding:(MTPaddingMode)padding {
     _padding = padding;
     [_depthwise setPadding:_padding];
+}
+
+- (void)setOffset:(MTLInt2)offset {
+    _offset = offset;
+    [_depthwise setOffset:offset];
 }
 
 - (void)setDataSourceDepthWise:(MICNNKernelDataSource *)dataSourceDepthWise {

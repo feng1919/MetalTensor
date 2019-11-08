@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) KernelShape kernel;
 @property (nonatomic, assign) NeuronType neuron;
 @property (nonatomic, assign) MTPaddingMode padding;
+@property (nonatomic, assign) MTLInt2 offset;
 @property (nonatomic, assign) BOOL depthWise;
 @property (nonatomic, assign) MPSImageEdgeMode edgeMode;
 @property (nonatomic, strong) MICNNKernelDataSource *dataSource;
