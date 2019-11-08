@@ -356,7 +356,7 @@
 		<key>stride</key>
 		<string>1</string>
 		<key>offset</key>
-		<string>0, 0, 0</string>
+		<string>0, 0</string>
 		<key>targets</key>
 		<string>block_16</string>
 		<key>weights</key>
