@@ -52,3 +52,8 @@ FOUNDATION_EXPORT const unsigned char MetalTensorVersionString[];
 #import "MITransposeConvolutionLayer.h"
 #import "MPSImage+Extension.h"
 #import "NSString+Extension.h"
+
+// SSD decoding
+#import "ssd_decoder.h"
+#import "SSDConfig.h"
+#import "SSDObject.h"

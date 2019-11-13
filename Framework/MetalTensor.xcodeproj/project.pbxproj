@@ -77,6 +77,14 @@
 		5A8D23DE2341DA04005F88E6 /* MIArithmeticLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23942341DA00005F88E6 /* MIArithmeticLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23E12341E020005F88E6 /* metal_tensor_log.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23DF2341E020005F88E6 /* metal_tensor_log.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23E22341E020005F88E6 /* metal_tensor_log.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23E02341E020005F88E6 /* metal_tensor_log.c */; };
+		5AC43CD2237C306500E740EA /* ssd_prior_box.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AC43CCA237C306500E740EA /* ssd_prior_box.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5AC43CD3237C306500E740EA /* ssd_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CCB237C306500E740EA /* ssd_decoder.c */; };
+		5AC43CD4237C306500E740EA /* SSDObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CCC237C306500E740EA /* SSDObject.m */; };
+		5AC43CD5237C306500E740EA /* SSDConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AC43CCD237C306500E740EA /* SSDConfig.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5AC43CD6237C306500E740EA /* ssd_decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AC43CCE237C306500E740EA /* ssd_decoder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5AC43CD7237C306500E740EA /* ssd_prior_box.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CCF237C306500E740EA /* ssd_prior_box.c */; };
+		5AC43CD8237C306500E740EA /* SSDConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CD0237C306500E740EA /* SSDConfig.m */; };
+		5AC43CD9237C306500E740EA /* SSDObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AC43CD1237C306500E740EA /* SSDObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -152,6 +160,14 @@
 		5A8D23942341DA00005F88E6 /* MIArithmeticLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIArithmeticLayer.h; sourceTree = "<group>"; };
 		5A8D23DF2341E020005F88E6 /* metal_tensor_log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = metal_tensor_log.h; sourceTree = "<group>"; };
 		5A8D23E02341E020005F88E6 /* metal_tensor_log.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = metal_tensor_log.c; sourceTree = "<group>"; };
+		5AC43CCA237C306500E740EA /* ssd_prior_box.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssd_prior_box.h; sourceTree = "<group>"; };
+		5AC43CCB237C306500E740EA /* ssd_decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ssd_decoder.c; sourceTree = "<group>"; };
+		5AC43CCC237C306500E740EA /* SSDObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSDObject.m; sourceTree = "<group>"; };
+		5AC43CCD237C306500E740EA /* SSDConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSDConfig.h; sourceTree = "<group>"; };
+		5AC43CCE237C306500E740EA /* ssd_decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssd_decoder.h; sourceTree = "<group>"; };
+		5AC43CCF237C306500E740EA /* ssd_prior_box.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ssd_prior_box.c; sourceTree = "<group>"; };
+		5AC43CD0237C306500E740EA /* SSDConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSDConfig.m; sourceTree = "<group>"; };
+		5AC43CD1237C306500E740EA /* SSDObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSDObject.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +200,7 @@
 		5A8D23412341D767005F88E6 /* MetalTensor */ = {
 			isa = PBXGroup;
 			children = (
+				5AC43CC9237C306500E740EA /* SSD */,
 				5A8D23432341D767005F88E6 /* Info.plist */,
 				5A8D23422341D767005F88E6 /* MetalTensor.h */,
 				5A8D23532341D9FB005F88E6 /* FPSCounter.h */,
@@ -259,6 +276,21 @@
 			path = MetalTensor;
 			sourceTree = "<group>";
 		};
+		5AC43CC9237C306500E740EA /* SSD */ = {
+			isa = PBXGroup;
+			children = (
+				5AC43CCB237C306500E740EA /* ssd_decoder.c */,
+				5AC43CCE237C306500E740EA /* ssd_decoder.h */,
+				5AC43CCF237C306500E740EA /* ssd_prior_box.c */,
+				5AC43CCA237C306500E740EA /* ssd_prior_box.h */,
+				5AC43CCD237C306500E740EA /* SSDConfig.h */,
+				5AC43CD0237C306500E740EA /* SSDConfig.m */,
+				5AC43CD1237C306500E740EA /* SSDObject.h */,
+				5AC43CCC237C306500E740EA /* SSDObject.m */,
+			);
+			path = SSD;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -279,9 +311,11 @@
 				5A8D23A02341DA03005F88E6 /* MITemporaryImage.h in Headers */,
 				5A8D23B92341DA03005F88E6 /* MIReshapeLayer.h in Headers */,
 				5A8D23C42341DA03005F88E6 /* MIPoolingAverageLayer.h in Headers */,
+				5AC43CD2237C306500E740EA /* ssd_prior_box.h in Headers */,
 				5A8D23992341DA03005F88E6 /* MPSImage+Extension.h in Headers */,
 				5A8D23AC2341DA03005F88E6 /* MITransposeConvolutionLayer.h in Headers */,
 				5A8D23BE2341DA03005F88E6 /* MetalTensorLayerDescriptor.h in Headers */,
+				5AC43CD5237C306500E740EA /* SSDConfig.h in Headers */,
 				5A8D23C52341DA03005F88E6 /* metal_tensor_structures.h in Headers */,
 				5A8D23C02341DA03005F88E6 /* MISeparableConvolutionLayer.h in Headers */,
 				5A8D23C12341DA03005F88E6 /* MIL2NormalizationLayer.h in Headers */,
@@ -290,6 +324,7 @@
 				5A8D23BB2341DA03005F88E6 /* MIInceptionV3Module.h in Headers */,
 				5A8D23DC2341DA04005F88E6 /* MIMPSImage.h in Headers */,
 				5A8D23C72341DA03005F88E6 /* MIDropoutLayer.h in Headers */,
+				5AC43CD6237C306500E740EA /* ssd_decoder.h in Headers */,
 				5A8D23442341D767005F88E6 /* MetalTensor.h in Headers */,
 				5A8D23962341DA03005F88E6 /* MIResidualModule.h in Headers */,
 				5A8D23B82341DA03005F88E6 /* MIPoolingMaxLayer.h in Headers */,
@@ -297,6 +332,7 @@
 				5A8D23DE2341DA04005F88E6 /* MIArithmeticLayer.h in Headers */,
 				5A8D23A42341DA03005F88E6 /* MITemporaryImageCache.h in Headers */,
 				5A8D23A22341DA03005F88E6 /* MetalNeuralNetwork.h in Headers */,
+				5AC43CD9237C306500E740EA /* SSDObject.h in Headers */,
 				5A8D239D2341DA03005F88E6 /* FPSCounter.h in Headers */,
 				5A8D23B22341DA03005F88E6 /* MIBatchNormalizationLayer.h in Headers */,
 				5A8D23E12341E020005F88E6 /* metal_tensor_log.h in Headers */,
@@ -375,8 +411,10 @@
 			files = (
 				5A8D23CF2341DA04005F88E6 /* MIResidualModule.m in Sources */,
 				5A8D23B52341DA03005F88E6 /* MIConcatenateLayer.m in Sources */,
+				5AC43CD8237C306500E740EA /* SSDConfig.m in Sources */,
 				5A8D239E2341DA03005F88E6 /* MIL2NormalizationLayer.m in Sources */,
 				5A8D239F2341DA03005F88E6 /* MetalTensorLayerDescriptor.m in Sources */,
+				5AC43CD7237C306500E740EA /* ssd_prior_box.c in Sources */,
 				5A8D23A62341DA03005F88E6 /* MITransposeConvolutionLayer.m in Sources */,
 				5A8D23CD2341DA04005F88E6 /* MIFullyConnectedLayer.m in Sources */,
 				5A8D23E22341E020005F88E6 /* metal_tensor_log.c in Sources */,
@@ -388,11 +426,13 @@
 				5A8D23AA2341DA03005F88E6 /* FPSCounter.m in Sources */,
 				5A8D23D62341DA04005F88E6 /* MIBatchNormalizationLayer.m in Sources */,
 				5A8D23C22341DA03005F88E6 /* numpy.c in Sources */,
+				5AC43CD4237C306500E740EA /* SSDObject.m in Sources */,
 				5A8D23C62341DA03005F88E6 /* NSString+Extension.m in Sources */,
 				5A8D23A92341DA03005F88E6 /* MIArithmeticLayer.m in Sources */,
 				5A8D23982341DA03005F88E6 /* MISoftMaxLayer.m in Sources */,
 				5A8D239B2341DA03005F88E6 /* MIMPSImage.m in Sources */,
 				5A8D23DB2341DA04005F88E6 /* MetalTensorLayer.m in Sources */,
+				5AC43CD3237C306500E740EA /* ssd_decoder.c in Sources */,
 				5A8D239A2341DA03005F88E6 /* MetalTensorInputLayer.m in Sources */,
 				5A8D23972341DA03005F88E6 /* MIDataSource.m in Sources */,
 				5A8D23952341DA03005F88E6 /* MIReshapeLayer.m in Sources */,
