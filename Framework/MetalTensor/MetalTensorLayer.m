@@ -152,7 +152,10 @@
     [super compile:device];
     
     NSParameterAssert(_numOfInputs > 0);
-    _outputShape = _inputShapes[0];
+    if (ProductOfDataShape(&_outputShape) == 0) {
+        _outputShape = _inputShapes[0];
+    }
+    
 }
 
 #pragma mark - MetalLayerInput delegate

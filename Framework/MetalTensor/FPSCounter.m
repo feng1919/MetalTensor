@@ -33,7 +33,7 @@ static FPSCounter *_fpsCounter = nil;
     if (self = [super init]) {
         _average_count = 16;
         _index = 0;
-        _fps_list = malloc(_average_count * sizeof(int));
+        _fps_list = calloc(_average_count, sizeof(int));
     }
     return self;
 }
@@ -56,7 +56,7 @@ static FPSCounter *_fpsCounter = nil;
         _average_count = count;
         _index = 0;
         _start_time_stamp = 0.0f;
-        _fps_list = malloc(_average_count * sizeof(int));
+        _fps_list = calloc(_average_count, sizeof(int));
     }
 }
 
@@ -82,7 +82,7 @@ static FPSCounter *_fpsCounter = nil;
         if (_fps_list) {
             free(_fps_list);
         }
-        _fps_list = malloc(_average_count * sizeof(int));
+        _fps_list = calloc(_average_count, sizeof(int));
         _start_time_stamp = 0.0f;
         _index = 0;
     }

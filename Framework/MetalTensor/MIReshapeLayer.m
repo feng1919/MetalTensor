@@ -18,8 +18,23 @@
 
 @implementation MIReshapeLayer
 
+- (instancetype)initWithInputShape:(DataShape *)inputShape {
+    NSAssert(NO, @"The reshape layer's output must be sepecified explicitly. Use -initWithInputShape:outputShape: for initializing.");
+    return nil;
+}
+
+- (instancetype)initWithInputShapes:(DataShape *)inputShapes size:(int)size {
+    NSAssert(NO, @"The reshape layer's output must be sepecified explicitly. Use -initWithInputShape:outputShape: for initializing.");
+    return nil;
+}
+
+- (instancetype)initWithInputShapes1:(DataShape * _Nonnull *)inputShapes size:(int)size {
+    NSAssert(NO, @"The reshape layer's output must be sepecified explicitly. Use -initWithInputShape:outputShape: for initializing.");
+    return nil;
+}
+
 - (instancetype)initWithInputShape:(DataShape *)inputShape outputShape:(DataShape *)outputShape {
-    if (self = [super initWithInputShape:inputShape]) {
+    if (self = [super initWithInputShapes:inputShape size:1]) {
         
         _outputShape = *outputShape;
         
