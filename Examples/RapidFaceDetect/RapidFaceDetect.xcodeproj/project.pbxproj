@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5AC43CAF237C22BE00E740EA /* RapidFaceDetect.json in Resources */ = {isa = PBXBuildFile; fileRef = 5AC43CAC237C22BE00E740EA /* RapidFaceDetect.json */; };
+		5AC43CB0237C22BE00E740EA /* RapidFaceDetect.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5AC43CAE237C22BE00E740EA /* RapidFaceDetect.bin */; };
+		5AC43CB5237C235F00E740EA /* RapidFaceDetectSummory in Resources */ = {isa = PBXBuildFile; fileRef = 5AC43CB2237C235F00E740EA /* RapidFaceDetectSummory */; };
+		5AC43CB6237C235F00E740EA /* RapidFaceDetect.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5AC43CB3237C235F00E740EA /* RapidFaceDetect.plist */; };
+		5AC43CB7237C235F00E740EA /* RapidFaceDetectConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5AC43CB4237C235F00E740EA /* RapidFaceDetectConfig.plist */; };
+		5AC43CB9237C25AB00E740EA /* RapidFaceDetect.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AC43CB8237C25AB00E740EA /* RapidFaceDetect.png */; };
+		5AC43CDE237C313500E740EA /* RapidFaceDetectNet.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CDD237C313500E740EA /* RapidFaceDetectNet.m */; };
+		5AC43CE4237C476C00E740EA /* RapidFaceDetectFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CE3237C476C00E740EA /* RapidFaceDetectFilter.m */; };
+		5AC43CE7237C49E300E740EA /* ObjectRender.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CE6237C49E300E740EA /* ObjectRender.metal */; };
 		5ACC082023506B83004CD815 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACC081F23506B83004CD815 /* AppDelegate.m */; };
 		5ACC082623506B83004CD815 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACC082523506B83004CD815 /* ViewController.m */; };
 		5ACC082B23506B85004CD815 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ACC082A23506B85004CD815 /* Assets.xcassets */; };
@@ -44,6 +53,17 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5AC43CAC237C22BE00E740EA /* RapidFaceDetect.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = RapidFaceDetect.json; sourceTree = "<group>"; };
+		5AC43CAE237C22BE00E740EA /* RapidFaceDetect.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = RapidFaceDetect.bin; sourceTree = "<group>"; };
+		5AC43CB2237C235F00E740EA /* RapidFaceDetectSummory */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = RapidFaceDetectSummory; sourceTree = "<group>"; };
+		5AC43CB3237C235F00E740EA /* RapidFaceDetect.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = RapidFaceDetect.plist; sourceTree = "<group>"; };
+		5AC43CB4237C235F00E740EA /* RapidFaceDetectConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = RapidFaceDetectConfig.plist; sourceTree = "<group>"; };
+		5AC43CB8237C25AB00E740EA /* RapidFaceDetect.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RapidFaceDetect.png; sourceTree = "<group>"; };
+		5AC43CDC237C313500E740EA /* RapidFaceDetectNet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RapidFaceDetectNet.h; sourceTree = "<group>"; };
+		5AC43CDD237C313500E740EA /* RapidFaceDetectNet.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RapidFaceDetectNet.m; sourceTree = "<group>"; };
+		5AC43CE2237C476C00E740EA /* RapidFaceDetectFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RapidFaceDetectFilter.h; sourceTree = "<group>"; };
+		5AC43CE3237C476C00E740EA /* RapidFaceDetectFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RapidFaceDetectFilter.m; sourceTree = "<group>"; };
+		5AC43CE6237C49E300E740EA /* ObjectRender.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ObjectRender.metal; sourceTree = "<group>"; };
 		5ACC081B23506B83004CD815 /* RapidFaceDetect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RapidFaceDetect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ACC081E23506B83004CD815 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5ACC081F23506B83004CD815 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -96,6 +116,17 @@
 				5ACC081F23506B83004CD815 /* AppDelegate.m */,
 				5ACC082423506B83004CD815 /* ViewController.h */,
 				5ACC082523506B83004CD815 /* ViewController.m */,
+				5AC43CAE237C22BE00E740EA /* RapidFaceDetect.bin */,
+				5AC43CAC237C22BE00E740EA /* RapidFaceDetect.json */,
+				5AC43CB3237C235F00E740EA /* RapidFaceDetect.plist */,
+				5AC43CB4237C235F00E740EA /* RapidFaceDetectConfig.plist */,
+				5AC43CB2237C235F00E740EA /* RapidFaceDetectSummory */,
+				5AC43CB8237C25AB00E740EA /* RapidFaceDetect.png */,
+				5AC43CDC237C313500E740EA /* RapidFaceDetectNet.h */,
+				5AC43CDD237C313500E740EA /* RapidFaceDetectNet.m */,
+				5AC43CE2237C476C00E740EA /* RapidFaceDetectFilter.h */,
+				5AC43CE3237C476C00E740EA /* RapidFaceDetectFilter.m */,
+				5AC43CE6237C49E300E740EA /* ObjectRender.metal */,
 				5ACC082A23506B85004CD815 /* Assets.xcassets */,
 				5ACC082C23506B85004CD815 /* LaunchScreen.storyboard */,
 				5ACC082F23506B85004CD815 /* Info.plist */,
@@ -193,7 +224,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AC43CAF237C22BE00E740EA /* RapidFaceDetect.json in Resources */,
+				5AC43CB5237C235F00E740EA /* RapidFaceDetectSummory in Resources */,
+				5AC43CB7237C235F00E740EA /* RapidFaceDetectConfig.plist in Resources */,
+				5AC43CB6237C235F00E740EA /* RapidFaceDetect.plist in Resources */,
 				5ACC082E23506B85004CD815 /* LaunchScreen.storyboard in Resources */,
+				5AC43CB9237C25AB00E740EA /* RapidFaceDetect.png in Resources */,
+				5AC43CB0237C22BE00E740EA /* RapidFaceDetect.bin in Resources */,
 				5ACC082B23506B85004CD815 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -205,8 +242,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AC43CDE237C313500E740EA /* RapidFaceDetectNet.m in Sources */,
+				5AC43CE7237C49E300E740EA /* ObjectRender.metal in Sources */,
 				5ACC082623506B83004CD815 /* ViewController.m in Sources */,
 				5ACC082023506B83004CD815 /* AppDelegate.m in Sources */,
+				5AC43CE4237C476C00E740EA /* RapidFaceDetectFilter.m in Sources */,
 				5ACC083123506B85004CD815 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,6 +379,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -362,6 +403,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_ASSET_PATHS = "";

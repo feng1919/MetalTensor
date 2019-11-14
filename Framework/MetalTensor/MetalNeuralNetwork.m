@@ -222,7 +222,7 @@
     id<MTLCommandQueue> command_queue = [MetalDevice sharedCommandQueue];
     id<MTLCommandBuffer> command_buffer = [command_queue commandBuffer];
     [command_buffer setLabel:_reuseIdentifier];
-    [command_buffer enqueue];
+//    [command_buffer enqueue];
     [[MITemporaryImageCache sharedCache] beginContextWithCommandBuffer:command_buffer];
     [_inputLayer processOnCommandBuffer:command_buffer];
     [[MITemporaryImageCache sharedCache] endContextWithCommandBuffer:command_buffer];

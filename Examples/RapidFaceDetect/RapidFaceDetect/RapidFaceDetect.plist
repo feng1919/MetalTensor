@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>input</key>
+	<dict>
+		<key>inputs</key>
+		<string>256, 256, 3</string>
+		<key>targets</key>
+		<string>preprocess</string>
+		<key>type</key>
+		<string>input</string>
+	</dict>
+	<key>preprocess</key>
+	<dict>
+		<key>type</key>
+		<string>neuron</string>
+		<key>inputs</key>
+		<string>256, 256, 3</string>
+		<key>activation</key>
+		<string>linear, 2.0, -1.0</string>
+		<key>targets</key>
+		<string>conv0</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>conv0</key>
+	<dict>
+		<key>inputs</key>
+		<string>256, 256, 3</string>
+		<key>kernel</key>
+		<string>5</string>
+		<key>filters</key>
+		<string>8</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>weight</key>
+		<string>conv_0</string>
+		<key>activation</key>
+		<string>relun, 0.0, 6.0</string>
+		<key>targets</key>
+		<string>block_0</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>block_0</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>128, 128, 8</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>8</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_1</string>
+		<key>weights</key>
+		<string>block_0_expand, block_0_depthwise, block_0_project</string>
+	</dict>
+	<key>block_1</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>128, 128, 8</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>16</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_2</string>
+		<key>weights</key>
+		<string>block_1_expand, block_1_depthwise, block_1_project</string>
+	</dict>
+	<key>block_2</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>128, 128, 16</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>16</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>targets</key>
+		<string>block_3</string>
+		<key>weights</key>
+		<string>block_2_expand, block_2_depthwise, block_2_project</string>
+	</dict>
+	<key>block_3</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>64, 64, 16</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>16</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_4</string>
+		<key>weights</key>
+		<string>block_3_expand, block_3_depthwise, block_3_project</string>
+	</dict>
+	<key>block_4</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>64, 64, 16</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_5</string>
+		<key>weights</key>
+		<string>block_4_expand, block_4_depthwise, block_4_project</string>
+	</dict>
+	<key>block_5</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>64, 64, 24</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>targets</key>
+		<string>block_6</string>
+		<key>weights</key>
+		<string>block_5_expand, block_5_depthwise, block_5_project</string>
+	</dict>
+	<key>block_6</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>32, 32, 24</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_7</string>
+		<key>weights</key>
+		<string>block_6_expand, block_6_depthwise, block_6_project</string>
+	</dict>
+	<key>block_7</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>32, 32, 24</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_8</string>
+		<key>weights</key>
+		<string>block_7_expand, block_7_depthwise, block_7_project</string>
+	</dict>
+	<key>block_8</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>32, 32, 32</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_9, conv_dw_100, conv_dw_200</string>
+		<key>weights</key>
+		<string>block_8_expand, block_8_depthwise, block_8_project</string>
+	</dict>
+	<key>block_9</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>32, 32, 32</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>targets</key>
+		<string>block_10</string>
+		<key>weights</key>
+		<string>block_9_expand, block_9_depthwise, block_9_project</string>
+	</dict>
+	<key>block_10</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>16, 16, 32</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_11, conv_dw_101, conv_dw_201</string>
+		<key>weights</key>
+		<string>block_10_expand, block_10_depthwise, block_10_project</string>
+	</dict>
+	<key>block_11</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>16, 16, 32</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>targets</key>
+		<string>block_12</string>
+		<key>weights</key>
+		<string>block_11_expand, block_11_depthwise, block_11_project</string>
+	</dict>
+	<key>block_12</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>8, 8, 32</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>block_13, conv_dw_102, conv_dw_202</string>
+		<key>weights</key>
+		<string>block_12_expand, block_12_depthwise, block_12_project</string>
+	</dict>
+	<key>block_13</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>8, 8, 32</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>2</string>
+		<key>targets</key>
+		<string>block_14</string>
+		<key>weights</key>
+		<string>block_13_expand, block_13_depthwise, block_13_project</string>
+	</dict>
+	<key>block_14</key>
+	<dict>
+		<key>type</key>
+		<string>inverted_residual</string>
+		<key>inputs</key>
+		<string>4, 4, 32</string>
+		<key>expansion</key>
+		<string>6</string>
+		<key>filters</key>
+		<string>32</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>targets</key>
+		<string>conv_dw_103, conv_dw_203</string>
+		<key>weights</key>
+		<string>block_14_expand, block_14_depthwise, block_14_project</string>
+	</dict>
+	<key>conv_dw_100</key>
+	<dict>
+		<key>inputs</key>
+		<string>32, 32, 32</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>1</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>depthwise</key>
+		<true/>
+		<key>weight</key>
+		<string>conv_dw_100</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>conv_pw_100</string>
+	</dict>
+	<key>conv_pw_100</key>
+	<dict>
+		<key>inputs</key>
+		<string>32, 32, 32</string>
+		<key>kernel</key>
+		<string>1</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>conv_pw_100</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>reshape100</string>
+	</dict>
+	<key>conv_dw_101</key>
+	<dict>
+		<key>inputs</key>
+		<string>16, 16, 32</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>1</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>depthwise</key>
+		<true/>
+		<key>weight</key>
+		<string>conv_dw_101</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>conv_pw_101</string>
+	</dict>
+	<key>conv_pw_101</key>
+	<dict>
+		<key>inputs</key>
+		<string>16, 16, 32</string>
+		<key>kernel</key>
+		<string>1</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>conv_pw_101</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>reshape101</string>
+	</dict>
+	<key>conv_dw_102</key>
+	<dict>
+		<key>inputs</key>
+		<string>8, 8, 32</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>1</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>depthwise</key>
+		<true/>
+		<key>weight</key>
+		<string>conv_dw_102</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>conv_pw_102</string>
+	</dict>
+	<key>conv_pw_102</key>
+	<dict>
+		<key>inputs</key>
+		<string>8, 8, 32</string>
+		<key>kernel</key>
+		<string>1</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>conv_pw_102</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>reshape102</string>
+	</dict>
+	<key>conv_dw_103</key>
+	<dict>
+		<key>inputs</key>
+		<string>4, 4, 32</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>1</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>depthwise</key>
+		<true/>
+		<key>weight</key>
+		<string>conv_dw_103</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>conv_pw_103</string>
+	</dict>
+	<key>conv_pw_103</key>
+	<dict>
+		<key>inputs</key>
+		<string>4, 4, 32</string>
+		<key>kernel</key>
+		<string>1</string>
+		<key>filters</key>
+		<string>24</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>conv_pw_103</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>reshape103</string>
+	</dict>
+	<key>conv_dw_200</key>
+	<dict>
+		<key>inputs</key>
+		<string>32, 32, 32</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>1</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>depthwise</key>
+		<true/>
+		<key>weight</key>
+		<string>conv_dw_200</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>conv_pw_200</string>
+	</dict>
+	<key>conv_pw_200</key>
+	<dict>
+		<key>inputs</key>
+		<string>32, 32, 32</string>
+		<key>kernel</key>
+		<string>1</string>
+		<key>filters</key>
+		<string>12</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>conv_pw_200</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>reshape200</string>
+	</dict>
+	<key>conv_dw_201</key>
+	<dict>
+		<key>inputs</key>
+		<string>16, 16, 32</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>1</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>depthwise</key>
+		<true/>
+		<key>weight</key>
+		<string>conv_dw_201</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>conv_pw_201</string>
+	</dict>
+	<key>conv_pw_201</key>
+	<dict>
+		<key>inputs</key>
+		<string>16, 16, 32</string>
+		<key>kernel</key>
+		<string>1</string>
+		<key>filters</key>
+		<string>12</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>conv_pw_201</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>reshape201</string>
+	</dict>
+	<key>conv_dw_202</key>
+	<dict>
+		<key>inputs</key>
+		<string>8, 8, 32</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>1</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>depthwise</key>
+		<true/>
+		<key>weight</key>
+		<string>conv_dw_202</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>conv_pw_202</string>
+	</dict>
+	<key>conv_pw_202</key>
+	<dict>
+		<key>inputs</key>
+		<string>8, 8, 32</string>
+		<key>kernel</key>
+		<string>1</string>
+		<key>filters</key>
+		<string>12</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>conv_pw_202</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>reshape202</string>
+	</dict>
+	<key>conv_dw_203</key>
+	<dict>
+		<key>inputs</key>
+		<string>4, 4, 32</string>
+		<key>kernel</key>
+		<string>3</string>
+		<key>filters</key>
+		<string>1</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>depthwise</key>
+		<true/>
+		<key>weight</key>
+		<string>conv_dw_203</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>conv_pw_203</string>
+	</dict>
+	<key>conv_pw_203</key>
+	<dict>
+		<key>inputs</key>
+		<string>4, 4, 32</string>
+		<key>kernel</key>
+		<string>1</string>
+		<key>filters</key>
+		<string>12</string>
+		<key>stride</key>
+		<string>1</string>
+		<key>weight</key>
+		<string>conv_pw_203</string>
+		<key>activation</key>
+		<string>none</string>
+		<key>targets</key>
+		<string>reshape203</string>
+	</dict>
+	<key>reshape100</key>
+	<dict>
+		<key>type</key>
+		<string>reshape</string>
+		<key>inputs</key>
+		<string>32, 32, 24</string>
+		<key>output</key>
+		<string>1, 4,  6144</string>
+		<key>targets</key>
+		<string>concatenate1000</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>reshape101</key>
+	<dict>
+		<key>type</key>
+		<string>reshape</string>
+		<key>inputs</key>
+		<string>16, 16, 24</string>
+		<key>output</key>
+		<string>1, 4, 1536</string>
+		<key>targets</key>
+		<string>concatenate1000</string>
+		<key>indices</key>
+		<string>1</string>
+	</dict>
+	<key>reshape102</key>
+	<dict>
+		<key>inputs</key>
+		<string>8, 8, 24</string>
+		<key>output</key>
+		<string>1, 4, 384</string>
+		<key>type</key>
+		<string>reshape</string>
+		<key>targets</key>
+		<string>concatenate1000</string>
+		<key>indices</key>
+		<string>2</string>
+	</dict>
+	<key>reshape103</key>
+	<dict>
+		<key>inputs</key>
+		<string>4, 4, 24</string>
+		<key>output</key>
+		<string>1, 4, 96</string>
+		<key>type</key>
+		<string>reshape</string>
+		<key>targets</key>
+		<string>concatenate1000</string>
+		<key>indices</key>
+		<string>3</string>
+	</dict>
+	<key>reshape200</key>
+	<dict>
+		<key>inputs</key>
+		<string>32, 32, 12</string>
+		<key>output</key>
+		<string>1, 2, 6144</string>
+		<key>type</key>
+		<string>reshape</string>
+		<key>targets</key>
+		<string>concatenate2000</string>
+		<key>indices</key>
+		<string>0</string>
+	</dict>
+	<key>reshape201</key>
+	<dict>
+		<key>inputs</key>
+		<string>16, 16, 12</string>
+		<key>output</key>
+		<string>1, 2, 1536</string>
+		<key>type</key>
+		<string>reshape</string>
+		<key>targets</key>
+		<string>concatenate2000</string>
+		<key>indices</key>
+		<string>1</string>
+	</dict>
+	<key>reshape202</key>
+	<dict>
+		<key>inputs</key>
+		<string>8, 8, 12</string>
+		<key>output</key>
+		<string>1, 2, 384</string>
+		<key>type</key>
+		<string>reshape</string>
+		<key>targets</key>
+		<string>concatenate2000</string>
+		<key>indices</key>
+		<string>2</string>
+	</dict>
+	<key>reshape203</key>
+	<dict>
+		<key>inputs</key>
+		<string>4, 4, 12</string>
+		<key>output</key>
+		<string>1, 2, 96</string>
+		<key>type</key>
+		<string>reshape</string>
+		<key>targets</key>
+		<string>concatenate2000</string>
+		<key>indices</key>
+		<string>3</string>
+	</dict>
+	<key>concatenate1000</key>
+	<dict>
+		<key>inputs</key>
+		<string>1, 4, 6144; 1, 4, 1536;  1, 4, 384; 1, 4, 96</string>
+		<key>type</key>
+		<string>concatenate</string>
+		<key>targets</key>
+		<string>output1000</string>
+	</dict>
+	<key>concatenate2000</key>
+	<dict>
+		<key>inputs</key>
+		<string>1, 2, 6144; 1, 2, 1536;  1, 2, 384; 1, 2, 96</string>
+		<key>type</key>
+		<string>concatenate</string>
+		<key>targets</key>
+		<string>output2000</string>
+	</dict>
+	<key>output1000</key>
+	<dict>
+		<key>inputs</key>
+		<string>1, 4, 8160</string>
+		<key>type</key>
+		<string>output</string>
+	</dict>
+	<key>output2000</key>
+	<dict>
+		<key>inputs</key>
+		<string>1, 2, 8160</string>
+		<key>type</key>
+		<string>output</string>
+	</dict>
+</dict>
+</plist>
