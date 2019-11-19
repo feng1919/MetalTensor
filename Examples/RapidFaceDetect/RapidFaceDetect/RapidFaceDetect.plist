@@ -5,7 +5,7 @@
 	<key>input</key>
 	<dict>
 		<key>inputs</key>
-		<string>256, 256, 3</string>
+		<string>224, 224, 3</string>
 		<key>targets</key>
 		<string>preprocess</string>
 		<key>type</key>
@@ -16,7 +16,7 @@
 		<key>type</key>
 		<string>neuron</string>
 		<key>inputs</key>
-		<string>256, 256, 3</string>
+		<string>224, 224, 3</string>
 		<key>activation</key>
 		<string>linear, 2.0, -1.0</string>
 		<key>targets</key>
@@ -27,7 +27,7 @@
 	<key>conv0</key>
 	<dict>
 		<key>inputs</key>
-		<string>256, 256, 3</string>
+		<string>224, 224, 3</string>
 		<key>kernel</key>
 		<string>5</string>
 		<key>filters</key>
@@ -48,11 +48,11 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>128, 128, 8</string>
+		<string>112, 112, 8</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
-		<string>8</string>
+		<string>16</string>
 		<key>stride</key>
 		<string>1</string>
 		<key>targets</key>
@@ -65,7 +65,7 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>128, 128, 8</string>
+		<string>112, 112, 16</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -82,11 +82,11 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>128, 128, 16</string>
+		<string>112, 112, 16</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
-		<string>16</string>
+		<string>24</string>
 		<key>stride</key>
 		<string>2</string>
 		<key>targets</key>
@@ -99,11 +99,11 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>64, 64, 16</string>
+		<string>56, 56, 24</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
-		<string>16</string>
+		<string>24</string>
 		<key>stride</key>
 		<string>1</string>
 		<key>targets</key>
@@ -116,7 +116,7 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>64, 64, 16</string>
+		<string>56, 56, 24</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -133,11 +133,11 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>64, 64, 24</string>
+		<string>56, 56, 24</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
-		<string>24</string>
+		<string>32</string>
 		<key>stride</key>
 		<string>2</string>
 		<key>targets</key>
@@ -150,11 +150,11 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>32, 32, 24</string>
+		<string>28, 28, 32</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
-		<string>24</string>
+		<string>32</string>
 		<key>stride</key>
 		<string>1</string>
 		<key>targets</key>
@@ -167,7 +167,7 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>32, 32, 24</string>
+		<string>28, 28, 32</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -184,7 +184,7 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>32, 32, 32</string>
+		<string>28, 28, 32</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -201,7 +201,7 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>32, 32, 32</string>
+		<string>28, 28, 32</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -218,7 +218,7 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>16, 16, 32</string>
+		<string>14, 14, 32</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -226,7 +226,7 @@
 		<key>stride</key>
 		<string>1</string>
 		<key>targets</key>
-		<string>block_11, conv_dw_101, conv_dw_201</string>
+		<string>block_11</string>
 		<key>weights</key>
 		<string>block_10_expand, block_10_depthwise, block_10_project</string>
 	</dict>
@@ -235,15 +235,15 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>16, 16, 32</string>
+		<string>14, 14, 32</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
 		<string>32</string>
 		<key>stride</key>
-		<string>2</string>
+		<string>1</string>
 		<key>targets</key>
-		<string>block_12</string>
+		<string>block_12,  conv_dw_101, conv_dw_201</string>
 		<key>weights</key>
 		<string>block_11_expand, block_11_depthwise, block_11_project</string>
 	</dict>
@@ -252,15 +252,15 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>8, 8, 32</string>
+		<string>14, 14, 32</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
 		<string>32</string>
 		<key>stride</key>
-		<string>1</string>
+		<string>2</string>
 		<key>targets</key>
-		<string>block_13, conv_dw_102, conv_dw_202</string>
+		<string>block_13</string>
 		<key>weights</key>
 		<string>block_12_expand, block_12_depthwise, block_12_project</string>
 	</dict>
@@ -269,24 +269,7 @@
 		<key>type</key>
 		<string>inverted_residual</string>
 		<key>inputs</key>
-		<string>8, 8, 32</string>
-		<key>expansion</key>
-		<string>6</string>
-		<key>filters</key>
-		<string>32</string>
-		<key>stride</key>
-		<string>2</string>
-		<key>targets</key>
-		<string>block_14</string>
-		<key>weights</key>
-		<string>block_13_expand, block_13_depthwise, block_13_project</string>
-	</dict>
-	<key>block_14</key>
-	<dict>
-		<key>type</key>
-		<string>inverted_residual</string>
-		<key>inputs</key>
-		<string>4, 4, 32</string>
+		<string>7, 7, 32</string>
 		<key>expansion</key>
 		<string>6</string>
 		<key>filters</key>
@@ -294,14 +277,14 @@
 		<key>stride</key>
 		<string>1</string>
 		<key>targets</key>
-		<string>conv_dw_103, conv_dw_203</string>
+		<string>conv_dw_102, conv_dw_202</string>
 		<key>weights</key>
-		<string>block_14_expand, block_14_depthwise, block_14_project</string>
+		<string>block_13_expand, block_13_depthwise, block_13_project</string>
 	</dict>
 	<key>conv_dw_100</key>
 	<dict>
 		<key>inputs</key>
-		<string>32, 32, 32</string>
+		<string>28, 28, 32</string>
 		<key>kernel</key>
 		<string>3</string>
 		<key>filters</key>
@@ -320,7 +303,7 @@
 	<key>conv_pw_100</key>
 	<dict>
 		<key>inputs</key>
-		<string>32, 32, 32</string>
+		<string>28, 28, 32</string>
 		<key>kernel</key>
 		<string>1</string>
 		<key>filters</key>
@@ -337,7 +320,7 @@
 	<key>conv_dw_101</key>
 	<dict>
 		<key>inputs</key>
-		<string>16, 16, 32</string>
+		<string>14, 14, 32</string>
 		<key>kernel</key>
 		<string>3</string>
 		<key>filters</key>
@@ -356,7 +339,7 @@
 	<key>conv_pw_101</key>
 	<dict>
 		<key>inputs</key>
-		<string>16, 16, 32</string>
+		<string>14, 14, 32</string>
 		<key>kernel</key>
 		<string>1</string>
 		<key>filters</key>
@@ -373,7 +356,7 @@
 	<key>conv_dw_102</key>
 	<dict>
 		<key>inputs</key>
-		<string>8, 8, 32</string>
+		<string>7, 7, 32</string>
 		<key>kernel</key>
 		<string>3</string>
 		<key>filters</key>
@@ -392,7 +375,7 @@
 	<key>conv_pw_102</key>
 	<dict>
 		<key>inputs</key>
-		<string>8, 8, 32</string>
+		<string>7, 7, 32</string>
 		<key>kernel</key>
 		<string>1</string>
 		<key>filters</key>
@@ -406,46 +389,10 @@
 		<key>targets</key>
 		<string>reshape102</string>
 	</dict>
-	<key>conv_dw_103</key>
-	<dict>
-		<key>inputs</key>
-		<string>4, 4, 32</string>
-		<key>kernel</key>
-		<string>3</string>
-		<key>filters</key>
-		<string>1</string>
-		<key>stride</key>
-		<string>1</string>
-		<key>depthwise</key>
-		<true/>
-		<key>weight</key>
-		<string>conv_dw_103</string>
-		<key>activation</key>
-		<string>none</string>
-		<key>targets</key>
-		<string>conv_pw_103</string>
-	</dict>
-	<key>conv_pw_103</key>
-	<dict>
-		<key>inputs</key>
-		<string>4, 4, 32</string>
-		<key>kernel</key>
-		<string>1</string>
-		<key>filters</key>
-		<string>24</string>
-		<key>stride</key>
-		<string>1</string>
-		<key>weight</key>
-		<string>conv_pw_103</string>
-		<key>activation</key>
-		<string>none</string>
-		<key>targets</key>
-		<string>reshape103</string>
-	</dict>
 	<key>conv_dw_200</key>
 	<dict>
 		<key>inputs</key>
-		<string>32, 32, 32</string>
+		<string>28, 28, 32</string>
 		<key>kernel</key>
 		<string>3</string>
 		<key>filters</key>
@@ -464,7 +411,7 @@
 	<key>conv_pw_200</key>
 	<dict>
 		<key>inputs</key>
-		<string>32, 32, 32</string>
+		<string>28, 28, 32</string>
 		<key>kernel</key>
 		<string>1</string>
 		<key>filters</key>
@@ -481,7 +428,7 @@
 	<key>conv_dw_201</key>
 	<dict>
 		<key>inputs</key>
-		<string>16, 16, 32</string>
+		<string>14, 14, 32</string>
 		<key>kernel</key>
 		<string>3</string>
 		<key>filters</key>
@@ -500,7 +447,7 @@
 	<key>conv_pw_201</key>
 	<dict>
 		<key>inputs</key>
-		<string>16, 16, 32</string>
+		<string>14, 14, 32</string>
 		<key>kernel</key>
 		<string>1</string>
 		<key>filters</key>
@@ -517,7 +464,7 @@
 	<key>conv_dw_202</key>
 	<dict>
 		<key>inputs</key>
-		<string>8, 8, 32</string>
+		<string>7, 7, 32</string>
 		<key>kernel</key>
 		<string>3</string>
 		<key>filters</key>
@@ -536,7 +483,7 @@
 	<key>conv_pw_202</key>
 	<dict>
 		<key>inputs</key>
-		<string>8, 8, 32</string>
+		<string>7, 7, 32</string>
 		<key>kernel</key>
 		<string>1</string>
 		<key>filters</key>
@@ -550,50 +497,14 @@
 		<key>targets</key>
 		<string>reshape202</string>
 	</dict>
-	<key>conv_dw_203</key>
-	<dict>
-		<key>inputs</key>
-		<string>4, 4, 32</string>
-		<key>kernel</key>
-		<string>3</string>
-		<key>filters</key>
-		<string>1</string>
-		<key>stride</key>
-		<string>1</string>
-		<key>depthwise</key>
-		<true/>
-		<key>weight</key>
-		<string>conv_dw_203</string>
-		<key>activation</key>
-		<string>none</string>
-		<key>targets</key>
-		<string>conv_pw_203</string>
-	</dict>
-	<key>conv_pw_203</key>
-	<dict>
-		<key>inputs</key>
-		<string>4, 4, 32</string>
-		<key>kernel</key>
-		<string>1</string>
-		<key>filters</key>
-		<string>12</string>
-		<key>stride</key>
-		<string>1</string>
-		<key>weight</key>
-		<string>conv_pw_203</string>
-		<key>activation</key>
-		<string>none</string>
-		<key>targets</key>
-		<string>reshape203</string>
-	</dict>
 	<key>reshape100</key>
 	<dict>
 		<key>type</key>
 		<string>reshape</string>
 		<key>inputs</key>
-		<string>32, 32, 24</string>
+		<string>28, 28, 24</string>
 		<key>output</key>
-		<string>1, 4,  6144</string>
+		<string>1, 4,  4704</string>
 		<key>targets</key>
 		<string>concatenate1000</string>
 		<key>indices</key>
@@ -604,9 +515,9 @@
 		<key>type</key>
 		<string>reshape</string>
 		<key>inputs</key>
-		<string>16, 16, 24</string>
+		<string>14, 14, 24</string>
 		<key>output</key>
-		<string>1, 4, 1536</string>
+		<string>1, 4, 1176</string>
 		<key>targets</key>
 		<string>concatenate1000</string>
 		<key>indices</key>
@@ -615,9 +526,9 @@
 	<key>reshape102</key>
 	<dict>
 		<key>inputs</key>
-		<string>8, 8, 24</string>
+		<string>7, 7, 24</string>
 		<key>output</key>
-		<string>1, 4, 384</string>
+		<string>1, 4, 294</string>
 		<key>type</key>
 		<string>reshape</string>
 		<key>targets</key>
@@ -625,25 +536,12 @@
 		<key>indices</key>
 		<string>2</string>
 	</dict>
-	<key>reshape103</key>
-	<dict>
-		<key>inputs</key>
-		<string>4, 4, 24</string>
-		<key>output</key>
-		<string>1, 4, 96</string>
-		<key>type</key>
-		<string>reshape</string>
-		<key>targets</key>
-		<string>concatenate1000</string>
-		<key>indices</key>
-		<string>3</string>
-	</dict>
 	<key>reshape200</key>
 	<dict>
 		<key>inputs</key>
-		<string>32, 32, 12</string>
+		<string>28, 28, 12</string>
 		<key>output</key>
-		<string>1, 2, 6144</string>
+		<string>1, 2, 4704</string>
 		<key>type</key>
 		<string>reshape</string>
 		<key>targets</key>
@@ -654,9 +552,9 @@
 	<key>reshape201</key>
 	<dict>
 		<key>inputs</key>
-		<string>16, 16, 12</string>
+		<string>14, 14, 12</string>
 		<key>output</key>
-		<string>1, 2, 1536</string>
+		<string>1, 2, 1176</string>
 		<key>type</key>
 		<string>reshape</string>
 		<key>targets</key>
@@ -667,9 +565,9 @@
 	<key>reshape202</key>
 	<dict>
 		<key>inputs</key>
-		<string>8, 8, 12</string>
+		<string>7, 7, 12</string>
 		<key>output</key>
-		<string>1, 2, 384</string>
+		<string>1, 2, 294</string>
 		<key>type</key>
 		<string>reshape</string>
 		<key>targets</key>
@@ -677,23 +575,10 @@
 		<key>indices</key>
 		<string>2</string>
 	</dict>
-	<key>reshape203</key>
-	<dict>
-		<key>inputs</key>
-		<string>4, 4, 12</string>
-		<key>output</key>
-		<string>1, 2, 96</string>
-		<key>type</key>
-		<string>reshape</string>
-		<key>targets</key>
-		<string>concatenate2000</string>
-		<key>indices</key>
-		<string>3</string>
-	</dict>
 	<key>concatenate1000</key>
 	<dict>
 		<key>inputs</key>
-		<string>1, 4, 6144; 1, 4, 1536;  1, 4, 384; 1, 4, 96</string>
+		<string>1, 4, 4704; 1, 4, 1176;  1, 4, 294;</string>
 		<key>type</key>
 		<string>concatenate</string>
 		<key>targets</key>
@@ -702,7 +587,7 @@
 	<key>concatenate2000</key>
 	<dict>
 		<key>inputs</key>
-		<string>1, 2, 6144; 1, 2, 1536;  1, 2, 384; 1, 2, 96</string>
+		<string>1, 2, 4704; 1, 2, 1176;  1, 2, 294;</string>
 		<key>type</key>
 		<string>concatenate</string>
 		<key>targets</key>
@@ -711,14 +596,14 @@
 	<key>output1000</key>
 	<dict>
 		<key>inputs</key>
-		<string>1, 4, 8160</string>
+		<string>1, 4, 6176</string>
 		<key>type</key>
 		<string>output</string>
 	</dict>
 	<key>output2000</key>
 	<dict>
 		<key>inputs</key>
-		<string>1, 2, 8160</string>
+		<string>1, 2, 6176</string>
 		<key>type</key>
 		<string>output</string>
 	</dict>
