@@ -14,13 +14,13 @@
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary {
     if (self = [super init]) {
         
-        self.classes = [dictionary[@"classes"] componentsSeparatedByString:@","];
+        self.classes = [dictionary[@"classes"] nonEmptyComponentsSeparatedByString:@","];
         
         NSString *coords = dictionary[@"coords"]?:@"minmax";
         self.coords = [coords substringToIndex:1].UTF8String[0];
         
         NSParameterAssert(dictionary[@"network_size"]);
-        NSArray<NSString *> *networkSizeInfo = [dictionary[@"network_size"] componentsSeparatedByString:@","];
+        NSArray<NSString *> *networkSizeInfo = [dictionary[@"network_size"] nonEmptyComponentsSeparatedByString:@","];
         NSParameterAssert(networkSizeInfo.count == 2);
         _network_size.width = [networkSizeInfo[0] floatValue];
         _network_size.height = [networkSizeInfo[1] floatValue];
@@ -33,14 +33,14 @@
         _feature_map_sizes = malloc(_n_pyramid_layers*sizeof(pb_size));
         NSParameterAssert(feature_map_sizes.count == _n_pyramid_layers);
         for (int i = 0; i < _n_pyramid_layers; i++) {
-            NSArray<NSString *> *sizeInfo = [feature_map_sizes[i] componentsSeparatedByString:@","];
+            NSArray<NSString *> *sizeInfo = [feature_map_sizes[i] nonEmptyComponentsSeparatedByString:@","];
             NSParameterAssert(sizeInfo.count == 2);
             _feature_map_sizes[i].width = [sizeInfo[0] floatValue];
             _feature_map_sizes[i].height = [sizeInfo[1] floatValue];
         }
         
         NSParameterAssert(dictionary[@"scales"]);
-        NSArray<NSString *> *scales = [dictionary[@"scales"] componentsSeparatedByString:@","];
+        NSArray<NSString *> *scales = [dictionary[@"scales"] nonEmptyComponentsSeparatedByString:@","];
         NSParameterAssert(scales.count == _n_pyramid_layers+1);
         _scales = malloc(scales.count*sizeof(float));
         for (int i = 0; i < scales.count; i++) {
@@ -52,7 +52,7 @@
         NSParameterAssert(aspectRatiosList.count == _n_pyramid_layers);
         _aspect_ratios = malloc(aspectRatiosList.count*sizeof(pb_ratios));
         for (int i = 0; i < aspectRatiosList.count; i++) {
-            NSArray<NSString *> *arInfo = [aspectRatiosList[i] componentsSeparatedByString:@","];
+            NSArray<NSString *> *arInfo = [aspectRatiosList[i] nonEmptyComponentsSeparatedByString:@","];
             NSParameterAssert(arInfo.count<=8);
             _aspect_ratios[i].count = (int)arInfo.count;
             for (int j = 0; j < arInfo.count; j++) {
@@ -68,7 +68,7 @@
         
         _variances = malloc(4*sizeof(float));
         NSParameterAssert(dictionary[@"variances"]);
-        NSArray<NSString *> *variances = [dictionary[@"variances"] componentsSeparatedByString:@","];
+        NSArray<NSString *> *variances = [dictionary[@"variances"] nonEmptyComponentsSeparatedByString:@","];
         NSParameterAssert(variances.count == 4);
         for (int i = 0; i < variances.count; i++) {
             _variances[i] = [variances[i] floatValue];
@@ -79,7 +79,7 @@
             NSParameterAssert(stepsList.count == _n_pyramid_layers);
             _steps = malloc(stepsList.count*sizeof(pb_vector));
             for (int i = 0; i < stepsList.count; i++) {
-                NSArray<NSString *> *stepInfo = [stepsList[i] componentsSeparatedByString:@","];
+                NSArray<NSString *> *stepInfo = [stepsList[i] nonEmptyComponentsSeparatedByString:@","];
                 NSParameterAssert(stepInfo.count == 2);
                 _steps[i].dx = [stepInfo[0] floatValue];
                 _steps[i].dy = [stepInfo[1] floatValue];
@@ -91,7 +91,7 @@
             NSParameterAssert(offsetsList.count == _n_pyramid_layers);
             _offsets = malloc(offsetsList.count*sizeof(pb_vector));
             for (int i = 0; i < offsetsList.count; i++) {
-                NSArray<NSString *> *offsetsInfo = [offsetsList[i] componentsSeparatedByString:@","];
+                NSArray<NSString *> *offsetsInfo = [offsetsList[i] nonEmptyComponentsSeparatedByString:@","];
                 NSParameterAssert(offsetsInfo.count == 2);
                 _offsets[i].dx = [offsetsInfo[0] floatValue];
                 _offsets[i].dy = [offsetsInfo[1] floatValue];
@@ -100,11 +100,11 @@
         
         // Analyse the output shapes
         NSParameterAssert(dictionary[@"location_shapes"]);
-        NSArray<NSString *> *locationList = [dictionary[@"location_shapes"] componentsSeparatedByString:@";"];
+        NSArray<NSString *> *locationList = [dictionary[@"location_shapes"] nonEmptyComponentsSeparatedByString:@";"];
         NSParameterAssert(locationList.count == _n_pyramid_layers);
         _location_shapes = malloc(_n_pyramid_layers * sizeof(DataShape));
         for (int i = 0; i < locationList.count; i++) {
-            NSArray<NSString *> *inputInfo = [locationList[i] componentsSeparatedByString:@","];
+            NSArray<NSString *> *inputInfo = [locationList[i] nonEmptyComponentsSeparatedByString:@","];
             NSAssert(inputInfo.count == 3, @"Invliad output shape: '%@'", dictionary[@"location_shapes"]);
             _location_shapes[i].row = [inputInfo[0] intValue];
             _location_shapes[i].column = [inputInfo[1] intValue];
@@ -112,11 +112,11 @@
         }
         
         NSParameterAssert(dictionary[@"confidence_shapes"]);
-        NSArray<NSString *> *confidenceList = [dictionary[@"confidence_shapes"] componentsSeparatedByString:@";"];
+        NSArray<NSString *> *confidenceList = [dictionary[@"confidence_shapes"] nonEmptyComponentsSeparatedByString:@";"];
         NSParameterAssert(confidenceList.count == _n_pyramid_layers);
         _confidence_shapes = malloc(_n_pyramid_layers * sizeof(DataShape));
         for (int i = 0; i < confidenceList.count; i++) {
-            NSArray<NSString *> *inputInfo = [confidenceList[i] componentsSeparatedByString:@","];
+            NSArray<NSString *> *inputInfo = [confidenceList[i] nonEmptyComponentsSeparatedByString:@","];
             NSAssert(inputInfo.count == 3, @"Invliad output shape: '%@'", dictionary[@"confidence_shapes"]);
             _confidence_shapes[i].row = [inputInfo[0] intValue];
             _confidence_shapes[i].column = [inputInfo[1] intValue];
