@@ -50,6 +50,10 @@ FOUNDATION_EXPORT const unsigned char MetalTensorVersionString[];
 #import "MITemporaryImage.h"
 #import "MITemporaryImageCache.h"
 #import "MITransposeConvolutionLayer.h"
+#import "MIMatrixMultiplyLayer.h"
+#import "MIGramMatrixLayer.h"
+#import "MIReduceUnaryLayer.h"
+
 #import "MPSImage+Extension.h"
 #import "NSString+Extension.h"
 

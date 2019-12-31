@@ -81,6 +81,7 @@
 		5ACC083023506B85004CD815 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		5ACC084723506FEF004CD815 /* MetalImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalImage.framework; path = ../../ThirdParts/MetalImage.framework; sourceTree = "<group>"; };
 		5ACC084923506FF6004CD815 /* MetalTensor.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MetalTensor.xcodeproj; path = ../../Framework/MetalTensor.xcodeproj; sourceTree = "<group>"; };
+		5AE3784223ADE2A200F2A1B1 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +148,7 @@
 		5ACC084223506F33004CD815 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5AE3784223ADE2A200F2A1B1 /* Accelerate.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
