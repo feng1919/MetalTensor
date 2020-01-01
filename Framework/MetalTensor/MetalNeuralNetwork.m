@@ -261,6 +261,34 @@
     return _allLayerDescriptors[name];
 }
 
+- (BOOL)removeLayerWithName:(NSString *)name {
+    MetalTensorNode *layer = _allLayers[name];
+    if (!layer) {
+        return NO;
+    }
+    
+    if (![layer conformsToProtocol:@protocol(MetalTensorInput)]) {
+        // It is not necessary to remove from.
+        return NO;
+    }
+    
+    for (MetalTensorNode *node in _allLayers) {
+        [node removeTarget:(MetalTensorNode <MetalTensorInput>*)layer];
+    }
+    
+    return YES;
+}
+
+- (MetalTensorOutputLayer *)outputLayerWithName:(NSString *)layerName {
+    NSParameterAssert([layerName length] > 0);
+    MetalTensorNode *layer = [self layerWithName:layerName];
+    NSParameterAssert(layer);
+    DataShape output_shape = [layer outputShape];
+    MetalTensorOutputLayer *outputLayer = [[MetalTensorOutputLayer alloc] initWithInputShape:&output_shape];
+    [layer addTarget:outputLayer];
+    return outputLayer;
+}
+
 #ifdef DEBUG
 - (void)setNeuronType:(NeuronType *)neuronType forLayerNamed:(NSString *)name {
     if (_networkDesc[name] == nil) {
@@ -276,15 +304,6 @@
     _networkDesc = [NSDictionary dictionaryWithDictionary:newNetworkDesc];
 }
 
-- (MetalTensorOutputLayer *)outputLayerWithName:(NSString *)layerName {
-    NSParameterAssert([layerName length] > 0);
-    MetalTensorNode *layer = [self layerWithName:layerName];
-    NSParameterAssert(layer);
-    DataShape output_shape = [layer outputShape];
-    MetalTensorOutputLayer *outputLayer = [[MetalTensorOutputLayer alloc] initWithInputShape:&output_shape];
-    [layer addTarget:outputLayer];
-    return outputLayer;
-}
 #endif
 
 #pragma mark - MetalImageInput delegate

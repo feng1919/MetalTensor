@@ -8,8 +8,8 @@
 
 /*
  *  To cast an unary reduce operation on the tensor.
- *  Supported operation: 'Max', 'Min', 'Mean' and 'Sum.
- *  Supported axis: 'Row', 'Column' and 'FeatureChannels'.
+ *  Supported operation: 'Max', 'Min', 'Mean' and 'Sum'.
+ *  Supported axis: 'Row', 'Column' and 'Depth'.
  *
  */
 

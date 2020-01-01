@@ -153,13 +153,15 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 - (NSArray<MetalTensorNode *> *)allLayers;
 - (MetalTensorNode *)layerWithName:(NSString *)name;
 - (MetalTensorLayerDescriptor *)layerDescriptorWithName:(NSString *)name;
+- (BOOL)removeLayerWithName:(NSString *)name;
+
+- (MetalTensorOutputLayer *)outputLayerWithName:(NSString *)layerName;
 
 #ifdef DEBUG
 // for debug
 @property (nonatomic, assign) int verbose; // If one need the detail of running
 
-- (void)setNeuronType:(NeuronType *)neuronType forLayerNamed:(NSString *)name; // call before compile
-- (MetalTensorOutputLayer *)outputLayerWithName:(NSString *)layerName;
+- (void)setNeuronType:(NeuronType *)neuronType forLayerNamed:(NSString *)name; // call before compile;
 - (void)printTexture:(id<MTLTexture>)bgraU8Texture;
 
 #endif
