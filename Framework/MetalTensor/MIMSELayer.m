@@ -73,9 +73,6 @@
     [_reduceDepthMean encodeToCommandBuffer:commandBuffer
                                 sourceImage:reduceColumnImage.image
                            destinationImage:_outputTempImage.image];
-    
-    MPSGradientNodeBlock
-        
     [subtractImage unlock];
     [multiplyImage unlock];
     [reduceRowImage unlock];
