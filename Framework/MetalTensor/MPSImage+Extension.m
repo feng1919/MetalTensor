@@ -107,6 +107,9 @@ MPSCNNNeuronType NeuronTypeFromString(NSString *neuron)
     if ([neuron isEqualToString:@"none"]) {
         return MPSCNNNeuronTypeNone;
     }
+    if ([neuron isEqualToString:@"power"]) {
+        return MPSCNNNeuronTypePower;
+    }
     assert(0);
     return MPSCNNNeuronTypeNone;
 }

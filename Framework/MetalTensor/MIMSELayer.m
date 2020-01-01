@@ -17,7 +17,7 @@
     DataShape _outputReduceColumnMean;
     
     MPSCNNSubtract *_subtract;
-    MPSCNNMultiply *_multiply;
+    MPSCNNNeuron *_neuron;
     MPSNNReduceRowMean *_reduceRowMean;
     MPSNNReduceColumnMean *_reduceColumnMean;
     MPSNNReduceFeatureChannelsMean *_reduceDepthMean;
@@ -36,7 +36,11 @@
     _outputReduceColumnMean = DataShapeMake(1, 1, _inputShapes[0].depth);
     
     _subtract = [[MPSCNNSubtract alloc] initWithDevice:device];
-    _multiply = [[MPSCNNMultiply alloc] initWithDevice:device];
+    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypePower
+                                                                                         a:1.0f
+                                                                                         b:0.0f
+                                                                                         c:2.0f];
+    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
     _reduceRowMean = [[MPSNNReduceRowMean alloc] initWithDevice:device];
     _reduceColumnMean = [[MPSNNReduceColumnMean alloc] initWithDevice:device];
     _reduceDepthMean = [[MPSNNReduceFeatureChannelsMean alloc] initWithDevice:device];
@@ -60,10 +64,9 @@
                         primaryImage:_inputs[@(0)].image
                       secondaryImage:_inputs[@(1)].image
                     destinationImage:subtractImage.image];
-    [_multiply encodeToCommandBuffer:commandBuffer
-                        primaryImage:subtractImage.image
-                      secondaryImage:subtractImage.image
-                    destinationImage:multiplyImage.image];
+    [_neuron encodeToCommandBuffer:commandBuffer
+                       sourceImage:subtractImage.image
+                  destinationImage:multiplyImage.image];
     [_reduceRowMean encodeToCommandBuffer:commandBuffer
                               sourceImage:multiplyImage.image
                          destinationImage:reduceRowImage.image];
