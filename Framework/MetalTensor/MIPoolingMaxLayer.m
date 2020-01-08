@@ -7,10 +7,11 @@
 //
 
 #import "MIPoolingMaxLayer.h"
-#import "MITemporaryImageCache.h"
+#import "MTTensorCache.h"
 
 @interface MIPoolingMaxLayer() {
     MPSCNNPoolingMax *_pooling;
+    MPSCNNPoolingMaxGradient *_poolingGradientOp;
 }
 
 @end
@@ -27,9 +28,9 @@
     
     NSParameterAssert(_kernel.stride > 0);
     
-    _outputShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, MTPaddingMode_tfsame);
-    _outputShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, MTPaddingMode_tfsame);
-    _outputShape.depth = _inputShapes[0].depth;
+    _dataShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, MTPaddingMode_tfsame);
+    _dataShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, MTPaddingMode_tfsame);
+    _dataShape.depth = _inputShapes[0].depth;
     
     _pooling = [[MPSCNNPoolingMax alloc] initWithDevice:_device
                                             kernelWidth:_kernel.column
@@ -38,6 +39,17 @@
                                         strideInPixelsY:_kernel.stride];
     _pooling.offset = _offset;
     _pooling.edgeMode = MPSImageEdgeModeClamp;
+    
+    if (_needBackward) {
+        _poolingGradientOp = [[MPSCNNPoolingMaxGradient alloc] initWithDevice:_device
+                                                                  kernelWidth:_kernel.column
+                                                                 kernelHeight:_kernel.row
+                                                              strideInPixelsX:_kernel.stride
+                                                              strideInPixelsY:_kernel.stride];
+    }
+    
+    _operation = _pooling;
+    _gradientOp = _poolingGradientOp;
 }
 
 - (void)setOffset:(MPSOffset)offset {
@@ -50,20 +62,6 @@
     NSParameterAssert(kernel.stride > 0);
     
     _kernel = kernel;
-}
-
-- (void)processTensorWithCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
-    
-    _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
-    [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];
-    [_pooling encodeToCommandBuffer:commandBuffer
-                        sourceImage:_inputs[@(0)].image
-                   destinationImage:_outputTempImage.image];
-    
-    [self removeCachedImages];
-    
-    [self notifyTargetsAboutNewTempImage:commandBuffer];
 }
 
 @end

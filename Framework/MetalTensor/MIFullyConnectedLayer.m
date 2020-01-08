@@ -7,11 +7,12 @@
 //
 
 #import "MIFullyConnectedLayer.h"
-#import "MITemporaryImageCache.h"
+#import "MTTensorCache.h"
 #import "MIDataSource.h"
 
 @interface MIFullyConnectedLayer() {
     MPSCNNFullyConnected *_fullyConnected;
+    MPSCNNFullyConnectedGradient *_fcGradientOp;
 }
 
 @end
@@ -26,29 +27,24 @@
                       _kernel.row == _inputShapes[0].row &&
                       _kernel.depth == _inputShapes[0].depth);
     
-    _outputShape.column = 1;
-    _outputShape.row = 1;
-    _outputShape.depth = _kernel.filters;
+    _dataShape.column = 1;
+    _dataShape.row = 1;
+    _dataShape.depth = _kernel.filters;
     
-    if (_dataSource) {
-        _fullyConnected = [[MPSCNNFullyConnected alloc] initWithDevice:_device weights:_dataSource];
-    }
+    [self updateComputing];
 }
 
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    NSAssert(_dataSource != nil, @"The weights has not been set.");
-
-    DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
+- (void)updateComputing {
     
-    _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
-    [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];
-    [_fullyConnected encodeToCommandBuffer:commandBuffer
-                              sourceImage:_inputs[@(0)].image
-                         destinationImage:_outputTempImage.image];
-    
-    [self removeCachedImages];
-    
-    [self notifyTargetsAboutNewTempImage:commandBuffer];
+    if (_dataSource && _device) {
+        _fullyConnected = [[MPSCNNFullyConnected alloc] initWithDevice:_device weights:_dataSource];
+        if (_needBackward) {
+            _fcGradientOp = [[MPSCNNFullyConnectedGradient alloc] initWithDevice:_device weights:_dataSource];
+            _fcGradientOp.gradientOption = MPSCNNConvolutionGradientOptionGradientWithData;
+        }
+        _operation = _fullyConnected;
+        _gradientOp = _fcGradientOp;
+    }
 }
 
 #pragma mark - Management of the weights

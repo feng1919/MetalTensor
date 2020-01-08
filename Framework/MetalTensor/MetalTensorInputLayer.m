@@ -8,29 +8,30 @@
 
 #import "MetalTensorInputLayer.h"
 
-@implementation MetalTensorInputLayer
-
-- (instancetype)initWithInputShape:(DataShape *)inputShape {
-    if (self = [super init]) {
-        
-        _outputShape = *inputShape;
-
-        DB_TRACE(-_verbose+2, "\n%s init --> %s", self.labelUTF8, NSStringFromDataShape(&_outputShape).UTF8String);
-    }
-    return self;
+@implementation MetalTensorInputLayer {
+    MPSCNNNeuron *_neuron;
 }
 
 - (void)compile:(id<MTLDevice>)device {
     
     [super compile:device];
     
-    _outputImage = [[MIMPSImage alloc] initWithShape:&_outputShape];
+    _outputImage = [[MTImageTensor alloc] initWithShape:&_dataShape];
     [_outputImage setReferenceCountingEnable:NO];
     
-    MPSImageDescriptor *descriptor = ImageDescriptor(&_outputShape);
+    MPSImageDescriptor *descriptor = ImageDescriptor(&_dataShape);
     descriptor.storageMode = MTLStorageModeShared;
     _outputImage.mpsImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:descriptor];
 
+    if (_needBackward) {
+        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
+        _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
+        
+        MPSImageDescriptor *desc = ImageDescriptor(&_dataShape);
+        desc.storageMode = MTLStorageModeShared;
+        _gradientImage.mpsImage = [[MPSImage alloc] initWithDevice:device imageDescriptor:desc];
+        
+    }
 }
 
 - (void)inputTexture:(id<MTLTexture>)bgraU8Texture {
@@ -38,20 +39,27 @@
     _outputImage.mpsImage = [[MPSImage alloc] initWithTexture:bgraU8Texture featureChannels:3];
 }
 
-- (void)processOnCommandBuffer:(nonnull id<MTLCommandBuffer>)cmdBuf {
+- (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
 
-    for (id<MetalTensorInput> currentTarget in _targets) {
+    for (ForwardTarget currentTarget in _targets) {
         NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
-        NSInteger tempImageIndex = [_targetTempImageIndices[indexOfObject] integerValue];
+        NSInteger imageIndex = [_targetIndices[indexOfObject] integerValue];
         
-        [currentTarget setInputImage:_outputImage atIndex:tempImageIndex];
+        [currentTarget setImage:_outputImage atIndex:imageIndex];
         
         DB_TRACE(-_verbose+1, "\n%s ---%s---> %s(%ld)", self.labelUTF8,
                  NSStringFromDataShape(_outputImage.shape).UTF8String,
-                 [currentTarget description].UTF8String, tempImageIndex);
+                 [currentTarget description].UTF8String, imageIndex);
         
-        [currentTarget tempImageReadyAtIndex:tempImageIndex commandBuffer:cmdBuf];
+        [currentTarget imageReadyAtIndex:imageIndex onCommandBuffer:commandBuffer];
     }
+}
+
+- (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    
+    [_neuron encodeToCommandBuffer:commandBuffer
+                       sourceImage:_gradient.content
+                  destinationImage:_gradientImage.mpsImage];
 }
 
 @end

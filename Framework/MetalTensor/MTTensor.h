@@ -1,5 +1,5 @@
 //
-//  MITemporaryImage.h
+//  MTTensor.h
 //  MetalImage
 //
 //  Created by Feng Stone on 2019/5/19.
@@ -12,14 +12,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MITemporaryImage : NSObject
+@protocol MTBackwardDelegate;
+@interface MTTensor : NSObject
 
-@property (nonatomic, strong, nullable) MPSTemporaryImage *image;
 @property (nonatomic, assign) BOOL referenceCountingEnable; //default YES
 @property (nonatomic, assign) NSInteger reuseIdentifier;
 
+@property (nonatomic, weak, nullable) id<MTBackwardDelegate> source;
+
 - (instancetype)initWithShape:(DataShape *)image;
 
+- (MPSImage *)content;
 - (DataShape *)shape;
 - (MPSImageFeatureChannelFormat)channelFormat;
 - (NSUInteger)width;
@@ -27,8 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSUInteger)depth;
 
 - (MPSImageDescriptor *)imageDescriptor;
-- (MPSTemporaryImage *)newTemporaryImageForCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
-- (void)deleteTemporaryImage;
+- (MPSTemporaryImage *)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+- (void)deleteContent;
 
 - (void)lock;
 - (void)unlock;
@@ -37,5 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 MPSImageDescriptor *ImageDescriptor(DataShape *s);
 
 @end
+
+typedef MTTensor * MetalTensor;
 
 NS_ASSUME_NONNULL_END

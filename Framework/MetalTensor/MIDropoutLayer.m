@@ -7,11 +7,12 @@
 //
 
 #import "MIDropoutLayer.h"
-#import "MITemporaryImageCache.h"
+#import "MTTensorCache.h"
 
 @interface MIDropoutLayer() {
     
     MPSCNNDropout *_dropout;
+    MPSCNNDropoutGradient *_dropoutGradientOp;
 }
 
 @end
@@ -26,36 +27,33 @@
     _keepProbability = keepProbability;
     DB_TRACE(-_verbose+1, "\n%s.keepProbability --> %f", self.labelUTF8, keepProbability);
     
-    if (_device) {
-        _dropout = [[MPSCNNDropout alloc] initWithDevice:_device
-                                         keepProbability:_keepProbability
-                                                    seed:0
-                                      maskStrideInPixels:MTLSizeMake(1, 1, 1)];
-    }
+    [self updateComputing];
 }
 
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
 
-    _dropout = [[MPSCNNDropout alloc] initWithDevice:device
-                                     keepProbability:_keepProbability
-                                                seed:0
-                                  maskStrideInPixels:MTLSizeMake(1, 1, 1)];
+    [self updateComputing];
 }
 
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+- (void)updateComputing {
     
-    DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
-    
-    _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
-    [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];
-    [_dropout encodeToCommandBuffer:commandBuffer
-                       sourceImage:_inputs[@(0)].image
-                  destinationImage:_outputTempImage.image];
-    
-    [self removeCachedImages];
-    
-    [self notifyTargetsAboutNewTempImage:commandBuffer];
+    if (_device) {
+        _dropout = [[MPSCNNDropout alloc] initWithDevice:_device
+                                         keepProbability:_keepProbability
+                                                    seed:0
+                                      maskStrideInPixels:MTLSizeMake(1, 1, 1)];
+        
+        if (_needBackward) {
+            _dropoutGradientOp = [[MPSCNNDropoutGradient alloc] initWithDevice:_device
+                                                               keepProbability:_keepProbability
+                                                                          seed:0
+                                                            maskStrideInPixels:MTLSizeMake(1, 1, 1)];
+        }
+        
+        _operation = _dropout;
+        _gradientOp = _dropoutGradientOp;
+    }
 }
 
 @end

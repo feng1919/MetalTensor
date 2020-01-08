@@ -7,10 +7,11 @@
 //
 
 #import "MISoftMaxLayer.h"
-#import "MITemporaryImageCache.h"
+#import "MTTensorCache.h"
 
 @interface MISoftMaxLayer() {
     MPSCNNSoftMax *_softMax;
+    MPSCNNSoftMaxGradient *_softmaxGradientOp;
 }
 
 @end
@@ -21,19 +22,12 @@
     [super compile:device];
     
     _softMax = [[MPSCNNSoftMax alloc] initWithDevice:device];
+    if (_needBackward) {
+        _softmaxGradientOp = [[MPSCNNSoftMaxGradient alloc] initWithDevice:device];
+    }
+    _operation = _softMax;
+    _gradientOp = _softmaxGradientOp;
 }
 
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
-
-    _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
-    [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];
-    [_softMax encodeToCommandBuffer:commandBuffer
-                       sourceImage:_inputs[@(0)].image
-                  destinationImage:_outputTempImage.image];
-    
-    [self removeCachedImages];
-    [self notifyTargetsAboutNewTempImage:commandBuffer];
-}
 
 @end

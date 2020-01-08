@@ -13,15 +13,19 @@
 
 #pragma mark - MetalLayerInput delegate
 
-- (void)setInputImage:(MITemporaryImage *)newInputImage atIndex:(NSInteger)imageIndex {
-    [_targets[_activedTargetIndex] setInputImage:newInputImage atIndex:imageIndex];
+- (DataShape *)dataShapeRef {
+    return NULL;
 }
 
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)cmdBuf {
-    [_targets[_activedTargetIndex] tempImageReadyAtIndex:imageIndex commandBuffer:cmdBuf];
+- (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
+    [_targets[_activedTargetIndex] setImage:newImage atIndex:imageIndex];
 }
 
-- (void)processTensorWithCommandBuffer:(id<MTLCommandBuffer>)cmdBuf {
+- (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    [_targets[_activedTargetIndex] imageReadyAtIndex:imageIndex onCommandBuffer:commandBuffer];
+}
+
+- (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
 }
 

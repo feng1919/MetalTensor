@@ -7,11 +7,7 @@
 //
 
 /*
- *  Inference tools for thrid part trained neural networks, such as
- *  Keras, tensorflow, Theano, caffe and etc,.
- *
- *  HOW TO USE?
- *  There are some examples, demonstrated the usage.
+ *  Tools for inference pre-trained neural networks.
  *
  */
 
@@ -134,12 +130,11 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 - (void)loadWeights:(NSString *)weightsFile mapFile:(NSString *)mapFile;
 
 /*
- *  Do the prediction, and callbacks.
- *  NOTE: The input texture will throw into the network directly,
- *        so one should preprocess the texture if needed.
+ *  Make the prediction, you may add MetalTensorOutputLayer to output the tensor
+ *  produced by the layer.
  *
- *  There are some preprocessing tricks demonstrating in the examples,
- *  enjoy yourself :)
+ *  NOTE: The input texture will throw into the network directly,
+ *        so one should preprocess the data if needed.
  *
  */
 - (void)predict:(id<MTLTexture>)bgraU8Texture;

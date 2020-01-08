@@ -30,18 +30,15 @@ static int _METAL_VERBOSE = 0;
 //#ifdef DEBUG
     _verbose = _METAL_VERBOSE;
 //#endif
+
+    _needBackward = NO;
     _targets = [[NSMutableArray alloc] init];
-    _targetTempImageIndices = [[NSMutableArray alloc] init];
+    _targetIndices = [[NSMutableArray alloc] init];
     
     return self;
 }
 
-- (DataShape *)outputShapeRef {
-    return &_outputShape;
-}
-
-- (void)dealloc
-{
+- (void)dealloc {
     [self removeAllTargets];
 }
 
@@ -58,118 +55,69 @@ static int _METAL_VERBOSE = 0;
     _device = device;
 }
 
-#pragma mark - Managing targets
+#pragma mark - FORWARD
 
-- (MITemporaryImage *)outputTempImage {
-    return _outputTempImage;
-}
-
-- (void)removeOutputTempImage {
-    
-    DB_TRACE(-_verbose+2, "\n%s rm %s",
-             self.labelUTF8,
-             NSStringFromDataShape(_outputTempImage.shape).UTF8String);
-    
-    [_outputTempImage unlock];
-    _outputTempImage = nil;
-    
-}
-
-- (void)setOutputTempImageToTargets {
-    for (id<MetalTensorInput> currentTarget in _targets) {
-        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
-        NSInteger tempImageIndex = [_targetTempImageIndices[indexOfObject] integerValue];
-        [currentTarget setInputImage:_outputTempImage atIndex:tempImageIndex];
-        
-        DB_TRACE(-_verbose+1, "\n%s ---%s---> %s(%ld)",
-                 self.labelUTF8,
-                 NSStringFromDataShape(_outputTempImage.shape).UTF8String,
-                 [currentTarget description].UTF8String,
-                 tempImageIndex);
-    }
-}
-
-- (void)notifyTargetsAboutNewTempImage:(id<MTLCommandBuffer>)cmdBuf {
-
-    [self setOutputTempImageToTargets];
-    [self removeOutputTempImage];
-    
-    for (id<MetalTensorInput> currentTarget in _targets)
-    {
-        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
-        NSInteger tempImageIndex = [[_targetTempImageIndices objectAtIndex:indexOfObject] integerValue];
-        [currentTarget tempImageReadyAtIndex:tempImageIndex commandBuffer:cmdBuf];
-    }
-}
-
-- (NSArray*)targets
-{
+- (NSArray<ForwardTarget> *)targets {
     @synchronized (self) {
         return [NSArray arrayWithArray:_targets];
     }
 }
 
-- (void)addTarget:(id<MetalTensorInput>)newTarget
-{
+- (void)addTarget:(ForwardTarget)newTarget {
     @synchronized (self) {
-        NSInteger nextAvailableTempImageIndex = 0;
-        if ([newTarget respondsToSelector:@selector(nextAvailableTempImageIndex)]) {
-            nextAvailableTempImageIndex = [newTarget nextAvailableTempImageIndex];
+        NSInteger nextAvailableImageIndex = 0;
+        if ([newTarget respondsToSelector:@selector(nextAvailableImageIndex)]) {
+            nextAvailableImageIndex = [newTarget nextAvailableImageIndex];
         }
         
-        [self addTarget:newTarget atTempImageIndex:nextAvailableTempImageIndex];
+        [self addTarget:newTarget atIndex:nextAvailableImageIndex];
     }
 }
 
-- (void)addTarget:(id<MetalTensorInput>)newTarget atTempImageIndex:(NSInteger)imageIndex
-{
+- (void)addTarget:(ForwardTarget)newTarget atIndex:(NSInteger)imageIndex {
     @synchronized (self) {
         if ([_targets containsObject:newTarget]) {
             return;
         }
         
         [_targets addObject:newTarget];
-        [_targetTempImageIndices addObject:@(imageIndex)];
+        [_targetIndices addObject:@(imageIndex)];
         
-        if ([newTarget respondsToSelector:@selector(reserveTempImageIndex:)]) {
-            [newTarget reserveTempImageIndex:imageIndex];
+        if ([newTarget respondsToSelector:@selector(reserveImageIndex:)]) {
+            [newTarget reserveImageIndex:imageIndex];
         }
         
         DB_TRACE(-_verbose+2, "\n%s add %s at %ld", self.labelUTF8, [newTarget description].UTF8String, imageIndex);
     }
 }
 
-- (void)removeTarget:(id<MetalTensorInput>)targetToRemove
-{
+- (void)removeTarget:(ForwardTarget)targetToRemove {
     @synchronized (self) {
-        if(![_targets containsObject:targetToRemove])
-        {
+        if(![_targets containsObject:targetToRemove]) {
             return;
         }
         
         NSInteger indexOfObject = [_targets indexOfObject:targetToRemove];
-        NSInteger tempImageIndexOfTarget = [[_targetTempImageIndices objectAtIndex:indexOfObject] integerValue];
+        NSInteger imageIndex = [[_targetIndices objectAtIndex:indexOfObject] integerValue];
         
-        [_targetTempImageIndices removeObjectAtIndex:indexOfObject];
+        [_targetIndices removeObjectAtIndex:indexOfObject];
         [_targets removeObject:targetToRemove];
         
-        if ([targetToRemove respondsToSelector:@selector(releaseTempImageIndex:)]) {
-            [targetToRemove releaseTempImageIndex:tempImageIndexOfTarget];
+        if ([targetToRemove respondsToSelector:@selector(releaseImageIndex:)]) {
+            [targetToRemove releaseImageIndex:imageIndex];
         }
         
         DB_TRACE(-_verbose+2, "\n%s(%ld) rm %s", self.label, indexOfObject, [targetToRemove description].UTF8String);
     }
 }
 
-- (void)removeAllTargets
-{
+- (void)removeAllTargets {
     @synchronized (self) {
         [_targets removeAllObjects];
-        [_targetTempImageIndices removeAllObjects];
+        [_targetIndices removeAllObjects];
         
-        DB_TRACE(-_verbose+2, "\n%s rm all targets", self.label);
+        DB_TRACE(-_verbose+2, "\n%s rm all forward targets", self.label);
     }
 }
 
 @end
-

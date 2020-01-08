@@ -6,19 +6,17 @@
 //  Copyright © 2019 fengshi. All rights reserved.
 //
 
-#import "MetalTensorNode.h"
-#import "MIMPSImage.h"
+#import "MetalTensorLayer.h"
+#import "MTImageTensor.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MetalTensorInputLayer : MetalTensorNode
+@interface MetalTensorInputLayer : MetalTensorLayer
 
-@property (nonatomic, strong) MIMPSImage *outputImage;
-
-- (instancetype)initWithInputShape:(DataShape *)inputShape;
+@property (nonatomic, strong) MTImageTensor *outputImage;
+@property (nonatomic, strong) MTImageTensor *gradientImage;
 
 - (void)inputTexture:(id<MTLTexture>)bgraU8Texture;
-- (void)processOnCommandBuffer:(id<MTLCommandBuffer>)cmdBuf;
 
 @end
 

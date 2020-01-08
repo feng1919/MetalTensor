@@ -136,6 +136,13 @@ Class LayerWithType(NSString *type)
         _targetIndices = [dictionary[@"indices"] nonEmptyComponentsSeparatedByString:@","];
         NSAssert(_targetIndices == nil || _targetIndices.count == _targets.count, @"If the indices were specified, the number of indices must be identical to the number of targets.");
         _type = dictionary[@"type"]?:@"convolution";
+        
+        if (dictionary[@"backward"]) {
+            _needBackward = [dictionary[@"backward"] boolValue];
+        }
+        else {
+            _needBackward = NO;
+        }
     }
     return self;
 }
@@ -273,6 +280,7 @@ Class LayerWithType(NSString *type)
         self.depthWise = convDesc.depthWise;
         self.offset = convDesc.offset;
         self.edgeMode = MPSImageEdgeModeZero;
+        self.needBackward = convDesc.needBackward;
         [self setLabel:convDesc.name];
         
         NSString *weightPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:convDesc.weight];
@@ -304,8 +312,9 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MIReshapeLayerDescriptor class]]);
-    
-    return [self initWithInputShape:[descriptor inputShapeRef] outputShape:[descriptor outputShapeRef]];
+    self = [self initWithInputShape:[descriptor inputShapeRef] outputShape:[descriptor outputShapeRef]];
+    self.needBackward = descriptor.needBackward;
+    return self;
 }
 
 @end
@@ -322,7 +331,9 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MIConcatenateLayerDescriptor class]]);
-    return [self initWithInputShapes:[descriptor inputShapes] size:[descriptor n_inputs]];
+    self = [self initWithInputShapes:[descriptor inputShapes] size:[descriptor n_inputs]];
+    self.needBackward = descriptor.needBackward;
+    return self;
 }
 
 @end
@@ -339,7 +350,9 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MetalTensorInputLayerDescriptor class]]);
-    return [self initWithInputShape:[descriptor inputShapes]];
+    self = [self initWithInputShape:[descriptor inputShapes]];
+    self.needBackward = descriptor.needBackward;
+    return self;
 }
 
 @end
@@ -356,7 +369,9 @@ Class LayerWithType(NSString *type)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
     NSParameterAssert([descriptor isKindOfClass:[MetalTensorOutputLayerDescriptor class]]);
-    return [self initWithInputShape:[descriptor inputShapeRef]];
+    self = [self initWithInputShape:[descriptor inputShapeRef]];
+    self.needBackward = descriptor.needBackward;
+    return self;
 }
 
 @end
@@ -533,6 +548,7 @@ Class LayerWithType(NSString *type)
         npmemcpy(self.neurons, neurons, 3 * sizeof(NeuronType));
         self.label = irmDesc.name;
         self.offset = irmDesc.offset;
+        self.needBackward = descriptor.needBackward;
         
         NSString *weightPath = [[NSBundle mainBundle] pathForResource:irmDesc.weights[0] ofType:@"bin"];
         if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
@@ -586,7 +602,9 @@ Class LayerWithType(NSString *type)
 @implementation MISoftMaxLayer (layerDescriptorInit)
 
 - (instancetype)initWithDescriptor:(MetalTensorLayerDescriptor *)descriptor {
-    return [self initWithInputShape:[descriptor inputShapeRef]];
+    self = [self initWithInputShape:[descriptor inputShapeRef]];
+    self.needBackward = descriptor.needBackward;
+    return self;
 }
 
 @end
@@ -669,6 +687,7 @@ Class LayerWithType(NSString *type)
         self.kernel = denseDesc.kernelShape;
         self.neuron = denseDesc.neuronType;
         [self setLabel:denseDesc.name];
+        self.needBackward = descriptor.needBackward;
         
         NSString *weightPath = [[NSBundle mainBundle] pathForResource:denseDesc.weight ofType:@"bin"];
         if ([[NSFileManager defaultManager] fileExistsAtPath:weightPath]) {
@@ -742,6 +761,7 @@ Class LayerWithType(NSString *type)
         MIPoolingAverageLayerDescriptor *poolingDesc = (MIPoolingAverageLayerDescriptor *)descriptor;
         [self setKernel:poolingDesc.kernelShape];
         [self setOffset:poolingDesc.offset];
+        self.needBackward = descriptor.needBackward;
     }
     return self;
 }
@@ -804,6 +824,7 @@ Class LayerWithType(NSString *type)
         MIPoolingMaxLayerDescriptor *poolingDesc = (MIPoolingMaxLayerDescriptor *)descriptor;
         [self setKernel:poolingDesc.kernelShape];
         [self setOffset:poolingDesc.offset];
+        self.needBackward = descriptor.needBackward;
     }
     return self;
 }
@@ -840,6 +861,7 @@ Class LayerWithType(NSString *type)
         
         self.channelOffset = descriptor.channelOffset;
         self.arithmeticType = descriptor.arithmetic;
+        self.needBackward = descriptor.needBackward;
         
         if (descriptor.secondaryImage) {
             UIImage *secondaryImage = [UIImage imageNamed:descriptor.secondaryImage];
@@ -847,7 +869,7 @@ Class LayerWithType(NSString *type)
                 secondaryImage = [UIImage imageWithContentsOfFile:descriptor.secondaryImage];
             }
             NSAssert(secondaryImage, @"Failed to load the secondary image: %@", descriptor.secondaryImage);
-            self.secondaryImage = [[MIMPSImage alloc] initWithImage:secondaryImage normalized:YES];
+            self.secondaryImage = [[MTImageTensor alloc] initWithImage:secondaryImage normalized:YES];
         }
     }
     return self;
@@ -893,6 +915,7 @@ Class LayerWithType(NSString *type)
     NSParameterAssert([descriptor isKindOfClass:[MetalTensorNeuronLayerDescriptor class]]);
     if (self = [super initWithInputShape:descriptor.inputShapeRef]) {
         self.neuronType = descriptor.neuronType;
+        self.needBackward = descriptor.needBackward;
     }
     return self;
 }
@@ -1011,6 +1034,7 @@ Class LayerWithType(NSString *type)
     if (self = [super initWithInputShape:[descriptor inputShapeRef]]) {
         MITransposeConvolutionLayerDescriptor *convDesc = (MITransposeConvolutionLayerDescriptor *)descriptor;
         
+        self.needBackward = convDesc.needBackward;
         self.kernel = convDesc.kernelShape;
         self.neuron = convDesc.neuronType;
         self.padding = convDesc.padding;

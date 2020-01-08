@@ -13,7 +13,7 @@
 #import "MetalTensorOutputLayer.h"
 #import "MIReshapeLayer.h"
 #import "MIConcatenateLayer.h"
-#import "MITemporaryImageCache.h"
+#import "MTTensorCache.h"
 #import <MetalImage/MetalDevice.h>
 
 @interface MetalNeuralNetwork()
@@ -39,14 +39,15 @@
         _completedHandler = NULL;
         _network_queue = dispatch_queue_create("metal_neuron_network_queue", DISPATCH_QUEUE_SERIAL);
         _network_semaphore = dispatch_semaphore_create(1);
-        NSInteger identifier = [[MITemporaryImageCache sharedCache] registerReuseIdentifier];
+        NSInteger identifier = [[MTTensorCache sharedCache] registerReuseIdentifier];
         _reuseIdentifier = [NSString stringWithFormat:@"%ld", identifier];
     }
     return self;
 }
 
 - (void)dealloc {
-    [[MITemporaryImageCache sharedCache] unregisterReuseIdentifier:_reuseIdentifier.integerValue];
+    [_allLayers.allValues makeObjectsPerformSelector:@selector(removeAllTargets)];
+    [[MTTensorCache sharedCache] unregisterReuseIdentifier:_reuseIdentifier.integerValue];
 }
 
 - (void)compile:(id<MTLDevice>)device {
@@ -84,17 +85,18 @@
             NSString *target = desc.targets[i];
             MetalTensorNode *targetLayer = _allLayers[target];
             if (targetLayer) {
-                if ([targetLayer conformsToProtocol:@protocol(MetalTensorInput)]) {
+                // link nodes...
+                if ([targetLayer conformsToProtocol:@protocol(MTForwardDelegate)]) {
                     // If the index were specified
                     if (desc.targetIndices.count == desc.targets.count) {
-                        [layer addTarget:(id<MetalTensorInput>)targetLayer atTempImageIndex:[desc.targetIndices[i] intValue]];
+                        [layer addTarget:(ForwardTarget)targetLayer atIndex:[desc.targetIndices[i] intValue]];
                     }
                     else {
-                        [layer addTarget:(id<MetalTensorInput>)targetLayer];
+                        [layer addTarget:(ForwardTarget)targetLayer];
                     }
                 }
                 else {
-                    NSAssert(NO, @"The layer %@ does not conform to the protocol <MetalTensorInput>", target);
+                    NSAssert(NO, @"The layer %@ does not conform to the protocol <MTForwardDelegate>", target);
                 }
             }
             else {
@@ -223,9 +225,9 @@
     id<MTLCommandBuffer> command_buffer = [command_queue commandBuffer];
     [command_buffer setLabel:_reuseIdentifier];
 //    [command_buffer enqueue];
-    [[MITemporaryImageCache sharedCache] beginContextWithCommandBuffer:command_buffer];
-    [_inputLayer processOnCommandBuffer:command_buffer];
-    [[MITemporaryImageCache sharedCache] endContextWithCommandBuffer:command_buffer];
+    [[MTTensorCache sharedCache] beginContextWithCommandBuffer:command_buffer];
+    [_inputLayer processImagesOnCommandBuffer:command_buffer];
+    [[MTTensorCache sharedCache] endContextWithCommandBuffer:command_buffer];
     
     if (_scheduledHandler) {
         [command_buffer addScheduledHandler:_scheduledHandler];
@@ -237,7 +239,7 @@
 }
 
 - (MTLUInt2)inputSize {
-    DataShape *dataShape = [_inputLayer outputShapeRef];
+    DataShape *dataShape = [_inputLayer dataShapeRef];
     return MTLUInt2Make(dataShape->row, dataShape->column);
 }
 
@@ -267,13 +269,12 @@
         return NO;
     }
     
-    if (![layer conformsToProtocol:@protocol(MetalTensorInput)]) {
-        // It is not necessary to remove from.
+    if (![layer conformsToProtocol:@protocol(MTForwardDelegate)]) {
         return NO;
     }
     
     for (MetalTensorNode *node in _allLayers) {
-        [node removeTarget:(MetalTensorNode <MetalTensorInput>*)layer];
+        [node removeTarget:(ForwardTarget)layer];
     }
     
     return YES;
@@ -283,8 +284,13 @@
     NSParameterAssert([layerName length] > 0);
     MetalTensorNode *layer = [self layerWithName:layerName];
     NSParameterAssert(layer);
-    DataShape output_shape = [layer outputShape];
-    MetalTensorOutputLayer *outputLayer = [[MetalTensorOutputLayer alloc] initWithInputShape:&output_shape];
+    if (![layer conformsToProtocol:@protocol(MTForwardDelegate)]) {
+        NSLog(@"The node does not conform to protocol <MTForwardDelegate>, it can not be output.");
+        return nil;
+    }
+    
+    DataShape *dataShape = [(ForwardTarget)layer dataShapeRef];
+    MetalTensorOutputLayer *outputLayer = [[MetalTensorOutputLayer alloc] initWithInputShape:dataShape];
     [layer addTarget:outputLayer];
     return outputLayer;
 }

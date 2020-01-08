@@ -37,6 +37,7 @@ Class LayerWithType(NSString *type);
     DataShape _outputShape;
     DataShape *_inputShapes;
     int _n_inputs;
+    BOOL _needBackward;
 }
 
 @property (nonatomic, retain, nullable) NSString *name;
@@ -46,6 +47,7 @@ Class LayerWithType(NSString *type);
 @property (nonatomic, readonly) DataShape outputShape;
 @property (nonatomic, readonly) DataShape *inputShapes;
 @property (nonatomic, readonly) int n_inputs;
+@property (nonatomic, readonly) BOOL needBackward;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 

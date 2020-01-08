@@ -1,17 +1,22 @@
 //
-//  MIMPSImage.h
+//  MTImageTensor.h
 //  MetalImage
 //
 //  Created by Feng Stone on 2019/5/25.
 //  Copyright © 2019 fengshi. All rights reserved.
 //
 
-#import "MITemporaryImage.h"
+#import "MTTensor.h"
 #import <UIKit/UIKit.h>
+
+/*
+ *  Load tensor from UIImage object.
+ *
+ */
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MIMPSImage : MITemporaryImage {
+@interface MTImageTensor : MTTensor {
     
 @protected
     MPSImage *_mpsImage;

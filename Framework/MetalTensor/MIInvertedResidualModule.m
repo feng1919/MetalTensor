@@ -54,7 +54,7 @@
     _convExpand.neuron = _neurons[0];
     [_convExpand compile:device];
     
-    _convDepthWise = [[MIConvolutionLayer alloc] initWithInputShape:_convExpand.outputShapeRef];
+    _convDepthWise = [[MIConvolutionLayer alloc] initWithInputShape:_convExpand.dataShapeRef];
     _convDepthWise.padding = MTPaddingMode_tfsame;
     _convDepthWise.depthWise = YES;
     _convDepthWise.offset = _offset;
@@ -62,24 +62,24 @@
     _convDepthWise.neuron = _neurons[1];
     [_convDepthWise compile:device];
     
-    _convProject = [[MIConvolutionLayer alloc] initWithInputShape:_convDepthWise.outputShapeRef];
+    _convProject = [[MIConvolutionLayer alloc] initWithInputShape:_convDepthWise.dataShapeRef];
     _convProject.padding = MTPaddingMode_tfsame;
     _convProject.depthWise = NO;
     _convProject.kernel = _kernels[2];
     _convProject.neuron = _neurons[2];
     [_convProject compile:device];
     
-    _outputShape = _convProject.outputShape;
+    _dataShape = _convProject.dataShape;
 
     [_convExpand addTarget:_convDepthWise];
     [_convDepthWise addTarget:_convProject];
     
-    if (DataShapesTheSame(&_inputShapes[0], &_outputShape)) {
-        _addition = [MIArithmeticLayer arithmeticLayerWithDataShape:&_outputShape];
+    if (DataShapesTheSame(&_inputShapes[0], &_dataShape)) {
+        _addition = [MIArithmeticLayer arithmeticLayerWithDataShape:&_dataShape];
         _addition.arithmeticType = @"addition";
         [_addition compile:device];
         
-        [_convProject addTarget:_addition atTempImageIndex:1];
+        [_convProject addTarget:_addition atIndex:1];
         _lastNode = _addition;
     }
     else {
@@ -90,9 +90,9 @@
     
     DB_TRACE(-_verbose+2, "\n%s compile %s --> %s --> %s --> %s", self.labelUTF8,
              NSStringFromDataShape(&_inputShapes[0]).UTF8String,
-             NSStringFromDataShape(_convExpand.outputShapeRef).UTF8String,
-             NSStringFromDataShape(_convDepthWise.outputShapeRef).UTF8String,
-             NSStringFromDataShape(_convProject.outputShapeRef).UTF8String);
+             NSStringFromDataShape(_convExpand.dataShapeRef).UTF8String,
+             NSStringFromDataShape(_convDepthWise.dataShapeRef).UTF8String,
+             NSStringFromDataShape(_convProject.dataShapeRef).UTF8String);
 }
 
 - (void)setLabel:(NSString *)label {
@@ -149,26 +149,26 @@
     [_lastNode removeAllTargets];
 }
 
-- (void)removeTarget:(id<MetalTensorInput>)targetToRemove {
+- (void)removeTarget:(ForwardTarget)targetToRemove{
     [_lastNode removeTarget:targetToRemove];
 }
 
-- (void)addTarget:(id<MetalTensorInput>)newTarget {
+- (void)addTarget:(ForwardTarget)newTarget {
     [_lastNode addTarget:newTarget];
 }
 
-- (void)addTarget:(id<MetalTensorInput>)newTarget atTempImageIndex:(NSInteger)imageIndex {
-    [_lastNode addTarget:newTarget atTempImageIndex:imageIndex];
+- (void)addTarget:(ForwardTarget)newTarget atIndex:(NSInteger)imageIndex {
+    [_lastNode addTarget:newTarget atIndex:imageIndex];
 }
 
-- (void)setInputImage:(MITemporaryImage *)newInputImage atIndex:(NSInteger)imageIndex {
-    [_convExpand setInputImage:newInputImage atIndex:0];
-    [_addition setInputImage:newInputImage atIndex:0];
+- (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
+    [_convExpand setImage:newImage atIndex:0];
+    [_addition setImage:newImage atIndex:0];
 }
 
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)cmdBuf {
-    [_convExpand tempImageReadyAtIndex:0 commandBuffer:cmdBuf];
-    [_addition tempImageReadyAtIndex:0 commandBuffer:cmdBuf];
+- (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    [_convExpand imageReadyAtIndex:0 onCommandBuffer:commandBuffer];
+    [_addition imageReadyAtIndex:0 onCommandBuffer:commandBuffer];
 }
 
 #pragma mark - Management of the weights

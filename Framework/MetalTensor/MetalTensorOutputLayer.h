@@ -6,6 +6,10 @@
 //  Copyright © 2019 fengshi. All rights reserved.
 //
 
+/*
+ *  This layer is used for output the tensor's data to CPU space.
+ */
+
 #import "MetalTensorLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN

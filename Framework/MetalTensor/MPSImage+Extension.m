@@ -266,4 +266,9 @@ NSString *NSStringFromNeuronType(NeuronType *neuron) {
 
 }
 
+MPSOffset MPSOffsetMake(NSInteger x, NSInteger y, NSInteger z) {
+    MPSOffset offset = {x, y, z};
+    return offset;
+}
+
 @end

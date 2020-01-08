@@ -16,6 +16,12 @@ FOUNDATION_EXPORT double MetalTensorVersionNumber;
 //! Project version string for MetalTensor.
 FOUNDATION_EXPORT const unsigned char MetalTensorVersionString[];
 
+
+#import "MTTensor.h"
+#import "MTTensorCache.h"
+#import "MTImageTensor.h"
+#import "MetalTensorProtocols.h"
+
 #import "numpy.h"
 #import "metal_tensor_log.h"
 #import "metal_tensor_structures.h"
@@ -39,16 +45,12 @@ FOUNDATION_EXPORT const unsigned char MetalTensorVersionString[];
 #import "MIInceptionV3Module.h"
 #import "MIInvertedResidualModule.h"
 #import "MIL2NormalizationLayer.h"
-#import "MetalTensorInput.h"
-#import "MIMPSImage.h"
 #import "MIPoolingAverageLayer.h"
 #import "MIPoolingMaxLayer.h"
 #import "MIReshapeLayer.h"
 #import "MIResidualModule.h"
 #import "MISeparableConvolutionLayer.h"
 #import "MISoftMaxLayer.h"
-#import "MITemporaryImage.h"
-#import "MITemporaryImageCache.h"
 #import "MITransposeConvolutionLayer.h"
 #import "MIMatrixMultiplyLayer.h"
 #import "MIGramMatrixLayer.h"

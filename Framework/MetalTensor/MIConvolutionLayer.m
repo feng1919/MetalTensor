@@ -7,12 +7,13 @@
 //
 
 #import "MIConvolutionLayer.h"
-#import "MITemporaryImageCache.h"
+#import "MTTensorCache.h"
 #import "MIDataSource.h"
 
 @interface MIConvolutionLayer() {
     
     MPSCNNConvolution *_convolution;
+    MPSCNNConvolutionGradient *_convolutionGradientOp;
 }
 
 @end
@@ -33,31 +34,11 @@
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
-    _outputShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, _padding);
-    _outputShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, _padding);
-    _outputShape.depth = _depthWise?_inputShapes[0].depth:_kernel.filters;
+    _dataShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, _padding);
+    _dataShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, _padding);
+    _dataShape.depth = _depthWise?_inputShapes[0].depth:_kernel.filters;
     
-    if (_dataSource) {
-        _convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
-        [_convolution setEdgeMode:_edgeMode];
-        [self setOffset:_offset];
-    }
-}
-
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    
-    NSAssert(_dataSource != nil, @"The weights has not been set.");
-    DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
-    
-    _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
-    [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];
-    [_convolution encodeToCommandBuffer:commandBuffer
-                            sourceImage:_inputs[@(0)].image
-                       destinationImage:_outputTempImage.image];
-    
-    [self removeCachedImages];
-    
-    [self notifyTargetsAboutNewTempImage:commandBuffer];
+    [self updateComputing];
 }
 
 - (void)setEdgeMode:(MPSImageEdgeMode)edgeMode {
@@ -83,10 +64,23 @@
     
     DB_TRACE(-_verbose+1, "\n%s data source --> %s", self.labelUTF8, [dataSource description].UTF8String);
     
+    [self updateComputing];
+}
+
+- (void)updateComputing {
+    
     if (_device) {
         _convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
         [_convolution setEdgeMode:_edgeMode];
         [self setOffset:_offset];
+        
+        if (_needBackward) {
+            _convolutionGradientOp = [[MPSCNNConvolutionGradient alloc] initWithDevice:_device weights:_dataSource];
+            _convolutionGradientOp.gradientOption = MPSCNNConvolutionGradientOptionGradientWithData;
+        }
+        
+        _operation = _convolution;
+        _gradientOp = _convolutionGradientOp;
     }
 }
 

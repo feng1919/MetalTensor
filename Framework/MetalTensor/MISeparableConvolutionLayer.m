@@ -50,7 +50,7 @@
     _depthwise.dataSource = _dataSourceDepthWise;
     [_depthwise compile:device];
     
-    _project = [[MIConvolutionLayer alloc] initWithInputShape:_depthwise.outputShapeRef];
+    _project = [[MIConvolutionLayer alloc] initWithInputShape:_depthwise.dataShapeRef];
     _project.kernel = _kernels[1];
     _project.neuron = _neurons[1];
     _project.depthWise = NO;
@@ -60,7 +60,7 @@
     
     [_depthwise addTarget:_project];
     
-    _outputShape = _project.outputShape;
+    _dataShape = _project.dataShape;
     
     [self setLabel:_label];
 }
@@ -93,17 +93,17 @@
     return _project;
 }
 
-- (void)addTarget:(id<MetalTensorInput>)newTarget {
+- (void)addTarget:(ForwardTarget)newTarget {
     NSAssert(_project, @"The separable layer is not compiled yet.");
     [_project addTarget:newTarget];
 }
 
-- (void)addTarget:(id<MetalTensorInput>)newTarget atTempImageIndex:(NSInteger)imageIndex {
+- (void)addTarget:(ForwardTarget)newTarget atIndex:(NSInteger)imageIndex {
     NSAssert(_project, @"The separable layer is not compiled yet.");
-    [_project addTarget:newTarget atTempImageIndex:imageIndex];
+    [_project addTarget:newTarget atIndex:imageIndex];
 }
 
-- (void)removeTarget:(id<MetalTensorInput>)targetToRemove {
+- (void)removeTarget:(ForwardTarget)targetToRemove {
     NSAssert(_project, @"The separable layer is not compiled yet.");
     [_project removeTarget:targetToRemove];
 }
@@ -129,12 +129,12 @@
 }
 #endif
 
-- (void)setInputImage:(MITemporaryImage *)newInputImage atIndex:(NSInteger)imageIndex {
-    [_depthwise setInputImage:newInputImage atIndex:imageIndex];
+- (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
+    [_depthwise setImage:newImage atIndex:imageIndex];
 }
 
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)cmdBuf {
-    [_depthwise tempImageReadyAtIndex:imageIndex commandBuffer:cmdBuf];
+- (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    [_depthwise imageReadyAtIndex:imageIndex onCommandBuffer:commandBuffer];
 }
 
 #pragma mark - Management of the weights

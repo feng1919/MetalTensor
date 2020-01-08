@@ -1,18 +1,19 @@
 //
-//  MITemporaryImage.m
+//  MTTensor.m
 //  MetalImage
 //
 //  Created by Feng Stone on 2019/5/19.
 //  Copyright © 2019 fengshi. All rights reserved.
 //
 
-#import "MITemporaryImage.h"
-#import "MITemporaryImageCache.h"
+#import "MTTensor.h"
+#import "MTTensorCache.h"
 
-@interface MITemporaryImage() {
+@interface MTTensor() {
     DataShape _shape;
     int _referenceCounting;
     MPSImageDescriptor *_imageDescriptor;
+    MPSTemporaryImage *_image;
 }
 
 @end
@@ -27,7 +28,7 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
     return desc;
 }
 
-@implementation MITemporaryImage
+@implementation MTTensor
 
 - (instancetype)initWithShape:(DataShape *)image {
     if (self = [super init]) {
@@ -40,7 +41,7 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Temporary image info: %@", KeyForImageType(&_shape)];
+    return [NSString stringWithFormat:@"Tensor: %@", KeyForTensorType(&_shape)];
 }
 
 - (void)dealloc {
@@ -49,6 +50,10 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
 }
 
 #pragma mark - Public Access
+
+- (MPSImage *)content {
+    return _image;
+}
 
 - (DataShape *)shape {
     return &_shape;
@@ -74,7 +79,7 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
     return _imageDescriptor;
 }
 
-- (MPSTemporaryImage *)newTemporaryImageForCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+- (MPSTemporaryImage *)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     @synchronized (self) {
         if (!_image) {
 //        _image.readCount = 0;
@@ -85,7 +90,7 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
     }
 }
 
-- (void)deleteTemporaryImage {
+- (void)deleteContent {
     self.image = nil;
 }
 
@@ -114,7 +119,7 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
             //            [(MPSTemporaryImage *)_image setReadCount:0];
             //        }
             //        self.image = nil;
-            [[MITemporaryImageCache sharedCache] cacheImage:self];
+            [[MTTensorCache sharedCache] cacheTensor:self];
         }
     }
 }

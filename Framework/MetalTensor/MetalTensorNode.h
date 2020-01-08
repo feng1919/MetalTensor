@@ -8,26 +8,36 @@
 
 #import <Foundation/Foundation.h>
 #import <MetalImage/MetalImageFunction.h>
-#import "MetalTensorInput.h"
-#import "MITemporaryImage.h"
+#import "MetalTensorProtocols.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /*
- *  Connecting all of the network operations, layers and tensors.
+ *  A MetalTensorNode makes the connection to the other nodes of the
+ *  network, if this node should pass a tensor to the nodes connected
+ *  with, or receive tensors from those, then it should confirm to
+ *  <MTForwardDelegate> protocol for forward propagation and to
+ *  <MetalTensorBackward> protocol for backward propagation.
  */
 
 @interface MetalTensorNode : NSObject {
     
 @protected
-    DataShape _outputShape;
-    MITemporaryImage *_outputTempImage;
-    NSMutableArray <id<MetalTensorInput>> *_targets;
-    NSMutableArray <NSNumber *> *_targetTempImageIndices;
     
+    //  Targets for forward propagation.
+    NSMutableArray <ForwardTarget> *_targets;
+    //  The index of slot of the tensor of the forward target node
+    //  received.
+    NSMutableArray <NSNumber *> *_targetIndices;
+    
+    //  A string to identify the node.
     NSString *_label;
     
+    //  The device to create the node on.
     id<MTLDevice> _device;
+    
+    //  Flag of backward propagation will be cast by the node.
+    BOOL _needBackward;
     
 //#ifdef DEBUG
     // If 0, there will be no 'printf' log in console.
@@ -35,24 +45,33 @@ NS_ASSUME_NONNULL_BEGIN
 //#endif
 }
 
+/*
+ *  A string to identify the node.
+ */
 @property (nonatomic, strong, nullable) NSString *label;
-@property (nonatomic, readonly) DataShape outputShape;
-@property (nonatomic, strong) MITemporaryImage *outputTempImage;
 
-- (DataShape *)outputShapeRef;
+/*
+ *  Whether this layer need backward propagation.
+ *  If YES, there will be extra computation of tensor gradients.
+ *  This framework is for inference purpose, so there will be no
+ *  computation of weights, bias or batch normalization parameters,
+ *  etc.
+ *  The default is NO.
+ */
+@property (nonatomic, assign) BOOL needBackward;
 
+/*
+ *  One should override this method and build up the node, such
+ *  as initialize the kernel operation, configue the data shape of
+ *  tensor for output and offsets of convolution, etc.
+ */
 - (void)compile:(id<MTLDevice>)device NS_REQUIRES_SUPER;
 
-- (void)removeOutputTempImage;
-- (void)setOutputTempImageToTargets;
-- (void)notifyTargetsAboutNewTempImage:(id<MTLCommandBuffer>)cmdBuf;
-
-- (NSArray<id<MetalTensorInput>>*)targets;
-
-- (void)addTarget:(id<MetalTensorInput>)newTarget;
-- (void)addTarget:(id<MetalTensorInput>)newTarget atTempImageIndex:(NSInteger)imageIndex;
-
-- (void)removeTarget:(id<MetalTensorInput>)targetToRemove;
+//  FORWARD CONNECTING...
+- (NSArray<ForwardTarget> *)targets;
+- (void)addTarget:(ForwardTarget)newTarget;
+- (void)addTarget:(ForwardTarget)newTarget atIndex:(NSInteger)imageIndex;
+- (void)removeTarget:(ForwardTarget)targetToRemove;
 - (void)removeAllTargets;
 
 //#ifdef DEBUG

@@ -7,7 +7,6 @@
 //
 
 #import "MIReduceUnaryLayer.h"
-#import "MITemporaryImageCache.h"
 
 @implementation MIReduceUnaryLayer {
 @protected
@@ -22,33 +21,25 @@
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
-    _outputShape = _inputShapes[0];
+    _dataShape = _inputShapes[0];
     if (_axis == ReduceAxisDepth) {
-        _outputShape.depth = 1;
+        _dataShape.depth = 1;
     }
     else if (_axis == ReduceAxisColumn) {
-        _outputShape.column = 1;
+        _dataShape.column = 1;
     }
     else {
-        _outputShape.row = 1;
+        _dataShape.row = 1;
     }
     
     NSString *className = GetReduceClass(_type, _axis);
     Class c = NSClassFromString(className);
     _reduce = [[c alloc] initWithDevice:device];
-}
-
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
-
-    _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
-    [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];
-    [_reduce encodeToCommandBuffer:commandBuffer
-                       sourceImage:_inputs[@(0)].image
-                  destinationImage:_outputTempImage.image];
     
-    [self removeCachedImages];
-    [self notifyTargetsAboutNewTempImage:commandBuffer];
+    if (_needBackward) {
+        _gradientOp = [[MPSCNNGradientKernel alloc] initWithDevice:_device];
+    }
+    _operation = _reduce;
 }
 
 NSString *GetReduceClass(ReduceType type, ReduceAxis axis)
@@ -63,7 +54,6 @@ NSString *DescWithReduceType(ReduceType type)
     switch (type) {
         case ReduceTypeMax:
             return @"Max";
-            break;
         case ReduceTypeMin:
             return @"Min";
         case ReduceTypeSum:
@@ -82,7 +72,6 @@ NSString *DescWithReduceAxis(ReduceAxis axis)
     switch (axis) {
         case ReduceAxisRow:
             return @"Row";
-            break;
         case ReduceAxisColumn:
             return @"Column";
         case ReduceAxisDepth:

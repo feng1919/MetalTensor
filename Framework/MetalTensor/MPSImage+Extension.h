@@ -49,6 +49,8 @@ void ConvertToTensorFlowLayout(float *dst, float *src, DataShape *shape);
 - (void)toFloat16Array:(float16_t *)buffer slice:(int)slice;
 + (void)texture:(id<MTLTexture>)texture toFloat16Array:(float16_t *)buffer;
 
+MPSOffset MPSOffsetMake(NSInteger x, NSInteger y, NSInteger z);
+
 @end
 
 NS_ASSUME_NONNULL_END

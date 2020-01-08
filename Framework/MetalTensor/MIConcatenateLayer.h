@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MIConcatenateLayer : MetalTensorLayer <MetalTensorInput> {
+@interface MIConcatenateLayer : MetalTensorLayer {
     
 @protected
     DataShape _tensorShape;

@@ -7,10 +7,11 @@
 //
 
 #import "MIBatchNormalizationLayer.h"
-#import "MITemporaryImageCache.h"
+#import "MTTensorCache.h"
 
 @interface MIBatchNormalizationLayer() {
     MPSCNNBatchNormalization *_bn;
+    MPSCNNBatchNormalizationGradient *_bnGradientOp;
 }
 
 @end
@@ -26,36 +27,28 @@
     
     [super compile:device];
     
-    if (_dataSource) {
-        _bn = [[MPSCNNBatchNormalization alloc] initWithDevice:_device dataSource:_dataSource];
-        _bn.epsilon = _epsilon;
-        _bn.edgeMode = _edgeMode;
-    }
+    [self updateComputing];
 }
 
 - (void)setDataSource:(id<MPSCNNBatchNormalizationDataSource>)dataSource {
     _dataSource = dataSource;
+    [self updateComputing];
+}
+
+- (void)updateComputing {
     
-    if (_device) {
+    if (_device && _dataSource) {
         _bn = [[MPSCNNBatchNormalization alloc] initWithDevice:_device dataSource:_dataSource];
         _bn.epsilon = _epsilon;
         _bn.edgeMode = _edgeMode;
+        
+        if (_needBackward) {
+            _bnGradientOp = [[MPSCNNBatchNormalizationGradient alloc] initWithDevice:_device fusedNeuronDescriptor:nil];
+        }
+        
+        _operation = _bn;
+        _gradientOp = _bnGradientOp;
     }
-}
-
-- (void)tempImageReadyAtIndex:(NSInteger)imageIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    NSAssert(_dataSource != nil, @"The weights has not been set.");
-    
-    _outputTempImage = [[MITemporaryImageCache sharedCache] fetchTemporaryImageWithShape:&_outputShape commandBuffer:commandBuffer];
-    [_outputTempImage newTemporaryImageForCommandBuffer:commandBuffer];
-    [_bn encodeToCommandBuffer:commandBuffer
-                   sourceImage:_inputs[@(0)].image
-              destinationImage:_outputTempImage.image];
-    
-    [self removeCachedImages];
-    
-    [self notifyTargetsAboutNewTempImage:commandBuffer];
-    
 }
 
 @end

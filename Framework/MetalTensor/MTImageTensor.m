@@ -1,15 +1,15 @@
 //
-//  MIMPSImage.m
+//  MTImageTensor.m
 //  MetalImage
 //
 //  Created by Feng Stone on 2019/5/25.
 //  Copyright © 2019 fengshi. All rights reserved.
 //
 
-#import "MIMPSImage.h"
+#import "MTImageTensor.h"
 #import <MetalImage/MetalDevice.h>
 
-@implementation MIMPSImage
+@implementation MTImageTensor
 
 - (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized {
     int width = (int)image.size.width;
@@ -64,14 +64,14 @@
     return self;
 }
 
-- (MPSTemporaryImage *)newTemporaryImageForCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    NSAssert(NO, @"It is invalid to call on command buffer for 'MIMPSImage', which is a global variance.");
+- (MPSTemporaryImage *)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    NSAssert(NO, @"It is invalid to call on command buffer for 'MTImageTensor', which is a global variance.");
     _mpsImage = nil;
-    return [super newTemporaryImageForCommandBuffer:commandBuffer];
+    return [super newContentOnCommandBuffer:commandBuffer];
 }
 
-- (MPSTemporaryImage *)image {
-    return (MPSTemporaryImage *)_mpsImage;
+- (MPSImage *)content {
+    return _mpsImage;
 }
 
 @end

@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  To decide which head to be actived.
  */
 
-@interface MetalLayerSwitch : MetalTensorNode <MetalTensorInput>
+@interface MetalLayerSwitch : MetalTensorNode <MTForwardDelegate>
 
 @property (atomic, assign) unsigned int activedTargetIndex;
 
