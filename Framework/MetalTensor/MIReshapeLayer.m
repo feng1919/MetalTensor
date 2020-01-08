@@ -36,9 +36,9 @@
 - (instancetype)initWithInputShape:(DataShape *)inputShape outputShape:(DataShape *)outputShape {
     if (self = [super initWithInputShapes:inputShape size:1]) {
         
-        _dataShape = *outputShape;
+        _outputShape = *outputShape;
         
-        NSAssert(ProductOfDataShape(&_inputShapes[0]) == ProductOfDataShape(&_dataShape), @"Reshape can not be cast, because the product of input shape is not equal to the product of output shape.");
+        NSAssert(ProductOfDataShape(&_inputShapes[0]) == ProductOfDataShape(&_outputShape), @"Reshape can not be cast, because the product of input shape is not equal to the product of output shape.");
         
         DB_TRACE(-_verbose+2, "\n%s init %s --> %s", self.labelUTF8, NSStringFromDataShape(inputShape).UTF8String, NSStringFromDataShape(outputShape).UTF8String);
     }

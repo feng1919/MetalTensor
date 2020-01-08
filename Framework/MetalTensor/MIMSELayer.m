@@ -31,7 +31,7 @@
     NSAssert(_numOfImages == 2, @"Invalid number of inputs, it must be two inputs.");
     NSAssert(DataShapesTheSame(&_inputShapes[0], &_inputShapes[1]), @"The two input tensors must have same shape.");
     
-    _dataShape = DataShapeMake(1, 1, 1); // Output one scalar.
+    _outputShape = DataShapeMake(1, 1, 1); // Output one scalar.
     _outputArithmetic = _inputShapes[0];
     _outputReduceRowMean = DataShapeMake(1, _inputShapes[0].column, _inputShapes[0].depth);
     _outputReduceColumnMean = DataShapeMake(1, 1, _inputShapes[0].depth);
@@ -77,7 +77,7 @@
     [reduceRowImage newContentOnCommandBuffer:commandBuffer];
     MetalTensor reduceColumnImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceColumnMean source:self commandBuffer:commandBuffer];
     [reduceColumnImage newContentOnCommandBuffer:commandBuffer];
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_dataShape source:self commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
     [_image newContentOnCommandBuffer:commandBuffer];
     
     [_subtract encodeToCommandBuffer:commandBuffer

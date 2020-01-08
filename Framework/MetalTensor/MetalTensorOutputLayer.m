@@ -29,14 +29,14 @@
     MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
     _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
     
-    MPSImageDescriptor *desc = ImageDescriptor(&_dataShape);
+    MPSImageDescriptor *desc = ImageDescriptor(&_outputShape);
     desc.storageMode = MTLStorageModeShared;
     _outputImage = [[MPSImage alloc] initWithDevice:device imageDescriptor:desc];
     
 }
 
 - (DataShape *)dataShapeRef {
-    return &_dataShape;
+    return &_outputShape;
 }
 
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
@@ -72,7 +72,7 @@
     [command_buffer commit];
     [command_buffer waitUntilCompleted];
     
-    float16_t *result = malloc(ProductOfDataShape(&_dataShape)*sizeof(float16_t));
+    float16_t *result = malloc(ProductOfDataShape(&_outputShape)*sizeof(float16_t));
     [_outputImage toFloat16Array:result];
     // Once we obtain the tensor buffer, we may do something blah blah blah...
     free(result);

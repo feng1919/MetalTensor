@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protected
     
     //  The data shape of forward result tensor.
-    DataShape _dataShape;
+    DataShape _outputShape;
     
     //  input image shapes
     DataShape *_inputShapes;
@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
     unsigned long long _reservedTargetFlags;
 }
 
-@property (nonatomic, readonly) DataShape dataShape;
+@property (nonatomic, readonly) DataShape outputShape;
 
 /*
  *  Recommanded initialze functions of MetalTensorLayer.

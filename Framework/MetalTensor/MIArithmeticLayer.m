@@ -89,7 +89,7 @@
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_dataShape source:self commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
     [_image newContentOnCommandBuffer:commandBuffer];
     if (_needBackward) {
         
@@ -122,7 +122,7 @@
     BackwardTarget primaryBackward = primaryTensor.source;
     BackwardTarget secondaryBackward = secondaryTensor.source;
     
-    MetalTensor primaryGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_dataShape source:nil commandBuffer:commandBuffer];
+    MetalTensor primaryGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:nil commandBuffer:commandBuffer];
     [_primaryGradientOperation encodeToCommandBuffer:commandBuffer
                                       sourceGradient:_gradient.content
                                          sourceImage:primaryTensor.content
@@ -132,7 +132,7 @@
     [primaryGradient unlock];
     
     if (secondaryBackward) {
-        MetalTensor secondaryGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_dataShape source:nil commandBuffer:commandBuffer];
+        MetalTensor secondaryGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:nil commandBuffer:commandBuffer];
         [_secondaryGradientOperation encodeToCommandBuffer:commandBuffer
                                             sourceGradient:_gradient.content
                                                sourceImage:secondaryTensor.content

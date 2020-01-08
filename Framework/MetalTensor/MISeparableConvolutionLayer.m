@@ -60,7 +60,7 @@
     
     [_depthwise addTarget:_project];
     
-    _dataShape = _project.dataShape;
+    _outputShape = _project.outputShape;
     
     [self setLabel:_label];
 }
@@ -111,6 +111,14 @@
 - (void)removeAllTargets {
     NSAssert(_project, @"The separable layer is not compiled yet.");
     [_project removeAllTargets];
+}
+
+- (void)reserveImageIndex:(NSInteger)index {
+    [_depthwise reserveImageIndex:index];
+}
+
+- (void)releaseImageIndex:(NSInteger)index {
+    [_depthwise releaseImageIndex:index];
 }
 
 - (void)setLabel:(NSString *)label {

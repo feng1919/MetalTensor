@@ -21,15 +21,15 @@
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
-    _dataShape = _inputShapes[0];
+    _outputShape = _inputShapes[0];
     if (_axis == ReduceAxisDepth) {
-        _dataShape.depth = 1;
+        _outputShape.depth = 1;
     }
     else if (_axis == ReduceAxisColumn) {
-        _dataShape.column = 1;
+        _outputShape.column = 1;
     }
     else {
-        _dataShape.row = 1;
+        _outputShape.row = 1;
     }
     
     NSString *className = GetReduceClass(_type, _axis);

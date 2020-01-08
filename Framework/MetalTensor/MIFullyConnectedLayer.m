@@ -27,9 +27,9 @@
                       _kernel.row == _inputShapes[0].row &&
                       _kernel.depth == _inputShapes[0].depth);
     
-    _dataShape.column = 1;
-    _dataShape.row = 1;
-    _dataShape.depth = _kernel.filters;
+    _outputShape.column = 1;
+    _outputShape.row = 1;
+    _outputShape.depth = _kernel.filters;
     
     [self updateComputing];
 }
@@ -69,9 +69,7 @@
     
     _dataSource = dataSource;
     
-    if (_device) {
-        _fullyConnected = [[MPSCNNFullyConnected alloc] initWithDevice:_device weights:_dataSource];
-    }
+    [self updateComputing];
     DB_TRACE(-_verbose+1, "\n%s data source --> %s", self.labelUTF8, [dataSource description].UTF8String);
 }
 

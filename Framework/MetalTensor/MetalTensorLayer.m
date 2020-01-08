@@ -123,15 +123,15 @@ static MPSCNNAdd *_reduceSumOperation = nil;
     [super compile:device];
     
     NSParameterAssert(_numOfImages > 0);
-    if (ProductOfDataShape(&_dataShape) == 0) {
-        _dataShape = _inputShapes[0];
+    if (ProductOfDataShape(&_outputShape) == 0) {
+        _outputShape = _inputShapes[0];
     }
 }
 
 #pragma mark - Forward Processing
 
 - (DataShape *)dataShapeRef {
-    return &_dataShape;
+    return &_outputShape;
 }
 
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
@@ -158,9 +158,9 @@ static MPSCNNAdd *_reduceSumOperation = nil;
 }
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
+    DB_TRACE(-_verbose+3, "\n%s encoding...", self.labelUTF8);
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_dataShape source:self commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
     [_image newContentOnCommandBuffer:commandBuffer];
     
     MetalTensor sourceTensor = _inputImages[@(0)];
@@ -196,12 +196,14 @@ static MPSCNNAdd *_reduceSumOperation = nil;
 }
 
 - (void)removeImage {
-    DB_TRACE(-_verbose+2, "\n%s rm %s",
-             self.labelUTF8,
-             NSStringFromDataShape(_image.shape).UTF8String);
-    
-    [_image unlock];
-    _image = nil;
+    if (_image) {
+        DB_TRACE(-_verbose+2, "\n%s rm %s",
+                 self.labelUTF8,
+                 NSStringFromDataShape(_image.shape).UTF8String);
+        
+        [_image unlock];
+        _image = nil;
+    }
 }
 
 - (void)setImageToTargets {
@@ -233,7 +235,7 @@ static MPSCNNAdd *_reduceSumOperation = nil;
 
 #pragma mark - Backward Processing
 - (void)setGradient:(MetalTensor)newGradient forwardTarget:(ForwardTarget)target{
-    NSAssert(DataShapesTheSame(&_dataShape, [newGradient shape]), @"The input gradient's shape is not identical to the output shape.");
+    NSAssert(DataShapesTheSame(&_outputShape, [newGradient shape]), @"The input gradient's shape is not identical to the output shape.");
     [_inputGradients addObject:newGradient];
     [newGradient lock];
     
@@ -299,7 +301,7 @@ static MPSCNNAdd *_reduceSumOperation = nil;
         goto GRADIENT_SUM_FINISH;
     }
     else {
-        MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&_dataShape source:self commandBuffer:commandBuffer];
+        MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
         if (_reduceSumOperation == nil) {
             _reduceSumOperation = [[MPSCNNAdd alloc] initWithDevice:_device];
         };

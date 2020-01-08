@@ -27,7 +27,7 @@
     
     NSParameterAssert(device);
     
-    _dataShape = DataShapeMake(_inputShapes[0].depth, _inputShapes[0].depth, 1);
+    _outputShape = DataShapeMake(_inputShapes[0].depth, _inputShapes[0].depth, 1);
     _outputArithmetic = _inputShapes[0];
     _outputReduceRow = DataShapeMake(1, _inputShapes[0].column, _inputShapes[0].depth);
     
@@ -65,7 +65,7 @@
     [arithmeticImage newContentOnCommandBuffer:commandBuffer];
     MetalTensor reduceRowImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceRow source:self commandBuffer:commandBuffer];
     [reduceRowImage newContentOnCommandBuffer:commandBuffer];
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_dataShape source:self commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
     [_image newContentOnCommandBuffer:commandBuffer];
     
     _neuron.offset = MPSOffsetMake(0, 0, 0);

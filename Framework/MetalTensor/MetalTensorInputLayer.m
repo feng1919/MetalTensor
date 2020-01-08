@@ -16,10 +16,10 @@
     
     [super compile:device];
     
-    _outputImage = [[MTImageTensor alloc] initWithShape:&_dataShape];
+    _outputImage = [[MTImageTensor alloc] initWithShape:&_outputShape];
     [_outputImage setReferenceCountingEnable:NO];
     
-    MPSImageDescriptor *descriptor = ImageDescriptor(&_dataShape);
+    MPSImageDescriptor *descriptor = ImageDescriptor(&_outputShape);
     descriptor.storageMode = MTLStorageModeShared;
     _outputImage.mpsImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:descriptor];
 
@@ -27,7 +27,7 @@
         MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
         _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
         
-        MPSImageDescriptor *desc = ImageDescriptor(&_dataShape);
+        MPSImageDescriptor *desc = ImageDescriptor(&_outputShape);
         desc.storageMode = MTLStorageModeShared;
         _gradientImage.mpsImage = [[MPSImage alloc] initWithDevice:device imageDescriptor:desc];
         

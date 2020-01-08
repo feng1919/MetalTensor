@@ -45,8 +45,11 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
 }
 
 - (void)dealloc {
+    
+    NSAssert(_referenceCountingEnable == NO || _referenceCounting == 0, @"Unexpected dealloc...");
+    
     self.image = nil;
-//    NSLog(@"Temporary image dealloc: %@", KeyForImageType(&imageParameters));
+    NSLog(@"Temporary image dealloc: %@", KeyForTensorType(&_shape));
 }
 
 #pragma mark - Public Access
@@ -97,7 +100,9 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
 - (void)setImage:(MPSTemporaryImage *)image {
     NSAssert(image==nil||[image isKindOfClass:[MPSTemporaryImage class]], @"Invalid image type...");
     @synchronized (self) {
-        _image.readCount = 0;
+        if (_image.readCount > 0) {
+            _image.readCount = 0;
+        }
         _image = image;
     }
 }

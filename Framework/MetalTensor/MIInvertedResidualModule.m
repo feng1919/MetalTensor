@@ -69,13 +69,13 @@
     _convProject.neuron = _neurons[2];
     [_convProject compile:device];
     
-    _dataShape = _convProject.dataShape;
+    _outputShape = _convProject.outputShape;
 
     [_convExpand addTarget:_convDepthWise];
     [_convDepthWise addTarget:_convProject];
     
-    if (DataShapesTheSame(&_inputShapes[0], &_dataShape)) {
-        _addition = [MIArithmeticLayer arithmeticLayerWithDataShape:&_dataShape];
+    if (DataShapesTheSame(&_inputShapes[0], &_outputShape)) {
+        _addition = [MIArithmeticLayer arithmeticLayerWithDataShape:&_outputShape];
         _addition.arithmeticType = @"addition";
         [_addition compile:device];
         
@@ -169,6 +169,16 @@
 - (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     [_convExpand imageReadyAtIndex:0 onCommandBuffer:commandBuffer];
     [_addition imageReadyAtIndex:0 onCommandBuffer:commandBuffer];
+}
+
+- (void)reserveImageIndex:(NSInteger)index {
+    [_convExpand reserveImageIndex:index];
+    [_addition reserveImageIndex:index];
+}
+
+- (void)releaseImageIndex:(NSInteger)index {
+    [_convExpand releaseImageIndex:index];
+    [_addition releaseImageIndex:index];
 }
 
 #pragma mark - Management of the weights

@@ -28,9 +28,9 @@
     
     NSParameterAssert(_kernel.stride > 0);
     
-    _dataShape.column = (_inputShapes[0].column + _kernel.stride - 1) / _kernel.stride;
-    _dataShape.row = (_inputShapes[0].row + _kernel.stride - 1) / _kernel.stride;
-    _dataShape.depth = _inputShapes[0].depth;
+    _outputShape.column = (_inputShapes[0].column + _kernel.stride - 1) / _kernel.stride;
+    _outputShape.row = (_inputShapes[0].row + _kernel.stride - 1) / _kernel.stride;
+    _outputShape.depth = _inputShapes[0].depth;
     
     _l2Normalization = [[MPSCNNPoolingL2Norm alloc] initWithDevice:_device
                                                        kernelWidth:_kernel.column

@@ -25,7 +25,7 @@
     [super compile:device];
     
     _offsets = malloc(_numOfImages * sizeof(int));
-    _dataShape = ConcatenateShapes(_inputShapes, _numOfImages, _offsets, true);
+    _outputShape = ConcatenateShapes(_inputShapes, _numOfImages, _offsets, true);
     _tensorShape = ConcatenateShapes(_inputShapes, _numOfImages, NULL, false);
 
     _neuron = [[MPSCNNNeuron alloc] initWithDevice:device
@@ -55,7 +55,7 @@
     
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_dataShape source:self commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
     [_image newContentOnCommandBuffer:commandBuffer];
     
     for (int i = 0; i < _numOfImages; i++) {

@@ -28,9 +28,9 @@
     
     NSParameterAssert(_kernel.stride > 0);
     
-    _dataShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, MTPaddingMode_tfsame);
-    _dataShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, MTPaddingMode_tfsame);
-    _dataShape.depth = _inputShapes[0].depth;
+    _outputShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, MTPaddingMode_tfsame);
+    _outputShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, MTPaddingMode_tfsame);
+    _outputShape.depth = _inputShapes[0].depth;
     
     _pooling = [[MPSCNNPoolingMax alloc] initWithDevice:_device
                                             kernelWidth:_kernel.column

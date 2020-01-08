@@ -34,9 +34,9 @@
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
-    _dataShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, _padding);
-    _dataShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, _padding);
-    _dataShape.depth = _depthWise?_inputShapes[0].depth:_kernel.filters;
+    _outputShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, _padding);
+    _outputShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, _padding);
+    _outputShape.depth = _depthWise?_inputShapes[0].depth:_kernel.filters;
     
     [self updateComputing];
 }
@@ -69,7 +69,7 @@
 
 - (void)updateComputing {
     
-    if (_device) {
+    if (_device && _dataSource) {
         _convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
         [_convolution setEdgeMode:_edgeMode];
         [self setOffset:_offset];
