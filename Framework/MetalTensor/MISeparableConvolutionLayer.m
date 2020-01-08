@@ -50,7 +50,7 @@
     _depthwise.dataSource = _dataSourceDepthWise;
     [_depthwise compile:device];
     
-    _project = [[MIConvolutionLayer alloc] initWithInputShape:_depthwise.dataShapeRef];
+    _project = [[MIConvolutionLayer alloc] initWithInputShape:_depthwise.outputShapeRef];
     _project.kernel = _kernels[1];
     _project.neuron = _neurons[1];
     _project.depthWise = NO;

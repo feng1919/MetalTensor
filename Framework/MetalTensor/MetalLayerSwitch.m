@@ -29,4 +29,9 @@
     
 }
 
+- (DataShape *)outputShapeRef {
+    return [_targets[_activedTargetIndex] outputShapeRef];
+}
+
+
 @end

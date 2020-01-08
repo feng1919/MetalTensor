@@ -54,7 +54,7 @@
     _convExpand.neuron = _neurons[0];
     [_convExpand compile:device];
     
-    _convDepthWise = [[MIConvolutionLayer alloc] initWithInputShape:_convExpand.dataShapeRef];
+    _convDepthWise = [[MIConvolutionLayer alloc] initWithInputShape:_convExpand.outputShapeRef];
     _convDepthWise.padding = MTPaddingMode_tfsame;
     _convDepthWise.depthWise = YES;
     _convDepthWise.offset = _offset;
@@ -62,7 +62,7 @@
     _convDepthWise.neuron = _neurons[1];
     [_convDepthWise compile:device];
     
-    _convProject = [[MIConvolutionLayer alloc] initWithInputShape:_convDepthWise.dataShapeRef];
+    _convProject = [[MIConvolutionLayer alloc] initWithInputShape:_convDepthWise.outputShapeRef];
     _convProject.padding = MTPaddingMode_tfsame;
     _convProject.depthWise = NO;
     _convProject.kernel = _kernels[2];
@@ -90,9 +90,9 @@
     
     DB_TRACE(-_verbose+2, "\n%s compile %s --> %s --> %s --> %s", self.labelUTF8,
              NSStringFromDataShape(&_inputShapes[0]).UTF8String,
-             NSStringFromDataShape(_convExpand.dataShapeRef).UTF8String,
-             NSStringFromDataShape(_convDepthWise.dataShapeRef).UTF8String,
-             NSStringFromDataShape(_convProject.dataShapeRef).UTF8String);
+             NSStringFromDataShape(_convExpand.outputShapeRef).UTF8String,
+             NSStringFromDataShape(_convDepthWise.outputShapeRef).UTF8String,
+             NSStringFromDataShape(_convProject.outputShapeRef).UTF8String);
 }
 
 - (void)setLabel:(NSString *)label {

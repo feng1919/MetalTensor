@@ -35,10 +35,6 @@
     
 }
 
-- (DataShape *)dataShapeRef {
-    return &_outputShape;
-}
-
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
     NSAssert(DataShapesTheSame(newImage.shape, &_inputShapes[0]), @"Invalid input tensor shape.");
     [super setImage:newImage atIndex:imageIndex];

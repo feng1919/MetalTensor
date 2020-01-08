@@ -13,7 +13,7 @@
 
 @required
 //  The data shape of tensor forward propgation.
-- (DataShape *)dataShapeRef;
+- (DataShape *)outputShapeRef;
 
 - (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex;

@@ -239,7 +239,7 @@
 }
 
 - (MTLUInt2)inputSize {
-    DataShape *dataShape = [_inputLayer dataShapeRef];
+    DataShape *dataShape = [_inputLayer outputShapeRef];
     return MTLUInt2Make(dataShape->row, dataShape->column);
 }
 
@@ -289,7 +289,7 @@
         return nil;
     }
     
-    DataShape *dataShape = [(ForwardTarget)layer dataShapeRef];
+    DataShape *dataShape = [(ForwardTarget)layer outputShapeRef];
     MetalTensorOutputLayer *outputLayer = [[MetalTensorOutputLayer alloc] initWithInputShape:dataShape];
     [layer addTarget:outputLayer];
     return outputLayer;

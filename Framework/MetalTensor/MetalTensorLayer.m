@@ -130,7 +130,7 @@ static MPSCNNAdd *_reduceSumOperation = nil;
 
 #pragma mark - Forward Processing
 
-- (DataShape *)dataShapeRef {
+- (DataShape *)outputShapeRef {
     return &_outputShape;
 }
 
@@ -377,5 +377,6 @@ GRADIENT_SUM_FINISH:
 - (void)resetImagesReceivedFlags {
     _receivedImageFlags = 0x0ULL;
 }
+
 
 @end
