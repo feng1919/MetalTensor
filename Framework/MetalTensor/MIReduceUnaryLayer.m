@@ -13,6 +13,7 @@
     MPSNNReduceUnary *_reduce;
 }
 
+#pragma mark - override
 - (void)initialize {
     _type = ReduceTypeMean;
     _axis = ReduceAxisDepth;
@@ -21,25 +22,30 @@
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
-    _outputShape = _inputShapes[0];
-    if (_axis == ReduceAxisDepth) {
-        _outputShape.depth = 1;
-    }
-    else if (_axis == ReduceAxisColumn) {
-        _outputShape.column = 1;
-    }
-    else {
-        _outputShape.row = 1;
-    }
-    
     NSString *className = GetReduceClass(_type, _axis);
     Class c = NSClassFromString(className);
     _reduce = [[c alloc] initWithDevice:device];
+    _operation = _reduce;
     
     if (_needBackward) {
         _gradientOp = [[MPSCNNGradientKernel alloc] initWithDevice:_device];
     }
-    _operation = _reduce;
+}
+
+- (void)updateOutputShape {
+    if (_device) {
+
+        _outputShape = _inputShapes[0];
+        if (_axis == ReduceAxisDepth) {
+            _outputShape.depth = 1;
+        }
+        else if (_axis == ReduceAxisColumn) {
+            _outputShape.column = 1;
+        }
+        else {
+            _outputShape.row = 1;
+        }
+    }
 }
 
 NSString *GetReduceClass(ReduceType type, ReduceAxis axis)

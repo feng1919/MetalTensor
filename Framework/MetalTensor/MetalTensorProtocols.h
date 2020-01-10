@@ -15,7 +15,8 @@
 //  The data shape of tensor forward propgation.
 - (DataShape *)outputShapeRef;
 
-- (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex;
+- (void)imageReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer atIndex:(NSInteger)imageIndex;
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex;
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 
@@ -39,7 +40,7 @@ typedef id<MTForwardDelegate> ForwardTarget;
 
 @required
 - (void)setGradient:(MetalTensor)newGradient forwardTarget:(ForwardTarget)target;
-- (void)gradientReadyFromForwardTarget:(ForwardTarget)target onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+- (void)gradientReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer forwardTarget:(ForwardTarget)target;
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 
 @optional

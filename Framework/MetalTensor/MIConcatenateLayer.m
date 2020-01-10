@@ -20,19 +20,6 @@
 
 @implementation MIConcatenateLayer
 
-- (void)compile:(id<MTLDevice>)device {
-    
-    [super compile:device];
-    
-    _offsets = malloc(_numOfImages * sizeof(int));
-    _outputShape = ConcatenateShapes(_inputShapes, _numOfImages, _offsets, true);
-    _tensorShape = ConcatenateShapes(_inputShapes, _numOfImages, NULL, false);
-
-    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device
-                                  neuronDescriptor:[MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone]];
-    
-}
-
 - (void)dealloc {
     
     if (_offsets) {
@@ -49,7 +36,29 @@
     return _offsets;
 }
 
-#pragma mark - MetalTensorInput Delegate
+#pragma mark - override
+
+- (void)compile:(id<MTLDevice>)device {
+    
+    [super compile:device];
+    
+    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
+    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
+}
+
+- (void)updateOutputShape {
+    
+    if (_device) {
+        if (_offsets == NULL) {
+            _offsets = malloc(_numOfImages * sizeof(int));
+        }
+
+        _outputShape = ConcatenateShapes(_inputShapes, _numOfImages, _offsets, true);
+        _tensorShape = ConcatenateShapes(_inputShapes, _numOfImages, NULL, false);
+    }
+}
+
+#pragma mark - MTTensorForward Delegate
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
@@ -69,6 +78,8 @@
     }
 }
 
+#pragma mark - MTTensorBackward Delegate
+
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
     DB_TRACE(-_verbose+2, "\n%s backward encoding...", self.labelUTF8);
@@ -80,7 +91,7 @@
         [_neuron encodeToCommandBuffer:commandBuffer sourceImage:_gradient.content destinationImage:tensor.content];
         [tensor.source setGradient:tensor forwardTarget:self];
         [tensor unlock];
-        [tensor.source gradientReadyFromForwardTarget:self onCommandBuffer:commandBuffer];
+        [tensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     }
     
     [_inputImages removeAllObjects];

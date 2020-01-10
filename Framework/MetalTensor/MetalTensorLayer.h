@@ -50,21 +50,42 @@ NS_ASSUME_NONNULL_BEGIN
     unsigned long long _reservedTargetFlags;
 }
 
-@property (nonatomic, readonly) DataShape outputShape;
+/*
+ *  The output shape to forward target.
+ *  One may specified an output shape in plist file, MetalTensor
+ *  framework will generate one if it is not specified.
+ *  One may modify this after compiling.
+ *
+ */
+@property (nonatomic, assign) DataShape outputShape;
+
+/*
+ *  Invalid.
+ */
+- (instancetype)init NS_UNAVAILABLE;
 
 /*
  *  Recommanded initialze functions of MetalTensorLayer.
  *  The method -init is invalid, for MetalTensorLayer
- *  there always be an input at least.
+ *  there always be one input at least.
+ */
+- (instancetype)initWithInputShapes:(DataShape *)inputShapes size:(int)size NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithInputShapes1:(DataShape *_Nonnull*_Nonnull)inputShapes size:(int)size NS_DESIGNATED_INITIALIZER;
+
+/*
+ *  One input initialize.
  */
 - (instancetype)initWithInputShape:(DataShape *)inputShape;
-- (instancetype)initWithInputShapes:(DataShape *)inputShapes size:(int)size;
-- (instancetype)initWithInputShapes1:(DataShape *_Nonnull*_Nonnull)inputShapes size:(int)size;
 
 /*
  *  The input shapes for the MetalTensorLayer instance.
  */
 - (DataShape *)inputShapes;
+
+/*
+ *  Calculate output data shape.
+ */
+- (void)updateOutputShape;
 
 /*
  *  Number Of input images for the MetalTensorLayer instance.
@@ -103,6 +124,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeGradient;
 - (void)removeState;
 - (void)reduceSumBatchGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+
+#if DEBUG
+- (void)printInputAndOutputShapes;
+#endif
 
 @end
 

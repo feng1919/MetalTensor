@@ -95,18 +95,22 @@ static MPSCNNAdd *_reduceSumOperation = nil;
     return [self initWithInputShapes:inputShape size:1];
 }
 
-- (void)initialize {
-}
-
 - (void)dealloc {
     free(_inputShapes);
     _inputShapes = NULL;
 }
 
-#pragma mark - GET
+#pragma mark - public
+
+- (void)initialize {
+}
 
 - (DataShape *)inputShapes {
     return _inputShapes;
+}
+
+- (DataShape)outputShape {
+    return _outputShape;
 }
 
 - (int)numOfImages {
@@ -117,33 +121,166 @@ static MPSCNNAdd *_reduceSumOperation = nil;
     return (int)_targets.count;
 }
 
-#pragma mark - Compile the layer
+- (void)updateOutputShape {
+    _outputShape = _inputShapes[0];
+}
 
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
     NSParameterAssert(_numOfImages > 0);
     if (ProductOfDataShape(&_outputShape) == 0) {
-        _outputShape = _inputShapes[0];
+        [self updateOutputShape];
     }
 }
 
-#pragma mark - Forward Processing
+- (void)removeImage {
+    if (_image) {
+        DB_TRACE(-_verbose+2, "\n%s rm %s",
+                 self.labelUTF8,
+                 NSStringFromDataShape(_image.shape).UTF8String);
+        
+        [_image unlock];
+        _image = nil;
+    }
+}
+
+- (void)setImageToTargets {
+    for (ForwardTarget currentTarget in _targets) {
+        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
+        NSInteger index = [_targetIndices[indexOfObject] integerValue];
+        [currentTarget setImage:_image atIndex:index];
+        
+        DB_TRACE(-_verbose+1, "\n%s ---%s---> %s(%ld)",
+                 self.labelUTF8,
+                 NSStringFromDataShape(_image.shape).UTF8String,
+                 [currentTarget description].UTF8String,
+                 index);
+    }
+}
+
+- (void)removeCachedImages {
+    [_inputImages.allValues makeObjectsPerformSelector:@selector(unlock)];
+    [_inputImages removeAllObjects];
+    
+    DB_TRACE(-_verbose+2, "\n%s rm all inputs.", self.labelUTF8);
+}
+
+- (void)notifyTargetsAboutNewImageOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+
+    [self setImageToTargets];
+    [self removeImage];
+    
+    for (ForwardTarget currentTarget in _targets)
+    {
+        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
+        NSInteger imageIndex = [[_targetIndices objectAtIndex:indexOfObject] integerValue];
+        [currentTarget imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
+    }
+}
+
+- (void)removeCachedGradients {
+    [_inputGradients makeObjectsPerformSelector:@selector(unlock)];
+    [_inputGradients removeAllObjects];
+    
+    DB_TRACE(-_verbose+3, "\n%s rm all gradients", self.labelUTF8);
+}
+
+- (void)removeGradient {
+    DB_TRACE(-_verbose+2, "\n%s rm %s",
+             self.labelUTF8,
+             NSStringFromDataShape(_gradient.shape).UTF8String);
+    
+    [_gradient unlock];
+    _gradient = nil;
+}
+
+- (void)removeState {
+    _state.readCount = 0;
+    _state = nil;
+}
+
+- (void)reduceSumBatchGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    
+    // Sum all of the gradients.
+    int numOfGradients = self.numOfGradients;
+    NSAssert(numOfGradients > 0, @"Invalid number of gradients.");
+    
+    if (numOfGradients == 1) {
+        _gradient = _inputGradients[0];
+        [_gradient lock];
+        goto GRADIENT_SUM_FINISH;
+    }
+    else {
+        MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                                      source:self
+                                                               commandBuffer:commandBuffer];
+        if (_reduceSumOperation == nil) {
+            _reduceSumOperation = [[MPSCNNAdd alloc] initWithDevice:_device];
+        };
+        MetalTensor t1 = _inputGradients[0];
+        MetalTensor t2 = _inputGradients[1];
+        _gradient = temp;
+        [_reduceSumOperation encodeToCommandBuffer:commandBuffer
+                                      primaryImage:t1.content
+                                    secondaryImage:t2.content
+                                  destinationImage:_gradient.content];
+        if (numOfGradients == 2) {
+            goto GRADIENT_SUM_FINISH;
+        }
+        
+        for (int i = 2; i < numOfGradients; i++) {
+            t1 = _inputGradients[i];
+            t2 = _gradient;
+            _gradient = _inputGradients[i-1];
+            [_reduceSumOperation encodeToCommandBuffer:commandBuffer
+                                          primaryImage:t1.content
+                                        secondaryImage:t2.content
+                                      destinationImage:_gradient.content];
+        }
+        [_gradient lock];
+        [temp unlock];
+        goto GRADIENT_SUM_FINISH;
+    }
+    
+GRADIENT_SUM_FINISH:
+    [self removeCachedGradients];
+}
+
+#pragma mark - MTTensorForward Delegate
 
 - (DataShape *)outputShapeRef {
     return &_outputShape;
 }
 
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
+    
+    NSAssert(imageIndex < _numOfImages, @"Invalid image index.");
+    _inputShapes[imageIndex] = *dataShape;
+    
+    [self updateOutputShape];
+    
+    for (int i = 0; i < _targets.count; i++) {
+        ForwardTarget target = _targets[i];
+        NSInteger index = [_targetIndices[i] integerValue];
+        [target setInputShape:&_outputShape atIndex:index];
+    }
+}
+
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
     NSAssert(imageIndex < _numOfImages, @"Invalid input image index.");
-    NSAssert(DataShapesTheSame(&_inputShapes[imageIndex], [newImage shape]), @"The input image's shape is not identical to the inputShapes[%d]", (int)imageIndex);
+    if (imageIndex == 0) {
+        NSAssert(DataShapesTheSame(&_inputShapes[imageIndex], [newImage shape]),
+                 @"The primary image's shape is not identical to the inputShapes[%d]", (int)imageIndex);
+    }
+    
     _inputImages[@(imageIndex)] = newImage;
     [newImage lock];
     
     DB_TRACE(-_verbose+2, "\n%s(%ld) <-- %s", self.labelUTF8, imageIndex, NSStringFromDataShape(newImage.shape).UTF8String);
 }
 
-- (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+- (void)imageReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer atIndex:(NSInteger)imageIndex {
     if ([self isAllImagesReceived]) {
         return;
     }
@@ -159,6 +296,9 @@ static MPSCNNAdd *_reduceSumOperation = nil;
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+3, "\n%s encoding...", self.labelUTF8);
+    
+    NSAssert(_operation, @"The computing operation has not been initialized.");
+    NSAssert(_inputImages.count > 0, @"There is no input image received.");
     
     _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
     [_image newContentOnCommandBuffer:commandBuffer];
@@ -188,52 +328,7 @@ static MPSCNNAdd *_reduceSumOperation = nil;
     }
 }
 
-- (void)removeCachedImages {
-    [_inputImages.allValues makeObjectsPerformSelector:@selector(unlock)];
-    [_inputImages removeAllObjects];
-    
-    DB_TRACE(-_verbose+3, "\n%s rm all inputs", self.labelUTF8);
-}
-
-- (void)removeImage {
-    if (_image) {
-        DB_TRACE(-_verbose+2, "\n%s rm %s",
-                 self.labelUTF8,
-                 NSStringFromDataShape(_image.shape).UTF8String);
-        
-        [_image unlock];
-        _image = nil;
-    }
-}
-
-- (void)setImageToTargets {
-    for (ForwardTarget currentTarget in _targets) {
-        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
-        NSInteger index = [_targetIndices[indexOfObject] integerValue];
-        [currentTarget setImage:_image atIndex:index];
-        
-        DB_TRACE(-_verbose+1, "\n%s ---%s---> %s(%ld)",
-                 self.labelUTF8,
-                 NSStringFromDataShape(_image.shape).UTF8String,
-                 [currentTarget description].UTF8String,
-                 index);
-    }
-}
-
-- (void)notifyTargetsAboutNewImageOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-
-    [self setImageToTargets];
-    [self removeImage];
-    
-    for (ForwardTarget currentTarget in _targets)
-    {
-        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
-        NSInteger imageIndex = [[_targetIndices objectAtIndex:indexOfObject] integerValue];
-        [currentTarget imageReadyAtIndex:imageIndex onCommandBuffer:commandBuffer];
-    }
-}
-
-#pragma mark - Backward Processing
+#pragma mark - MTTensorBackward Delegate
 - (void)setGradient:(MetalTensor)newGradient forwardTarget:(ForwardTarget)target{
     NSAssert(DataShapesTheSame(&_outputShape, [newGradient shape]), @"The input gradient's shape is not identical to the output shape.");
     [_inputGradients addObject:newGradient];
@@ -242,7 +337,7 @@ static MPSCNNAdd *_reduceSumOperation = nil;
     DB_TRACE(-_verbose+2, "\n%s <-- %s", self.labelUTF8, NSStringFromDataShape(newGradient.shape).UTF8String);
 }
 
-- (void)gradientReadyFromForwardTarget:(ForwardTarget)target onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+- (void)gradientReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer forwardTarget:(ForwardTarget)target {
     
     if ([self isAllGradientsReceived]) {
         [self reduceSumBatchGradientsOnCommandBuffer:commandBuffer];
@@ -270,62 +365,7 @@ static MPSCNNAdd *_reduceSumOperation = nil;
     
     [sourceTensor.source setGradient:destinationGradient forwardTarget:self];
     [destinationGradient unlock];
-    [sourceTensor.source gradientReadyFromForwardTarget:self onCommandBuffer:commandBuffer];
-}
-
-- (void)removeCachedGradients {
-    [_inputGradients makeObjectsPerformSelector:@selector(unlock)];
-    [_inputGradients removeAllObjects];
-    
-    DB_TRACE(-_verbose+3, "\n%s rm all gradients", self.labelUTF8);
-}
-
-- (void)removeGradient {
-    DB_TRACE(-_verbose+2, "\n%s rm %s",
-             self.labelUTF8,
-             NSStringFromDataShape(_gradient.shape).UTF8String);
-    
-    [_gradient unlock];
-    _gradient = nil;
-}
-
-- (void)reduceSumBatchGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    
-    // Sum all of the gradients.
-    int numOfGradients = self.numOfGradients;
-    NSAssert(numOfGradients > 0, @"Invalid number of gradients.");
-    
-    if (numOfGradients == 1) {
-        _gradient = _inputGradients[0];
-        [_gradient lock];
-        goto GRADIENT_SUM_FINISH;
-    }
-    else {
-        MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
-        if (_reduceSumOperation == nil) {
-            _reduceSumOperation = [[MPSCNNAdd alloc] initWithDevice:_device];
-        };
-        MetalTensor t1 = _inputGradients[0];
-        MetalTensor t2 = _inputGradients[1];
-        _gradient = temp;
-        [_reduceSumOperation encodeToCommandBuffer:commandBuffer primaryImage:t1.content secondaryImage:t2.content destinationImage:_gradient.content];
-        if (numOfGradients == 2) {
-            goto GRADIENT_SUM_FINISH;
-        }
-        
-        for (int i = 2; i < numOfGradients; i++) {
-            t1 = _inputGradients[i];
-            t2 = _gradient;
-            _gradient = _inputGradients[i-1];
-            [_reduceSumOperation encodeToCommandBuffer:commandBuffer primaryImage:t1.content secondaryImage:t2.content destinationImage:_gradient.content];
-        }
-        [_gradient lock];
-        [temp unlock];
-        goto GRADIENT_SUM_FINISH;
-    }
-    
-GRADIENT_SUM_FINISH:
-    [self removeCachedGradients];
+    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
 }
 
 - (BOOL)isAllGradientsReceived {
@@ -333,12 +373,7 @@ GRADIENT_SUM_FINISH:
     return _inputGradients.count == _targets.count;
 }
 
-- (void)removeState {
-    _state.readCount = 0;
-    _state = nil;
-}
-
-#pragma mark - Forward Index
+#pragma mark - Index
 
 - (NSInteger)nextAvailableImageIndex {
     int bitCount = sizeof(unsigned long long)<<3;
@@ -378,5 +413,19 @@ GRADIENT_SUM_FINISH:
     _receivedImageFlags = 0x0ULL;
 }
 
+
+#if DEBUG
+
+- (void)printInputAndOutputShapes {
+    
+    NSLog(@"%@", self.label);
+    for (int i = 0; i < _numOfImages; i++) {
+        NSLog(@"Input%d: %@", i, NSStringFromDataShape(&_inputShapes[i]));
+    }
+    
+    NSLog(@"Output: %@\n", NSStringFromDataShape(&_outputShape));
+}
+
+#endif
 
 @end

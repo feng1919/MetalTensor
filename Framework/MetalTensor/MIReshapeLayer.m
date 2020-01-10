@@ -18,6 +18,11 @@
 
 @implementation MIReshapeLayer
 
+- (instancetype)init {
+    NSAssert(NO, @"The reshape layer's output shape must be sepecified explicitly. Use -initWithInputShape:outputShape:.");
+    return nil;
+}
+
 - (instancetype)initWithInputShape:(DataShape *)inputShape {
     NSAssert(NO, @"The reshape layer's output shape must be sepecified explicitly. Use -initWithInputShape:outputShape:.");
     return nil;
@@ -45,6 +50,7 @@
     return self;
 }
 
+#pragma mark - override
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     _reshape = [[MPSNNReshape alloc] initWithDevice:device];
@@ -52,6 +58,13 @@
     _operation = _reshape;
 }
 
+#pragma mark - MTTensorForward Delegate
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
+    [super setInputShape:dataShape atIndex:imageIndex];
+    NSLog(@"The reshape layer %@ need an output shape specified explicitly, the input shape is changed.", self.label);
+}
+
+#pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
     //  Reshape the gradient from backward node to forward input tensor shape.
@@ -61,7 +74,8 @@
     [sourceTensor.source setGradient:sourceTensor forwardTarget:self];
     [self removeCachedImages];
     [self removeGradient];
-    [sourceTensor.source gradientReadyFromForwardTarget:self onCommandBuffer:commandBuffer];
+    
+    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     
 }
 

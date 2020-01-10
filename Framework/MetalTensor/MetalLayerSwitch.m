@@ -17,12 +17,16 @@
     return NULL;
 }
 
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
+    [_targets[_activedTargetIndex] setInputShape:dataShape atIndex:imageIndex];
+}
+
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
     [_targets[_activedTargetIndex] setImage:newImage atIndex:imageIndex];
 }
 
-- (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    [_targets[_activedTargetIndex] imageReadyAtIndex:imageIndex onCommandBuffer:commandBuffer];
+- (void)imageReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer atIndex:(NSInteger)imageIndex {
+    [_targets[_activedTargetIndex] imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
 }
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {

@@ -17,19 +17,16 @@
     MPSNNReduceColumnMean *_reduceMeanColumn;
     MPSNNReduceFeatureChannelsSum *_reduceSumChannels;
     
-    DataShape _outputArithmetic;
+    DataShape _outputMultiply;
     DataShape _outputReduceRow;
     DataShape _outputReduceColumn;
 }
 
+#pragma mark - override
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
     NSParameterAssert(device);
-    
-    _outputShape = DataShapeMake(_inputShapes[0].depth, _inputShapes[0].depth, 1);
-    _outputArithmetic = _inputShapes[0];
-    _outputReduceRow = DataShapeMake(1, _inputShapes[0].column, _inputShapes[0].depth);
     
     MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
     _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
@@ -54,14 +51,25 @@
     }
 }
 
+- (void)updateOutputShape {
+    if (_device) {
+        
+        DataShape *inputShape = &_inputShapes[0];
+        _outputShape = DataShapeMake(inputShape->depth, inputShape->depth, 1);
+        _outputMultiply = *inputShape;
+        _outputReduceRow = DataShapeMake(1, inputShape->column, inputShape->depth);
+    }
+}
+
+#pragma mark - MTTensorForward Delegate
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
     
     MetalTensor sourceTensor = _inputImages[@(0)];
-    int numOfChannels = _inputShapes[0].depth;
-    MetalTensor secondaryImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_inputShapes[0] source:self commandBuffer:commandBuffer];
+    DataShape *inputShape = &_inputShapes[0];
+    MetalTensor secondaryImage = [[MTTensorCache sharedCache] fetchTensorWithShape:inputShape source:self commandBuffer:commandBuffer];
     [secondaryImage newContentOnCommandBuffer:commandBuffer];
-    MetalTensor arithmeticImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic source:self commandBuffer:commandBuffer];
+    MetalTensor arithmeticImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputMultiply source:self commandBuffer:commandBuffer];
     [arithmeticImage newContentOnCommandBuffer:commandBuffer];
     MetalTensor reduceRowImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceRow source:self commandBuffer:commandBuffer];
     [reduceRowImage newContentOnCommandBuffer:commandBuffer];
@@ -73,28 +81,28 @@
     
     MTLRegion clipRect;
     clipRect.origin = MTLOriginMake(0, 0, 0);
-    clipRect.size = MTLSizeMake(_inputShapes[0].column, _inputShapes[0].row, _inputShapes[0].depth);
+    clipRect.size = MTLSizeMake(inputShape->column, inputShape->row, inputShape->depth);
 
     _multiply.secondaryStrideInPixelsX = 1;
     _multiply.secondaryStrideInPixelsY = 1;
     _multiply.secondaryStrideInFeatureChannels = 0;
     
-    for (int i = 0; i < numOfChannels; i++) {
+    for (int i = 0; i < inputShape->depth; i++) {
         [_multiply setSecondaryOffset:MPSOffsetMake(0, 0, i)];
         [_multiply encodeToCommandBuffer:commandBuffer
-                              primaryImage:sourceTensor.content
-                            secondaryImage:secondaryImage.content
-                          destinationImage:arithmeticImage.content];
+                            primaryImage:sourceTensor.content
+                          secondaryImage:secondaryImage.content
+                        destinationImage:arithmeticImage.content];
         
         [_reduceMeanRow encodeToCommandBuffer:commandBuffer
-                              sourceImage:arithmeticImage.content
-                         destinationImage:reduceRowImage.content];
+                                  sourceImage:arithmeticImage.content
+                             destinationImage:reduceRowImage.content];
         
         clipRect.origin.y = i;
         [_reduceMeanColumn setClipRect:clipRect];
         [_reduceMeanColumn encodeToCommandBuffer:commandBuffer
-                                 sourceImage:reduceRowImage.content
-                            destinationImage:_image.content];
+                                     sourceImage:reduceRowImage.content
+                                destinationImage:_image.content];
     }
     
     if (!_needBackward) {
@@ -106,6 +114,7 @@
     [secondaryImage unlock];
 }
 
+#pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     /*
      *  g = Gradient(i), where i stands for i-th row of backward gradients.
@@ -159,7 +168,8 @@
     
     [sourceTensor.source setGradient:gradients1 forwardTarget:self];
     [gradients1 unlock];
-    [sourceTensor.source gradientReadyFromForwardTarget:self onCommandBuffer:commandBuffer];
+    
+    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
 }
 
 @end

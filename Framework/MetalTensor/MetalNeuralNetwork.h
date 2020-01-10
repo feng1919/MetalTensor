@@ -83,6 +83,8 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
  */
 @property (nonatomic, assign) BOOL synchronizedProcessing;
 
+- (instancetype)init NS_UNAVAILABLE;
+
 /*
  *
  *  ******************************************************
@@ -101,7 +103,7 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
  *
  */
 - (instancetype)initWithPlist:(NSString *)plist;
-- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary NS_DESIGNATED_INITIALIZER;
 
 /*
  *  Build up the entire model.
@@ -140,9 +142,11 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 - (void)predict:(id<MTLTexture>)bgraU8Texture;
 
 /*
- *  Model interacting function.
+ *  Network input image size.
  */
-- (MTLUInt2)inputSize;    // network input image size.
+- (MTLUInt2)inputSize;
+- (void)setInputSize:(MTLUInt2)size;
+
 - (MetalTensorInputLayer *)inputLayer;
 - (NSArray<MetalTensorOutputLayer *> *)outputLayers;
 - (NSArray<MetalTensorNode *> *)allLayers;

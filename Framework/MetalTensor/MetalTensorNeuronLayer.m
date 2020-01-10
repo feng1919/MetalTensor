@@ -20,16 +20,19 @@
 
 @implementation MetalTensorNeuronLayer
 
+#pragma mark - override
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     [self updateComputation];
 }
 
+#pragma mark - public
 - (void)setNeuronType:(NeuronType)neuronType {
     _neuronType = neuronType;
     [self updateComputation];
 }
 
+#pragma mark - private
 - (void)updateComputation {
     if (_device) {
         MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:_neuronType.neuron
@@ -45,11 +48,6 @@
         _operation = _neuron;
         _gradientOp = _neuronGradientOp;
     }
-}
-
-- (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
-    NSAssert(DataShapesTheSame(newImage.shape, &_inputShapes[0]), @"Invalid input tensor shape.");
-    [super setImage:newImage atIndex:imageIndex];
 }
 
 @end

@@ -624,7 +624,7 @@ Class LayerWithType(NSString *type)
         
         NSParameterAssert(dictionary[@"filters"]);
         _kernelShape.filters = [dictionary[@"filters"] intValue];
-        _kernelShape.stride = _kernelShape.column;
+        _kernelShape.stride = 1;
         
         if (dictionary[@"activation"]) {
             NSArray<NSString *> *neuronList = [dictionary[@"activation"] nonEmptyComponentsSeparatedByString:@","];
@@ -732,7 +732,7 @@ Class LayerWithType(NSString *type)
             NSParameterAssert(_kernelShape.stride > 0);
         }
         else {
-            _kernelShape.stride = 1;
+            _kernelShape.stride = 2;
         }
         
         if (dictionary[@"offset"]) {
@@ -743,8 +743,8 @@ Class LayerWithType(NSString *type)
             _offset.z = [offsetList[2] intValue];
         }
         else {
-            _offset.x = pooling_offset(_kernelShape.column);
-            _offset.y = pooling_offset(_kernelShape.row);
+            _offset.x = pooling_offset(_kernelShape.column, _kernelShape.stride);
+            _offset.y = pooling_offset(_kernelShape.row, _kernelShape.stride);
             _offset.z = 0;
         }
     }
@@ -806,8 +806,8 @@ Class LayerWithType(NSString *type)
             _offset.z = [offsetList[2] intValue];
         }
         else {
-            _offset.x = pooling_offset(_kernelShape.column);
-            _offset.y = pooling_offset(_kernelShape.row);
+            _offset.x = pooling_offset(_kernelShape.column, _kernelShape.stride);
+            _offset.y = pooling_offset(_kernelShape.row, _kernelShape.stride);
             _offset.z = 0;
         }
     }
@@ -845,8 +845,68 @@ Class LayerWithType(NSString *type)
         
         _channelOffset = [dictionary[@"channel_offset"] integerValue];
         _secondaryImage = dictionary[@"secondary_image"];
+        _secondaryData = dictionary[@"secondary_data"];
+        
+        if (dictionary[@"secondary_data_shape"]) {
+            NSArray<NSString *> *outputList = [dictionary[@"secondary_data_shape"] nonEmptyComponentsSeparatedByString:@","];
+            NSAssert(outputList.count == 3, @"Invalid data shape: '%@'", dictionary[@"secondary_data_shape"]);
+            _secondaryDataShape.row = [outputList[0] intValue];
+            _secondaryDataShape.column = [outputList[1] intValue];
+            _secondaryDataShape.depth = [outputList[2] intValue];
+        }
+        
+        if (dictionary[@"bias"]) {
+            _bias = [dictionary[@"bias"] floatValue];
+        }
+        else {
+            _bias = 0.0f;
+        }
+        
+        if (dictionary[@"primary_scale"]) {
+            _primaryScale = [dictionary[@"primary_scale"] floatValue];
+        }
+        else {
+            _primaryScale = 1.0f;
+        }
+        
+        if (dictionary[@"secondary_scale"]) {
+            _secondaryScale = [dictionary[@"secondary_scale"] floatValue];
+        }
+        else {
+            _secondaryScale = 1.0f;
+        }
+        
+        if (dictionary[@"primary_strides"]) {
+            NSArray<NSNumber *> *strides = [dictionary[@"primary_strides"] nonEmptyComponentsSeparatedByString:@","];
+            NSAssert(strides.count == 3, @"Invalid primary strides: %@", strides);
+            _primaryStrides.x = [strides[0] intValue];
+            _primaryStrides.y = [strides[1] intValue];
+            _primaryStrides.z = [strides[2] intValue];
+        }
+        else {
+            _primaryStrides.x = 1;
+            _primaryStrides.y = 1;
+            _primaryStrides.z = 1;
+        }
+        
+        if (dictionary[@"secondary_strides"]) {
+            NSArray<NSNumber *> *strides = [dictionary[@"secondary_strides"]  nonEmptyComponentsSeparatedByString:@","];
+            NSAssert(strides.count == 3, @"Invalid secondary strides: %@", strides);
+            _secondaryStrides.x = [strides[0] intValue];
+            _secondaryStrides.y = [strides[1] intValue];
+            _secondaryStrides.z = [strides[2] intValue];
+        }
+        else {
+            _secondaryStrides.x = 1;
+            _secondaryStrides.y = 1;
+            _secondaryStrides.z = 1;
+        }
     }
     return self;
+}
+
+- (DataShape *)secondaryDataShapeRef {
+    return &_secondaryDataShape;
 }
 
 @end
@@ -859,9 +919,15 @@ Class LayerWithType(NSString *type)
     DataShape *inputShapes[2] = {dataShape, dataShape};
     if (self = [super initWithInputShapes1:inputShapes size:2]) {
         
-        self.channelOffset = descriptor.channelOffset;
         self.arithmeticType = descriptor.arithmetic;
         self.needBackward = descriptor.needBackward;
+        
+        self.channelOffset = descriptor.channelOffset;
+        self.bias = descriptor.bias;
+        self.primaryScale = descriptor.primaryScale;
+        self.secondaryScale = descriptor.secondaryScale;
+        self.primaryStrides = descriptor.primaryStrides;
+        self.secondaryStrides = descriptor.secondaryStrides;
         
         if (descriptor.secondaryImage) {
             UIImage *secondaryImage = [UIImage imageNamed:descriptor.secondaryImage];
@@ -870,6 +936,17 @@ Class LayerWithType(NSString *type)
             }
             NSAssert(secondaryImage, @"Failed to load the secondary image: %@", descriptor.secondaryImage);
             self.secondaryImage = [[MTImageTensor alloc] initWithImage:secondaryImage normalized:YES];
+        }
+        else if (descriptor.secondaryData) {
+            NSData *data = [NSData dataWithContentsOfFile:descriptor.secondaryData];
+            if (!data) {
+                NSString *bundlePath = [[NSBundle mainBundle] pathForResource:descriptor.secondaryData ofType:@""];
+                data = [NSData dataWithContentsOfFile:bundlePath];
+            }
+            NSAssert(data.length > 0, @"Failed to load the secondary data: %@", descriptor.secondaryData);
+            
+            self.secondaryImage = [[MTImageTensor alloc] initWithShape:descriptor.secondaryDataShapeRef];
+            [self.secondaryImage loadData:(float16_t *)data.bytes length:data.length];
         }
     }
     return self;

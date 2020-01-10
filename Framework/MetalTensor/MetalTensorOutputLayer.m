@@ -16,6 +16,7 @@
 
 @implementation MetalTensorOutputLayer
 
+#pragma mark - override
 - (void)compile:(id<MTLDevice>)device {
     
     [super compile:device];
@@ -31,8 +32,23 @@
     
     MPSImageDescriptor *desc = ImageDescriptor(&_outputShape);
     desc.storageMode = MTLStorageModeShared;
-    _outputImage = [[MPSImage alloc] initWithDevice:device imageDescriptor:desc];
+    _outputImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:desc];
     
+}
+
+- (void)notifyTargetsAboutNewImageOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+
+}
+
+#pragma mark - MTTensorForward Delegate
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
+    [super setInputShape:dataShape atIndex:imageIndex];
+    
+    if (_device) {
+        MPSImageDescriptor *desc = ImageDescriptor(&_outputShape);
+        desc.storageMode = MTLStorageModeShared;
+        _outputImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:desc];
+    }
 }
 
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
@@ -51,6 +67,8 @@
     }
 }
 
+#pragma mark - MTTensorBackward Delegate
+
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s backward encoding...", self.labelUTF8);
     
@@ -58,10 +76,11 @@
     [sourceTensor.source setGradient:sourceTensor forwardTarget:self];
     [self removeCachedImages];
     [self removeGradient];
-    [sourceTensor.source gradientReadyFromForwardTarget:self onCommandBuffer:commandBuffer];
     
+    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
 }
 
+#pragma mark - DEBUG
 #ifdef DEBUG
 - (void)debugOutputTensorWithCommandBuffer:(id<MTLCommandBuffer>)command_buffer {
     

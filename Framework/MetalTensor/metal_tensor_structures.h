@@ -53,7 +53,7 @@ int conv_offset(int kernel, int stride, MTPaddingMode padding);
 int trans_conv_output_length(int input_length, int kernel, int stride, MTPaddingMode padding);
 int trans_conv_offset(int kernel, int stride, MTPaddingMode padding);
 
-int pooling_offset(int kernel);
+int pooling_offset(int kernel, int stride);
 
 int make_divisible_8(int v);
 int make_divisible(int v, int divisor, int min_value);

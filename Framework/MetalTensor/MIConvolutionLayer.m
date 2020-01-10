@@ -20,6 +20,8 @@
 
 @implementation MIConvolutionLayer
 
+#pragma mark - override
+
 - (void)initialize {
     _edgeMode = MPSImageEdgeModeZero;
     _depthWise = NO;
@@ -33,13 +35,19 @@
 
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
-    
-    _outputShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, _padding);
-    _outputShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, _padding);
-    _outputShape.depth = _depthWise?_inputShapes[0].depth:_kernel.filters;
-    
     [self updateComputing];
 }
+
+- (void)updateOutputShape {
+    
+    if (_device) {
+        _outputShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, _padding);
+        _outputShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, _padding);
+        _outputShape.depth = _depthWise?_inputShapes[0].depth:_kernel.filters;
+    }
+}
+
+#pragma mark - public
 
 - (void)setEdgeMode:(MPSImageEdgeMode)edgeMode {
     _edgeMode = edgeMode;
@@ -96,7 +104,10 @@
 }
 
 - (void)loadWeights:(NSData *)weights {
-    self.dataSource = [[MICNNKernelDataSource alloc] initWithData:weights kernel:&_kernel neuron:&_neuron depthWise:_depthWise];
+    self.dataSource = [[MICNNKernelDataSource alloc] initWithData:weights
+                                                           kernel:&_kernel
+                                                           neuron:&_neuron
+                                                        depthWise:_depthWise];
     [self.dataSource load];
 }
 

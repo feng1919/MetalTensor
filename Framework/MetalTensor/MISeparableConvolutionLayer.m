@@ -19,12 +19,6 @@
 
 @implementation MISeparableConvolutionLayer
 
-- (void)initialize {
-    _kernels = malloc(2 * sizeof(KernelShape));
-    _neurons = malloc(2 * sizeof(NeuronType));
-    _padding = MTPaddingMode_tfsame;
-}
-
 - (void)dealloc {
     if (_kernels) {
         free(_kernels);
@@ -35,6 +29,13 @@
         free(_neurons);
         _neurons = NULL;
     }
+}
+
+#pragma mark - override
+- (void)initialize {
+    _kernels = malloc(2 * sizeof(KernelShape));
+    _neurons = malloc(2 * sizeof(NeuronType));
+    _padding = MTPaddingMode_tfsame;
 }
 
 - (void)compile:(id<MTLDevice>)device {
@@ -65,6 +66,34 @@
     [self setLabel:_label];
 }
 
+- (void)addTarget:(ForwardTarget)newTarget {
+    NSAssert(_project, @"The separable layer is not compiled yet.");
+    [_project addTarget:newTarget];
+}
+
+- (void)addTarget:(ForwardTarget)newTarget atIndex:(NSInteger)imageIndex {
+    NSAssert(_project, @"The separable layer is not compiled yet.");
+    [_project addTarget:newTarget atIndex:imageIndex];
+}
+
+- (void)removeTarget:(ForwardTarget)targetToRemove {
+    NSAssert(_project, @"The separable layer is not compiled yet.");
+    [_project removeTarget:targetToRemove];
+}
+
+- (void)removeAllTargets {
+    NSAssert(_project, @"The separable layer is not compiled yet.");
+    [_project removeAllTargets];
+}
+
+- (void)setLabel:(NSString *)label {
+    [super setLabel:label];
+    
+    [_depthwise setLabel:[NSString stringWithFormat:@"%@_depthwise", label]];
+    [_project setLabel:[NSString stringWithFormat:@"%@_project", label]];
+}
+
+#pragma mark - public
 - (void)setPadding:(MTPaddingMode)padding {
     _padding = padding;
     [_depthwise setPadding:_padding];
@@ -93,41 +122,6 @@
     return _project;
 }
 
-- (void)addTarget:(ForwardTarget)newTarget {
-    NSAssert(_project, @"The separable layer is not compiled yet.");
-    [_project addTarget:newTarget];
-}
-
-- (void)addTarget:(ForwardTarget)newTarget atIndex:(NSInteger)imageIndex {
-    NSAssert(_project, @"The separable layer is not compiled yet.");
-    [_project addTarget:newTarget atIndex:imageIndex];
-}
-
-- (void)removeTarget:(ForwardTarget)targetToRemove {
-    NSAssert(_project, @"The separable layer is not compiled yet.");
-    [_project removeTarget:targetToRemove];
-}
-
-- (void)removeAllTargets {
-    NSAssert(_project, @"The separable layer is not compiled yet.");
-    [_project removeAllTargets];
-}
-
-- (void)reserveImageIndex:(NSInteger)index {
-    [_depthwise reserveImageIndex:index];
-}
-
-- (void)releaseImageIndex:(NSInteger)index {
-    [_depthwise releaseImageIndex:index];
-}
-
-- (void)setLabel:(NSString *)label {
-    [super setLabel:label];
-    
-    [_depthwise setLabel:[NSString stringWithFormat:@"%@_depthwise", label]];
-    [_project setLabel:[NSString stringWithFormat:@"%@_project", label]];
-}
-
 #ifdef DEBUG
 - (void)setVerbose:(int)verbose {
     [super setVerbose:verbose];
@@ -137,14 +131,26 @@
 }
 #endif
 
+#pragma mark - MTTensorForward Delegate
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
+    [_depthwise setInputShape:dataShape atIndex:imageIndex];
+}
+
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
     [_depthwise setImage:newImage atIndex:imageIndex];
 }
 
-- (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    [_depthwise imageReadyAtIndex:imageIndex onCommandBuffer:commandBuffer];
+- (void)imageReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer atIndex:(NSInteger)imageIndex {
+    [_depthwise imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
 }
 
+- (void)reserveImageIndex:(NSInteger)index {
+    [_depthwise reserveImageIndex:index];
+}
+
+- (void)releaseImageIndex:(NSInteger)index {
+    [_depthwise releaseImageIndex:index];
+}
 #pragma mark - Management of the weights
 
 - (BOOL)didLoadWeights {

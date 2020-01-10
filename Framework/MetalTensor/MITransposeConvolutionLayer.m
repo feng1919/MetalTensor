@@ -20,6 +20,7 @@
 
 @implementation MITransposeConvolutionLayer
 
+#pragma mark - override
 - (void)initialize {
 
     _edgeMode = MPSImageEdgeModeZero;
@@ -37,13 +38,19 @@
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
-    _outputShape.column = trans_conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, _padding);
-    _outputShape.row = trans_conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, _padding);
-    _outputShape.depth = _depthWise?_inputShapes[0].depth:_kernel.filters;
-    
     [self updateComputing];
 }
 
+- (void)updateOutputShape {
+    
+    if (_device) {
+        _outputShape.column = trans_conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, _padding);
+        _outputShape.row = trans_conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, _padding);
+        _outputShape.depth = _depthWise?_inputShapes[0].depth:_kernel.filters;
+    }
+}
+
+#pragma mark - public
 - (void)setEdgeMode:(MPSImageEdgeMode)edgeMode {
     _edgeMode = edgeMode;
     [_convolution setEdgeMode:_edgeMode];

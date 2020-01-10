@@ -18,6 +18,8 @@
 
 @implementation MIBatchNormalizationLayer
 
+#pragma mark - override
+
 - (void)initialize {
     _edgeMode = MPSImageEdgeModeZero;
     _epsilon = 0.001;
@@ -29,6 +31,8 @@
     
     [self updateComputing];
 }
+
+#pragma mark - public
 
 - (void)setDataSource:(id<MPSCNNBatchNormalizationDataSource>)dataSource {
     _dataSource = dataSource;

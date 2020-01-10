@@ -12,12 +12,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*
+ *  MTTensor is a container for data on GPU, which content is expensive
+ *  to create, and MTTensorCache holds the data when it is out of using
+ *  and if asked for a tensor with the same shape, then it will be reused.
+ *  NOTE: The content of MTTensor is temporary and has the same life cycle
+ *  to MTLCommandBuffer object.
+ *
+ */
+
 @interface MTTensorCache : NSObject
 
 + (MTTensorCache *)sharedCache;
 
 - (NSInteger)registerReuseIdentifier;
 - (void)unregisterReuseIdentifier:(NSInteger)identifier;
+
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape source:(BackwardTarget _Nullable)source commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 
 - (void)cacheTensor:(MetalTensor)tensor;

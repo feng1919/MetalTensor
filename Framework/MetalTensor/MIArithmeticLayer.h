@@ -15,12 +15,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nullable) MTImageTensor *secondaryImage;
 @property (nonatomic, strong) NSString *arithmeticType;
-@property (nonatomic, assign) NSInteger channelOffset;
 
 @property (nonatomic, strong) MPSCNNArithmetic *arithmetic;
 
-+ (instancetype)arithmeticLayerWithDataShape:(DataShape *)dataShape;
+@property (nonatomic, assign) float bias;
+@property (nonatomic, assign) float primaryScale;
+@property (nonatomic, assign) float secondaryScale;
+@property (nonatomic, assign) MTLInt3 primaryStrides;
+@property (nonatomic, assign) MTLInt3 secondaryStrides;
+@property (nonatomic, assign) NSInteger channelOffset;
 
++ (instancetype)arithmeticLayerWithDataShape:(DataShape *)dataShape;
+- (void)updateArithmeticParameters;
 + (Class)arithmeticWithType:(NSString *)arithmetic;
 
 @end

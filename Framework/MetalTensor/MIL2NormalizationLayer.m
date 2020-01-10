@@ -19,6 +19,7 @@
 
 @implementation MIL2NormalizationLayer
 
+#pragma mark - override
 - (void)initialize {
     _kernel = KernelShapeMake(2, 2, 1, 1, 2);
 }
@@ -27,10 +28,6 @@
     [super compile:device];
     
     NSParameterAssert(_kernel.stride > 0);
-    
-    _outputShape.column = (_inputShapes[0].column + _kernel.stride - 1) / _kernel.stride;
-    _outputShape.row = (_inputShapes[0].row + _kernel.stride - 1) / _kernel.stride;
-    _outputShape.depth = _inputShapes[0].depth;
     
     _l2Normalization = [[MPSCNNPoolingL2Norm alloc] initWithDevice:_device
                                                        kernelWidth:_kernel.column
@@ -50,6 +47,16 @@
     _operation = _l2Normalization;
     _gradientOp = _l2NormaliationGradientOp;
 }
+
+- (void)updateOutputShape {
+    if (_device) {
+        _outputShape.column = (_inputShapes[0].column + _kernel.stride - 1) / _kernel.stride;
+        _outputShape.row = (_inputShapes[0].row + _kernel.stride - 1) / _kernel.stride;
+        _outputShape.depth = _inputShapes[0].depth;
+    }
+}
+
+#pragma mark - public
 
 - (void)setOffset:(MPSOffset)offset {
     _offset = offset;

@@ -47,7 +47,7 @@
                 float16[i] /= 255.0f;
             }
         }
-        [_mpsImage writeBytes:float16 dataLayout:MPSDataLayoutHeightxWidthxFeatureChannels imageIndex:0];
+        [self loadData:float16 length:width * height * 3 * sizeof(float16_t)];
         free(float16);
     }
     return self;
@@ -62,6 +62,10 @@
         _mpsImage = [[MPSImage alloc] initWithDevice:[MetalDevice sharedMTLDevice] imageDescriptor:descriptor];
     }
     return self;
+}
+
+- (void)loadData:(float16_t *)data length:(NSInteger)length {
+    [_mpsImage writeBytes:data dataLayout:MPSDataLayoutHeightxWidthxFeatureChannels imageIndex:0];
 }
 
 - (MPSTemporaryImage *)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {

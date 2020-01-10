@@ -232,7 +232,15 @@ Class LayerWithType(NSString *type);
 @property (nonatomic, readonly) NSInteger channelOffset;
 @property (nonatomic, strong, readonly) NSString *arithmetic;
 @property (nonatomic, strong, readonly) NSString *secondaryImage;
-@property (nonatomic, readonly) BOOL normalized;
+@property (nonatomic, strong, readonly) NSString *secondaryData;
+@property (nonatomic, assign, readonly) DataShape secondaryDataShape;
+@property (nonatomic, assign, readonly) float bias;
+@property (nonatomic, assign, readonly) float primaryScale;
+@property (nonatomic, assign, readonly) float secondaryScale;
+@property (nonatomic, assign, readonly) MTLInt3 primaryStrides;
+@property (nonatomic, assign, readonly) MTLInt3 secondaryStrides;
+
+- (DataShape *)secondaryDataShapeRef;
 
 @end
 

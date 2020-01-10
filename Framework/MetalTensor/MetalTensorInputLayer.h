@@ -13,7 +13,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MetalTensorInputLayer : MetalTensorLayer
 
+/*
+ *  RGB
+ *  3 channels
+ */
 @property (nonatomic, strong) MTImageTensor *outputImage;
+
 @property (nonatomic, strong) MTImageTensor *gradientImage;
 
 - (void)inputTexture:(id<MTLTexture>)bgraU8Texture;

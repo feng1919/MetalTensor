@@ -32,6 +32,7 @@
 }
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary {
+    NSParameterAssert(dictionary.count > 0);
     if (self = [super init]) {
         _networkDesc = dictionary;
         _synchronizedProcessing = YES;
@@ -243,6 +244,11 @@
     return MTLUInt2Make(dataShape->row, dataShape->column);
 }
 
+- (void)setInputSize:(MTLUInt2)size {
+    DataShape dataShape = DataShapeMake(size.x, size.y, 3);
+    [_inputLayer setInputShape:&dataShape atIndex:0];
+}
+
 - (MetalTensorInputLayer *)inputLayer {
     return _inputLayer;
 }
@@ -273,7 +279,7 @@
         return NO;
     }
     
-    for (MetalTensorNode *node in _allLayers) {
+    for (MetalTensorNode *node in _allLayers.allValues) {
         [node removeTarget:(ForwardTarget)layer];
     }
     
@@ -340,10 +346,11 @@
     }
     else {
         __weak __auto_type weakSelf = self;
+        MetalImageTexture *processing = _inputTexture;
         dispatch_async(_network_queue, ^{
             __strong __auto_type strongSelf = weakSelf;
-            [strongSelf predict:strongSelf->_inputTexture.texture];
-            [strongSelf->_inputTexture unlock];
+            [strongSelf predict:processing.texture];
+            [processing unlock];
             
             dispatch_semaphore_signal(strongSelf->_network_semaphore);
         });

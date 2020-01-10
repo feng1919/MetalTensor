@@ -19,15 +19,9 @@
 
 @implementation MIDropoutLayer
 
+#pragma mark - overridee
 - (void)initialize {
     _keepProbability = 0.999f;
-}
-
-- (void)setKeepProbability:(float)keepProbability {
-    _keepProbability = keepProbability;
-    DB_TRACE(-_verbose+1, "\n%s.keepProbability --> %f", self.labelUTF8, keepProbability);
-    
-    [self updateComputing];
 }
 
 - (void)compile:(id<MTLDevice>)device {
@@ -36,6 +30,15 @@
     [self updateComputing];
 }
 
+#pragma mark - public
+- (void)setKeepProbability:(float)keepProbability {
+    _keepProbability = keepProbability;
+    DB_TRACE(-_verbose+1, "\n%s.keepProbability --> %f", self.labelUTF8, keepProbability);
+    
+    [self updateComputing];
+}
+
+#pragma mark - private
 - (void)updateComputing {
     
     if (_device) {

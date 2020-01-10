@@ -20,7 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak, nullable) id<MTBackwardDelegate> source;
 
-- (instancetype)initWithShape:(DataShape *)image;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithShape:(DataShape *)shape NS_DESIGNATED_INITIALIZER;
 
 - (MPSImage *)content;
 - (DataShape *)shape;

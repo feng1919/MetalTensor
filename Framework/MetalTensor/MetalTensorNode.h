@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  network, if this node should pass a tensor to the nodes connected
  *  with, or receive tensors from those, then it should confirm to
  *  <MTForwardDelegate> protocol for forward propagation and to
- *  <MetalTensorBackward> protocol for backward propagation.
+ *  <MTBackwardDelegate> protocol for backward propagation.
  */
 
 @interface MetalTensorNode : NSObject {

@@ -12,31 +12,42 @@
     MPSCNNNeuron *_neuron;
 }
 
+#pragma mark - override
 - (void)compile:(id<MTLDevice>)device {
     
     [super compile:device];
     
-    _outputImage = [[MTImageTensor alloc] initWithShape:&_outputShape];
-    [_outputImage setReferenceCountingEnable:NO];
+    [self buildupTensors];
     
-    MPSImageDescriptor *descriptor = ImageDescriptor(&_outputShape);
-    descriptor.storageMode = MTLStorageModeShared;
-    _outputImage.mpsImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:descriptor];
-
     if (_needBackward) {
         MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
-        _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
-        
-        MPSImageDescriptor *desc = ImageDescriptor(&_outputShape);
-        desc.storageMode = MTLStorageModeShared;
-        _gradientImage.mpsImage = [[MPSImage alloc] initWithDevice:device imageDescriptor:desc];
-        
+        _neuron = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
     }
 }
 
+#pragma mark - private
+- (void)buildupTensors {
+    
+    if (_device) {
+        _outputImage = [[MTImageTensor alloc] initWithShape:&_outputShape];
+        
+        if (_needBackward) {
+            _gradientImage = [[MTImageTensor alloc] initWithShape:&_outputShape];
+        }
+    }
+}
+
+#pragma mark - public
 - (void)inputTexture:(id<MTLTexture>)bgraU8Texture {
     DB_TRACE(-_verbose+2, "\n\n\n%s <-- (%ld, %ld, 4)", self.labelUTF8, bgraU8Texture.width, bgraU8Texture.height);
+//    [self debugInputTexture:bgraU8Texture];
     _outputImage.mpsImage = [[MPSImage alloc] initWithTexture:bgraU8Texture featureChannels:3];
+}
+
+#pragma mark - MTTensorForward Delegate
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
+    [super setInputShape:dataShape atIndex:imageIndex];
+    [self buildupTensors];
 }
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
@@ -51,15 +62,29 @@
                  NSStringFromDataShape(_outputImage.shape).UTF8String,
                  [currentTarget description].UTF8String, imageIndex);
         
-        [currentTarget imageReadyAtIndex:imageIndex onCommandBuffer:commandBuffer];
+        [currentTarget imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
     }
 }
 
+#pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
     [_neuron encodeToCommandBuffer:commandBuffer
                        sourceImage:_gradient.content
                   destinationImage:_gradientImage.mpsImage];
+}
+
+#pragma mark - DEBUG
+- (void)debugInputTexture:(id<MTLTexture>)texture {
+    
+    CGSize imageSize = CGSizeMake([texture width], [texture height]);
+    size_t imageByteCount = imageSize.width * imageSize.height * 4;
+    Byte *imageBytes = malloc(imageByteCount);
+    NSUInteger bytesPerRow = imageSize.width * 4;
+    MTLRegion region = MTLRegionMake2D(0, 0, imageSize.width, imageSize.height);
+    [texture getBytes:imageBytes bytesPerRow:bytesPerRow fromRegion:region mipmapLevel:0];
+    
+    free(imageBytes);
 }
 
 @end

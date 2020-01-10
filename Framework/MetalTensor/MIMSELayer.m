@@ -25,16 +25,12 @@
     MPSNNReduceFeatureChannelsMean *_reduceDepthMean;
 }
 
+#pragma mark - override
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
     NSAssert(_numOfImages == 2, @"Invalid number of inputs, it must be two inputs.");
-    NSAssert(DataShapesTheSame(&_inputShapes[0], &_inputShapes[1]), @"The two input tensors must have same shape.");
-    
-    _outputShape = DataShapeMake(1, 1, 1); // Output one scalar.
-    _outputArithmetic = _inputShapes[0];
-    _outputReduceRowMean = DataShapeMake(1, _inputShapes[0].column, _inputShapes[0].depth);
-    _outputReduceColumnMean = DataShapeMake(1, 1, _inputShapes[0].depth);
+//    NSAssert(DataShapesTheSame(&_inputShapes[0], &_inputShapes[1]), @"The two input tensors must have same shape.");
     
     _subtract = [[MPSCNNSubtract alloc] initWithDevice:device];
     MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypePower
@@ -60,11 +56,20 @@
     }
 }
 
+- (void)updateOutputShape {
+    if (_device) {
+
+        _outputShape = DataShapeMake(1, 1, 1); // Output one scalar.
+        _outputArithmetic = _inputShapes[0];
+        _outputReduceRowMean = DataShapeMake(1, _inputShapes[0].column, _inputShapes[0].depth);
+        _outputReduceColumnMean = DataShapeMake(1, 1, _inputShapes[0].depth);
+    }
+}
+
+#pragma mark - MTTensorForward Delegate
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     /*
-     *  MSE f = 0.5*sum((v0-v1)^2) = 0.5*sum(v0^2-2*v0*v1+v1^2).
-     *  The derivative of v0: df/dv0 = v0-v1.
-     *  The derivative of v1: df/dv1 = v1-v0.
+     *  MSE f = 0.5*sum((v0-v1)^2).
      */
     
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
@@ -85,8 +90,8 @@
                       secondaryImage:_inputImages[@(1)].content
                     destinationImage:subtractImage.content];
     [_power encodeToCommandBuffer:commandBuffer
-                       sourceImage:subtractImage.content
-                  destinationImage:multiplyImage.content];
+                      sourceImage:subtractImage.content
+                 destinationImage:multiplyImage.content];
     [_reduceRowMean encodeToCommandBuffer:commandBuffer
                               sourceImage:multiplyImage.content
                          destinationImage:reduceRowImage.content];
@@ -106,18 +111,18 @@
     }
 }
 
+#pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     /*
      *  MSE f = 0.5*sum((v0-v1)^2) = 0.5*sum(v0^2-2*v0*v1+v1^2).
      *  The derivative of v0: df/dv0 = v0-v1.
-     *  The derivative of v1: df/dv1 = v1-v0.
+     *  The derivative of v1: df/dv1 = v1-v0 = -(df/dv0).
      */
     
     MetalTensor t0 = _inputImages[@(0)];
     MetalTensor t1 = _inputImages[@(1)];
     BackwardTarget back0 = t0.source;
     BackwardTarget back1 = t1.source;
-    [_inputImages removeAllObjects];
     
     MetalTensor dv0 = [[MTTensorCache sharedCache] fetchTensorWithShape:t0.shape source:nil commandBuffer:commandBuffer];
     
@@ -140,10 +145,10 @@
                          sourceImage:t0.content
                     destinationImage:t1.content];
     [back1 setGradient:t1 forwardTarget:self];
-    [t0 unlock];
-    [t1 unlock];
-    [back0 gradientReadyFromForwardTarget:self onCommandBuffer:commandBuffer];
-    [back1 gradientReadyFromForwardTarget:self onCommandBuffer:commandBuffer];
+    [self removeCachedImages];
+    
+    [back0 gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    [back1 gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     
 }
 

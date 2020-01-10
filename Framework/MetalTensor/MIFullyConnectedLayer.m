@@ -19,21 +19,28 @@
 
 @implementation MIFullyConnectedLayer
 
+#pragma mark - override
 - (void)compile:(id<MTLDevice>)device {
-    
     [super compile:device];
-    
-    NSParameterAssert(_kernel.column == _inputShapes[0].column &&
-                      _kernel.row == _inputShapes[0].row &&
-                      _kernel.depth == _inputShapes[0].depth);
-    
-    _outputShape.column = 1;
-    _outputShape.row = 1;
-    _outputShape.depth = _kernel.filters;
     
     [self updateComputing];
 }
 
+- (void)updateOutputShape {
+    if (_device) {
+
+        NSParameterAssert(_kernel.column == _inputShapes[0].column &&
+                          _kernel.row == _inputShapes[0].row &&
+                          _kernel.depth == _inputShapes[0].depth);
+        
+        _outputShape.column = 1;
+        _outputShape.row = 1;
+        _outputShape.depth = _kernel.filters;
+        
+    }
+}
+
+#pragma - private
 - (void)updateComputing {
     
     if (_dataSource && _device) {

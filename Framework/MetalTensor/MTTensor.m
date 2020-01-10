@@ -30,11 +30,16 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
 
 @implementation MTTensor
 
-- (instancetype)initWithShape:(DataShape *)image {
+- (instancetype)init{
+    NSAssert(NO, @"Invalid initialize function.");
+    return nil;
+}
+
+- (instancetype)initWithShape:(DataShape *)shape {
     if (self = [super init]) {
-        _shape = image[0];
+        _shape = shape[0];
         _referenceCounting = 0;
-        _imageDescriptor = ImageDescriptor(image);
+        _imageDescriptor = ImageDescriptor(shape);
         _referenceCountingEnable = YES;
     }
     return self;

@@ -25,12 +25,6 @@
 
 @implementation MIInvertedResidualModule
 
-- (void)initialize {
-    _kernels = malloc(3 * sizeof(KernelShape));
-    _neurons = malloc(3 * sizeof(NeuronType));
-    _offset = MTLInt2Make(0, 0);
-}
-
 - (void)dealloc {
     if (_kernels) {
         free(_kernels);
@@ -41,6 +35,13 @@
         free(_neurons);
         _neurons = NULL;
     }
+}
+
+#pragma mark - override
+- (void)initialize {
+    _kernels = malloc(3 * sizeof(KernelShape));
+    _neurons = malloc(3 * sizeof(NeuronType));
+    _offset = MTLInt2Make(0, 0);
 }
 
 - (void)compile:(id<MTLDevice>)device {
@@ -95,6 +96,22 @@
              NSStringFromDataShape(_convProject.outputShapeRef).UTF8String);
 }
 
+- (void)removeAllTargets {
+    [_lastNode removeAllTargets];
+}
+
+- (void)removeTarget:(ForwardTarget)targetToRemove{
+    [_lastNode removeTarget:targetToRemove];
+}
+
+- (void)addTarget:(ForwardTarget)newTarget {
+    [_lastNode addTarget:newTarget];
+}
+
+- (void)addTarget:(ForwardTarget)newTarget atIndex:(NSInteger)imageIndex {
+    [_lastNode addTarget:newTarget atIndex:imageIndex];
+}
+
 - (void)setLabel:(NSString *)label {
     [super setLabel:label];
     
@@ -104,6 +121,7 @@
     [_addition setLabel:[NSString stringWithFormat:@"%@_addition", label]];
 }
 
+#pragma mark - public
 - (void)setOffset:(MTLInt2)offset {
     _offset = offset;
     _convDepthWise.offset = offset;
@@ -145,20 +163,11 @@
     return _convProject;
 }
 
-- (void)removeAllTargets {
-    [_lastNode removeAllTargets];
-}
+#pragma mark - MTTensorForward Delegate
 
-- (void)removeTarget:(ForwardTarget)targetToRemove{
-    [_lastNode removeTarget:targetToRemove];
-}
-
-- (void)addTarget:(ForwardTarget)newTarget {
-    [_lastNode addTarget:newTarget];
-}
-
-- (void)addTarget:(ForwardTarget)newTarget atIndex:(NSInteger)imageIndex {
-    [_lastNode addTarget:newTarget atIndex:imageIndex];
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
+    [_convExpand setInputShape:dataShape atIndex:imageIndex];
+    [_addition setInputShape:dataShape atIndex:imageIndex];
 }
 
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
@@ -166,9 +175,9 @@
     [_addition setImage:newImage atIndex:0];
 }
 
-- (void)imageReadyAtIndex:(NSInteger)imageIndex onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    [_convExpand imageReadyAtIndex:0 onCommandBuffer:commandBuffer];
-    [_addition imageReadyAtIndex:0 onCommandBuffer:commandBuffer];
+- (void)imageReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer atIndex:(NSInteger)imageIndex {
+    [_convExpand imageReadyOnCommandBuffer:commandBuffer atIndex:0];
+    [_addition imageReadyOnCommandBuffer:commandBuffer atIndex:0];
 }
 
 - (void)reserveImageIndex:(NSInteger)index {
