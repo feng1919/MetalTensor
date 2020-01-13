@@ -181,6 +181,10 @@ NSString *NSStringFromNeuronType(NeuronType *neuron) {
     return [NSString stringWithFormat:@"(%@, %f, %f, %f)", StringWithNeuronType(neuron->neuron), neuron->a, neuron->b, neuron->c];
 }
 
+NSString *NSStringFromRegion(MTLRegion region) {
+    return [NSString stringWithFormat:@"(%d, %d, %d, %d, %d, %d)", (int)region.origin.x, (int)region.origin.y,
+            (int)region.origin.z, (int)region.size.width, (int)region.size.height, (int)region.size.depth];
+}
 /*
  We receive the predicted output as an MPSImage. We need to convert this
  to an array of Floats that we can use from Swift.

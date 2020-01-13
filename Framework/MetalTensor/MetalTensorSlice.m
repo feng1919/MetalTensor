@@ -92,7 +92,7 @@
     
     int _numberOfChannel;
     SliceDataSource *_dataSource;
-    MPSCNNConvolution *_convolution;
+//    MPSCNNConvolution *_convolution;
     id<MTLDevice> _device;
 }
 
@@ -109,7 +109,7 @@
 
 - (void)compile:(id<MTLDevice>)device {
     _device = device;
-    _convolution = [[MPSCNNConvolution alloc] initWithDevice:device weights:_dataSource];
+//    _convolution = [[MPSCNNConvolution alloc] initWithDevice:device weights:_dataSource];
 }
 
 - (MetalTensor)sliceTensor:(MetalTensor)src channelIndex:(int)channelIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
@@ -120,8 +120,8 @@
     MetalTensor dst = [[MTTensorCache sharedCache] fetchTensorWithShape:&dstShape commandBuffer:commandBuffer];
     
     [_dataSource activeChannelAtIndex:channelIndex];
-    [_convolution reloadWeightsAndBiasesFromDataSource];
-    [_convolution encodeToCommandBuffer:commandBuffer sourceImage:src.content destinationImage:dst.content];
+    MPSCNNConvolution *convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
+    [convolution encodeToCommandBuffer:commandBuffer sourceImage:src.content destinationImage:dst.content];
     return dst;
 }
 
@@ -133,8 +133,8 @@
     NSAssert(src.shape->row == dst.shape->row && src.shape->column == dst.shape->column, @"MetalTensorSlice output tensor should be the same row and column.");
     
     [_dataSource activeChannelAtIndex:channelIndex];
-    [_convolution reloadWeightsAndBiasesFromDataSource];
-    [_convolution encodeToCommandBuffer:commandBuffer sourceImage:src.content destinationImage:dst.content];
+    MPSCNNConvolution *convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
+    [convolution encodeToCommandBuffer:commandBuffer sourceImage:src.content destinationImage:dst.content];
 }
 
 @end

@@ -9,6 +9,7 @@
 #import "MIGramMatrixLayer.h"
 #import "MTTensorCache.h"
 #import "MetalTensorSlice.h"
+#import "MTImageTensor.h"
 
 @implementation MIGramMatrixLayer {
 @private
@@ -17,12 +18,9 @@
     MPSCNNPoolingAverage *_mean;
     MPSNNReduceFeatureChannelsSum *_reduceSumChannels;
     MPSCNNNeuron *_neuron;
-    MPSNNReshape *_reshape;
     
     DataShape _oneChannelShape;
     DataShape _multiplyShape;
-    DataShape _poolingShape;
-    DataShape _reshapeShape;
 }
 
 #pragma mark - override
@@ -55,17 +53,15 @@
     _slice = [[MetalTensorSlice alloc] initWithNumberOfChannel:inputShape->depth];
     [_slice compile:device];
     
+    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
+    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
+    
     _mean = [[MPSCNNPoolingAverage alloc] initWithDevice:device
                                              kernelWidth:inputShape->column
                                             kernelHeight:inputShape->row
                                          strideInPixelsX:inputShape->column
                                          strideInPixelsY:inputShape->row];
     _mean.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
-    
-    MPSNNNeuronDescriptor *desc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
-    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:desc];
-    
-    _reshape = [[MPSNNReshape alloc] initWithDevice:device];
     
     if (_needBackward) {
         _reduceSumChannels = [[MPSNNReduceFeatureChannelsSum alloc] initWithDevice:device];
@@ -77,10 +73,9 @@
         
         DataShape *inputShape = &_inputShapes[0];
 //        _outputShape = *inputShape;
-        _outputShape = DataShapeMake(1, inputShape->depth, 1);
+        _outputShape = DataShapeMake(1, inputShape->depth, inputShape->depth);
         _oneChannelShape = DataShapeMake(inputShape->row, inputShape->column, 4);
         _multiplyShape = *inputShape;
-        _poolingShape = DataShapeMake(1, 1, inputShape->depth);
     }
 }
 
@@ -91,14 +86,13 @@
     
     MetalTensor sourceTensor = _inputImages[@(0)];
     DataShape *inputShape = &_inputShapes[0];
+//    MetalTensor copyTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape commandBuffer:commandBuffer];
+//    [_neuron encodeToCommandBuffer:commandBuffer sourceImage:sourceTensor.content destinationImage:copyTensor.content];
+    
     MetalTensor oneChannel = [[MTTensorCache sharedCache] fetchTensorWithShape:&_oneChannelShape commandBuffer:commandBuffer];
     MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_multiplyShape commandBuffer:commandBuffer];
-    MetalTensor poolingImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_poolingShape commandBuffer:commandBuffer];
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
-                                                    dataFormat:TensorDataFormatFloat16
-                                                numberOfImages:inputShape->depth
-                                                 commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
     _image.source = self;
 
     _multiply.secondaryStrideInPixelsX = 1;
@@ -107,10 +101,9 @@
     
     MTLRegion clipRect;
     clipRect.origin = MTLOriginMake(0, 0, 0);
-    clipRect.size = MTLSizeMake(1, 1, 1);
+    clipRect.size = MTLSizeMake(1, 1, -1);
     
     for (int i = 0; i < inputShape->depth; i++) {
-
         [_slice sliceTensor:sourceTensor
                    toTensor:oneChannel
                channelIndex:i
@@ -119,18 +112,16 @@
                             primaryImage:sourceTensor.content
                           secondaryImage:oneChannel.content
                         destinationImage:multiplyImage.content];    //  384x512x64
+        clipRect.origin.x = i;
+        [_mean setClipRect:clipRect];
         [_mean encodeToCommandBuffer:commandBuffer
                          sourceImage:multiplyImage.content
-                    destinationImage:poolingImage.content];
-
-        clipRect.origin.z = i;
-        [_reshape setClipRect:clipRect];
-        [_reshape encodeToCommandBuffer:commandBuffer sourceImage:poolingImage.content destinationImage:_image.content];
+                    destinationImage:_image.content];
     }
     
     [oneChannel unlock];
     [multiplyImage unlock];
-    [poolingImage unlock];
+//    [copyTensor unlock];
     
     if (!_needBackward) {
         [self removeCachedImages];

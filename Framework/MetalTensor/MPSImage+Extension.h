@@ -34,6 +34,7 @@ NSString *StringWithNeuronType(MPSCNNNeuronType neuron);
 NSString *NSStringFromDataShape(DataShape *dataShape);
 NSString *NSStringFromKernelShape(KernelShape *kernel);
 NSString *NSStringFromNeuronType(NeuronType *neuron);
+NSString *NSStringFromRegion(MTLRegion region);
 
 bool ConvertFloat32To16(float32_t *src, float16_t *dst, unsigned int size);
 bool ConvertFloat16To32(float16_t *src, float32_t *dst, unsigned int size);
