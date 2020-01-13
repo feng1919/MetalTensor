@@ -324,9 +324,17 @@ int trans_conv_offset(int kernel, int stride, MTPaddingMode padding) {
     }
 }
 
-int pooling_offset(int kernel, int stride) {
-    return 1 + (stride - kernel) / 2;
+int pooling_output_length(int input_length, int stride) {
+    return input_length / stride;
 }
+
+int pooling_offset(int kernel, int stride) {
+    return stride - (kernel / 2);
+}
+
+//int pooling_offset(int input_length, int kernel, int stride) {
+//    return stride - (kernel / 2) + (input_length % stride);
+//}
 
 int make_divisible_8(int v) {
     return make_divisible(v, 8, 8);

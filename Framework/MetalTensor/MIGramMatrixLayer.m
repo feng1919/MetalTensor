@@ -8,28 +8,34 @@
 
 #import "MIGramMatrixLayer.h"
 #import "MTTensorCache.h"
+#import "MetalTensorSlice.h"
 
 @implementation MIGramMatrixLayer {
 @private
-    MPSCNNNeuron *_neuron;
+    MetalTensorSlice *_slice;
     MPSCNNMultiply *_multiply;
-    MPSNNReduceRowMean *_reduceMeanRow;
-    MPSNNReduceColumnMean *_reduceMeanColumn;
+    MPSCNNPoolingAverage *_mean;
     MPSNNReduceFeatureChannelsSum *_reduceSumChannels;
+    MPSCNNNeuron *_neuron;
     
-    DataShape _outputMultiply;
-    DataShape _outputReduceRow;
-    DataShape _outputReduceColumn;
+    DataShape _oneChannelShape;
+    DataShape _multiplyShape;
+    DataShape _poolingShape;
+    DataShape _reshapeShape;
 }
 
 #pragma mark - override
+
+- (void)initialize {
+    NSAssert((_inputShapes[0].column&0x01)==0 && (_inputShapes[0].row&0x01)==0, @"The dimensions have to be multiple of 2.");
+}
+
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
     NSParameterAssert(device);
     
-    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
-    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
+    DataShape *inputShape = &_inputShapes[0];
     
     _multiply = [[MPSCNNMultiply alloc] initWithDevice:device];
     _multiply.primaryScale = 1.0f;
@@ -37,14 +43,26 @@
     _multiply.primaryStrideInPixelsX = 1;
     _multiply.primaryStrideInPixelsY = 1;
     _multiply.primaryStrideInFeatureChannels = 1;
+    _multiply.primaryOffset = MPSOffsetMake(0, 0, 0);
     _multiply.secondaryScale = 1.0f;
     _multiply.secondaryStrideInPixelsX = 1;
     _multiply.secondaryStrideInPixelsY = 1;
     _multiply.secondaryStrideInFeatureChannels = 0;
+    _multiply.secondaryOffset = MPSOffsetMake(0, 0, 0);
     _multiply.destinationFeatureChannelOffset = 0;
     
-    _reduceMeanRow = [[MPSNNReduceRowMean alloc] initWithDevice:device];
-    _reduceMeanColumn = [[MPSNNReduceColumnMean alloc] initWithDevice:device];
+    _slice = [[MetalTensorSlice alloc] initWithNumberOfChannel:inputShape->depth];
+    [_slice compile:device];
+    
+    _mean = [[MPSCNNPoolingAverage alloc] initWithDevice:device
+                                             kernelWidth:inputShape->column
+                                            kernelHeight:inputShape->row
+                                         strideInPixelsX:inputShape->column
+                                         strideInPixelsY:inputShape->row];
+    _mean.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+    
+    MPSNNNeuronDescriptor *desc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
+    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:desc];
     
     if (_needBackward) {
         _reduceSumChannels = [[MPSNNReduceFeatureChannelsSum alloc] initWithDevice:device];
@@ -55,63 +73,60 @@
     if (_device) {
         
         DataShape *inputShape = &_inputShapes[0];
-        _outputShape = DataShapeMake(inputShape->depth, inputShape->depth, 1);
-        _outputMultiply = *inputShape;
-        _outputReduceRow = DataShapeMake(1, inputShape->column, inputShape->depth);
+//        _outputShape = *inputShape;
+        _outputShape = DataShapeMake(1, inputShape->depth, inputShape->depth);
+        _oneChannelShape = DataShapeMake(inputShape->row, inputShape->column, 4);
+        _multiplyShape = *inputShape;
     }
 }
 
 #pragma mark - MTTensorForward Delegate
+
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
     
     MetalTensor sourceTensor = _inputImages[@(0)];
     DataShape *inputShape = &_inputShapes[0];
-    MetalTensor secondaryImage = [[MTTensorCache sharedCache] fetchTensorWithShape:inputShape source:self commandBuffer:commandBuffer];
-    [secondaryImage newContentOnCommandBuffer:commandBuffer];
-    MetalTensor arithmeticImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputMultiply source:self commandBuffer:commandBuffer];
-    [arithmeticImage newContentOnCommandBuffer:commandBuffer];
-    MetalTensor reduceRowImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceRow source:self commandBuffer:commandBuffer];
-    [reduceRowImage newContentOnCommandBuffer:commandBuffer];
+    MetalTensor oneChannel = [[MTTensorCache sharedCache] fetchTensorWithShape:&_oneChannelShape source:nil commandBuffer:commandBuffer];
+    [oneChannel newContentOnCommandBuffer:commandBuffer];
+    
+    MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_multiplyShape source:nil commandBuffer:commandBuffer];
+    [multiplyImage newContentOnCommandBuffer:commandBuffer];
+    
     _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
     [_image newContentOnCommandBuffer:commandBuffer];
-    
-    _neuron.offset = MPSOffsetMake(0, 0, 0);
-    [_neuron encodeToCommandBuffer:commandBuffer sourceImage:sourceTensor.content destinationImage:secondaryImage.content];
-    
-    MTLRegion clipRect;
-    clipRect.origin = MTLOriginMake(0, 0, 0);
-    clipRect.size = MTLSizeMake(inputShape->column, inputShape->row, inputShape->depth);
 
     _multiply.secondaryStrideInPixelsX = 1;
     _multiply.secondaryStrideInPixelsY = 1;
     _multiply.secondaryStrideInFeatureChannels = 0;
     
+    MTLRegion clipRect;
+    clipRect.origin = MTLOriginMake(0, 0, 0);
+    clipRect.size = MTLSizeMake(1, 1, 1);
+    
     for (int i = 0; i < inputShape->depth; i++) {
-        [_multiply setSecondaryOffset:MPSOffsetMake(0, 0, i)];
+
+        [_slice sliceTensor:sourceTensor
+                   toTensor:oneChannel
+               channelIndex:i
+              commandBuffer:commandBuffer];
         [_multiply encodeToCommandBuffer:commandBuffer
                             primaryImage:sourceTensor.content
-                          secondaryImage:secondaryImage.content
-                        destinationImage:arithmeticImage.content];
-        
-        [_reduceMeanRow encodeToCommandBuffer:commandBuffer
-                                  sourceImage:arithmeticImage.content
-                             destinationImage:reduceRowImage.content];
-        
-        clipRect.origin.y = i;
-        [_reduceMeanColumn setClipRect:clipRect];
-        [_reduceMeanColumn encodeToCommandBuffer:commandBuffer
-                                     sourceImage:reduceRowImage.content
-                                destinationImage:_image.content];
+                          secondaryImage:oneChannel.content
+                        destinationImage:multiplyImage.content];    //  384x512x64
+        clipRect.origin.x = i;
+        [_mean setClipRect:clipRect];
+        [_mean encodeToCommandBuffer:commandBuffer
+                         sourceImage:multiplyImage.content
+                    destinationImage:_image.content];
     }
+    
+    [oneChannel unlock];
+    [multiplyImage unlock];
     
     if (!_needBackward) {
         [self removeCachedImages];
     }
-    
-    [arithmeticImage unlock];
-    [reduceRowImage unlock];
-    [secondaryImage unlock];
 }
 
 #pragma mark - MTTensorBackward Delegate
@@ -145,10 +160,10 @@
     
     for (int i = 0; i < numOfChannels; i++) {
         //  Copy the i-th row gradient.
-        _neuron.offset = MPSOffsetMake(0, i, 0);
-        [_neuron encodeToCommandBuffer:commandBuffer
-                           sourceImage:_gradient.content
-                      destinationImage:channelsWeights.content];
+//        _neuron.offset = MPSOffsetMake(0, i, 0);
+//        [_neuron encodeToCommandBuffer:commandBuffer
+//                           sourceImage:_gradient.content
+//                      destinationImage:channelsWeights.content];
         
         //  Data of each channel multipy its respect weight.
         [_multiply encodeToCommandBuffer:commandBuffer

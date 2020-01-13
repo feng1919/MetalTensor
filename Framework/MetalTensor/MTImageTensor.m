@@ -18,7 +18,7 @@
     if (self = [super initWithShape:&shape]) {
         self.referenceCountingEnable = NO;
         
-        MPSImageDescriptor *descriptor = ImageDescriptor(&shape);
+        MPSImageDescriptor *descriptor = ImageDescriptor(&shape, TensorDataFormatFloat16);
         descriptor.storageMode = MTLStorageModeShared;
         _mpsImage = [[MPSImage alloc] initWithDevice:[MetalDevice sharedMTLDevice] imageDescriptor:descriptor];
         
@@ -57,7 +57,7 @@
     if (self = [super initWithShape:shape]) {
         self.referenceCountingEnable = NO;
         
-        MPSImageDescriptor *descriptor = ImageDescriptor(shape);
+        MPSImageDescriptor *descriptor = ImageDescriptor(shape, TensorDataFormatFloat16);
         descriptor.storageMode = MTLStorageModeShared;
         _mpsImage = [[MPSImage alloc] initWithDevice:[MetalDevice sharedMTLDevice] imageDescriptor:descriptor];
     }

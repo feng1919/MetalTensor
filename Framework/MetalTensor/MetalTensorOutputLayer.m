@@ -17,6 +17,14 @@
 @implementation MetalTensorOutputLayer
 
 #pragma mark - override
+- (void)initialize {
+    _dataFormat = TensorDataFormatFloat16;
+    _neuronType.neuron = MPSCNNNeuronTypeNone;
+    _neuronType.a = 0.0f;
+    _neuronType.b = 0.0f;
+    _neuronType.c = 0.0f;
+}
+
 - (void)compile:(id<MTLDevice>)device {
     
     [super compile:device];
@@ -27,10 +35,13 @@
      *  TODO: DMA optimization
      */
     
-    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
+    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:_neuronType.neuron
+                                                                                         a:_neuronType.a
+                                                                                         b:_neuronType.b
+                                                                                         c:_neuronType.c];
     _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
     
-    MPSImageDescriptor *desc = ImageDescriptor(&_outputShape);
+    MPSImageDescriptor *desc = ImageDescriptor(&_outputShape, _dataFormat);
     desc.storageMode = MTLStorageModeShared;
     _outputImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:desc];
     
@@ -45,7 +56,7 @@
     [super setInputShape:dataShape atIndex:imageIndex];
     
     if (_device) {
-        MPSImageDescriptor *desc = ImageDescriptor(&_outputShape);
+        MPSImageDescriptor *desc = ImageDescriptor(&_outputShape, _dataFormat);
         desc.storageMode = MTLStorageModeShared;
         _outputImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:desc];
     }
@@ -57,6 +68,7 @@
 }
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    NSAssert(_neuron, @"The layer %@ is not compiled.", self.label);
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
     [_neuron encodeToCommandBuffer:commandBuffer
                        sourceImage:_inputImages[@(0)].content

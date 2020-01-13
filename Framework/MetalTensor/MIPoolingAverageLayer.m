@@ -52,8 +52,8 @@
 - (void)updateOutputShape {
     if (_device) {
         
-        _outputShape.column = conv_output_length(_inputShapes[0].column, _kernel.column, _kernel.stride, MTPaddingMode_tfsame);
-        _outputShape.row = conv_output_length(_inputShapes[0].row, _kernel.row, _kernel.stride, MTPaddingMode_tfsame);
+        _outputShape.column = pooling_output_length(_inputShapes[0].column, _kernel.stride);
+        _outputShape.row = pooling_output_length(_inputShapes[0].row, _kernel.stride);
         _outputShape.depth = _inputShapes[0].depth;
     }
 }

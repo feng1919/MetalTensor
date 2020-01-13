@@ -72,6 +72,8 @@
     [_neuron encodeToCommandBuffer:commandBuffer
                        sourceImage:_gradient.content
                   destinationImage:_gradientImage.mpsImage];
+    
+    [self removeGradient];
 }
 
 #pragma mark - DEBUG
@@ -83,6 +85,11 @@
     NSUInteger bytesPerRow = imageSize.width * 4;
     MTLRegion region = MTLRegionMake2D(0, 0, imageSize.width, imageSize.height);
     [texture getBytes:imageBytes bytesPerRow:bytesPerRow fromRegion:region mipmapLevel:0];
+    
+    for (int i = 0; i < 10; i++) {
+        printf("\n%d, %d, %d", imageBytes[i*4], imageBytes[i*4+1], imageBytes[i*4+2]);
+    }
+    printf("\n");
     
     free(imageBytes);
 }

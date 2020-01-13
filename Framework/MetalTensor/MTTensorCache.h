@@ -28,14 +28,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)registerReuseIdentifier;
 - (void)unregisterReuseIdentifier:(NSInteger)identifier;
 
-- (MetalTensor)fetchTensorWithShape:(DataShape *)shape source:(BackwardTarget _Nullable)source commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+- (MetalTensor)fetchTensorWithShape:(DataShape *)shape
+                             source:(BackwardTarget _Nullable)source
+                      commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+
+- (MetalTensor)fetchTensorWithShape:(DataShape *)shape
+                             source:(BackwardTarget _Nullable)source
+                         dataFormat:(TensorDataFormat)dataFormat
+                      commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 
 - (void)cacheTensor:(MetalTensor)tensor;
 
 - (void)beginContextWithCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 - (void)endContextWithCommandBuffer:(id<MTLCommandBuffer>)commandBufferfer;
 
-NSString *KeyForTensorType(DataShape *shape);
+NSString *KeyForTensorType(DataShape *shape, TensorDataFormat dataFormat);
 
 @end
 

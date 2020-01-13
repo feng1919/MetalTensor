@@ -74,6 +74,12 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 @property (nonatomic, copy) NetworkCallback _Nullable completedHandler;
 
 /*
+ *  The device that network compiled on.
+ *
+ */
+@property (nonatomic, strong, nullable) id<MTLDevice> device;
+
+/*
  *  The network's tasks should be processed synchronizely or asynchronizely.
  *  If sync the processing will be casted on the current thread,
  *  and if async the processing will be casted on the network thread.
@@ -152,6 +158,8 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 - (NSArray<MetalTensorNode *> *)allLayers;
 - (MetalTensorNode *)layerWithName:(NSString *)name;
 - (MetalTensorLayerDescriptor *)layerDescriptorWithName:(NSString *)name;
+
+- (BOOL)removeLayer:(MetalTensorNode *)node;
 - (BOOL)removeLayerWithName:(NSString *)name;
 
 - (MetalTensorOutputLayer *)outputLayerWithName:(NSString *)layerName;

@@ -53,6 +53,7 @@
 
 - (void)compile:(id<MTLDevice>)device {
     
+    _device = device;
     _allLayers = [NSMutableDictionary dictionary];
     _allLayerDescriptors = [NSMutableDictionary dictionary];
     
@@ -241,11 +242,11 @@
 
 - (MTLUInt2)inputSize {
     DataShape *dataShape = [_inputLayer outputShapeRef];
-    return MTLUInt2Make(dataShape->row, dataShape->column);
+    return MTLUInt2Make(dataShape->column, dataShape->row);
 }
 
 - (void)setInputSize:(MTLUInt2)size {
-    DataShape dataShape = DataShapeMake(size.x, size.y, 3);
+    DataShape dataShape = DataShapeMake(size.y, size.x, 3);
     [_inputLayer setInputShape:&dataShape atIndex:0];
 }
 
@@ -274,6 +275,11 @@
     if (!layer) {
         return NO;
     }
+    
+    return [self removeLayer:layer];
+}
+
+- (BOOL)removeLayer:(MetalTensorNode *)layer {
     
     if (![layer conformsToProtocol:@protocol(MTForwardDelegate)]) {
         return NO;

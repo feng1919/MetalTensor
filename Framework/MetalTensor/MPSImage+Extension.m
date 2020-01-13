@@ -72,6 +72,26 @@ void ConvertToTensorFlowLayout(float *dst, float *src, DataShape *shape)
     }
 }
 
+
+void ConvertF16ToTensorFlowLayout(float16_t *dst, float16_t *src, DataShape *shape)
+{
+    if (shape->depth <= 4) {
+        npmemcpy(dst, src, ProductOfDataShape(shape)*sizeof(float16_t));
+        return;
+    }
+    
+    int unit = shape->column*shape->row*4;
+    for (int i = 0; i < shape->row; i++) {
+        int offset_y = i*shape->column*shape->depth;
+        for (int j = 0; j < shape->column; j++) {
+            int offset = j*shape->depth+offset_y;
+            for (int k = 0; k < shape->depth; k++) {
+                dst[offset+k] = src[unit*(k>>2)+(i*shape->column+j)*4+(k&0x03)];
+            }
+        }
+    }
+}
+
 NeuronType NeuronTypeMake(MPSCNNNeuronType n, float a, float b) {
     NeuronType s;
     s.neuron = n;
@@ -224,10 +244,12 @@ NSString *NSStringFromNeuronType(NeuronType *neuron) {
     }
 }
 
+
+
 - (void)toFloat16Array:(float16_t *)buffer {
     int numOfSlices = ((int)self.featureChannels + 3)/4;
     
-    int numOfComponents = self.featureChannels<3?:4;
+    int numOfComponents = [self numberOfComponents];
     NSUInteger bytesPerSlice = numOfComponents * self.width * self.height;// * [self sizeOfComponent];
     
     for (int i = 0; i < numOfSlices; i++) {
@@ -237,7 +259,7 @@ NSString *NSStringFromNeuronType(NeuronType *neuron) {
 
 - (void)toFloat16Array:(float16_t *)buffer slice:(int)slice {
     
-    int numOfComponents = self.featureChannels<3?:4;
+    int numOfComponents = [self numberOfComponents];
     int sizeOfComponent = [self sizeOfComponent];
     
     MTLRegion region = MTLRegionMake3D(0, 0, 0, self.width, self.height, 1);
@@ -247,6 +269,39 @@ NSString *NSStringFromNeuronType(NeuronType *neuron) {
                 fromRegion:region
                mipmapLevel:0
                      slice:slice];
+}
+
+
+
+- (void)toBuffer:(Byte *)buffer {
+    int numOfSlices = ((int)self.featureChannels + 3)/4;
+    
+    int numOfComponents = [self numberOfComponents];
+    NSUInteger bytesPerSlice = numOfComponents * self.width * self.height * [self sizeOfComponent];
+    
+    for (int i = 0; i < numOfSlices; i++) {
+        [self toBuffer:buffer+bytesPerSlice*i slice:i];
+    }
+}
+
+- (void)toBuffer:(Byte *)buffer slice:(int)slice {
+    
+    int numOfComponents = [self numberOfComponents];
+    int sizeOfComponent = [self sizeOfComponent];
+    
+    MTLRegion region = MTLRegionMake3D(0, 0, 0, self.width, self.height, 1);
+    [self.texture getBytes:buffer
+               bytesPerRow:self.width*numOfComponents*sizeOfComponent
+             bytesPerImage:0
+                fromRegion:region
+               mipmapLevel:0
+                     slice:slice];
+}
+
+
+
+- (int)numberOfComponents {
+    return self.featureChannels<3?:4;
 }
 
 + (void)texture:(id<MTLTexture>)texture toFloat16Array:(float16_t *)buffer {

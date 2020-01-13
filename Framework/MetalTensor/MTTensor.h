@@ -12,6 +12,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(int, TensorDataFormat) {
+    TensorDataFormatFloat16 = 16,
+    TensorDataFormatFloat32 = 32,
+};
+
 @protocol MTBackwardDelegate;
 @interface MTTensor : NSObject
 
@@ -20,8 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak, nullable) id<MTBackwardDelegate> source;
 
+@property (nonatomic, readonly) TensorDataFormat dataFormat;
+
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithShape:(DataShape *)shape NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithShape:(DataShape *)shape dataFormat:(TensorDataFormat)dataFormat NS_DESIGNATED_INITIALIZER;
 
 - (MPSImage *)content;
 - (DataShape *)shape;
@@ -38,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)unlock;
 - (int)referenceCounting;
 
-MPSImageDescriptor *ImageDescriptor(DataShape *s);
+MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat);
 
 @end
 

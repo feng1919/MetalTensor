@@ -18,9 +18,10 @@
 
 @end
 
-MPSImageDescriptor *ImageDescriptor(DataShape *s) {
+MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat dataFormat) {
     assert(s->row>0 && s->column>0 && s->depth>0);
-    MPSImageDescriptor *desc = [MPSImageDescriptor imageDescriptorWithChannelFormat:MPSImageFeatureChannelFormatFloat16
+    MPSImageFeatureChannelFormat format = dataFormat == TensorDataFormatFloat16?MPSImageFeatureChannelFormatFloat16:MPSImageFeatureChannelFormatFloat32;
+    MPSImageDescriptor *desc = [MPSImageDescriptor imageDescriptorWithChannelFormat:format
                                                                               width:s->column
                                                                              height:s->row
                                                                     featureChannels:s->depth];
@@ -37,16 +38,28 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
 
 - (instancetype)initWithShape:(DataShape *)shape {
     if (self = [super init]) {
+        _dataFormat = TensorDataFormatFloat16;
         _shape = shape[0];
         _referenceCounting = 0;
-        _imageDescriptor = ImageDescriptor(shape);
+        _imageDescriptor = ImageDescriptor(shape, _dataFormat);
+        _referenceCountingEnable = YES;
+    }
+    return self;
+}
+
+- (instancetype)initWithShape:(DataShape *)shape dataFormat:(TensorDataFormat)dataFormat {
+    if (self = [super init]) {
+        _dataFormat = dataFormat;
+        _shape = shape[0];
+        _referenceCounting = 0;
+        _imageDescriptor = ImageDescriptor(shape, _dataFormat);
         _referenceCountingEnable = YES;
     }
     return self;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Tensor: %@", KeyForTensorType(&_shape)];
+    return [NSString stringWithFormat:@"Tensor: %@", KeyForTensorType(&_shape, _dataFormat)];
 }
 
 - (void)dealloc {
@@ -54,7 +67,7 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s) {
     NSAssert(_referenceCountingEnable == NO || _referenceCounting == 0, @"Unexpected dealloc...");
     
     self.image = nil;
-    NSLog(@"Temporary image dealloc: %@", KeyForTensorType(&_shape));
+    NSLog(@"Temporary image dealloc: %@", KeyForTensorType(&_shape, _dataFormat));
 }
 
 #pragma mark - Public Access

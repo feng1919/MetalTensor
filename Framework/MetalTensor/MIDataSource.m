@@ -172,9 +172,11 @@
                                                                          inputFeatureChannels:_kernel.depth
                                                                         outputFeatureChannels:_kernel.filters];
         }
+    
         [_descriptor setFusedNeuronDescriptor:[MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:_neuron.neuron
                                                                                               a:_neuron.a
                                                                                               b:_neuron.b]];
+        
         [_descriptor setStrideInPixelsX:_kernel.stride];
         [_descriptor setStrideInPixelsY:_kernel.stride];
         if (_bn) {

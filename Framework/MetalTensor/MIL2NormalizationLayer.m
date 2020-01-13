@@ -50,8 +50,8 @@
 
 - (void)updateOutputShape {
     if (_device) {
-        _outputShape.column = (_inputShapes[0].column + _kernel.stride - 1) / _kernel.stride;
-        _outputShape.row = (_inputShapes[0].row + _kernel.stride - 1) / _kernel.stride;
+        _outputShape.column = pooling_output_length(_inputShapes[0].column, _kernel.stride);
+        _outputShape.row = pooling_output_length(_inputShapes[0].row, _kernel.stride);
         _outputShape.depth = _inputShapes[0].depth;
     }
 }
