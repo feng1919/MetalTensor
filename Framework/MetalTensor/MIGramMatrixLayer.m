@@ -17,6 +17,7 @@
     MPSCNNPoolingAverage *_mean;
     MPSNNReduceFeatureChannelsSum *_reduceSumChannels;
     MPSCNNNeuron *_neuron;
+    MPSNNReshape *_reshape;
     
     DataShape _oneChannelShape;
     DataShape _multiplyShape;
@@ -64,6 +65,8 @@
     MPSNNNeuronDescriptor *desc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
     _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:desc];
     
+    _reshape = [[MPSNNReshape alloc] initWithDevice:device];
+    
     if (_needBackward) {
         _reduceSumChannels = [[MPSNNReduceFeatureChannelsSum alloc] initWithDevice:device];
     }
@@ -74,9 +77,10 @@
         
         DataShape *inputShape = &_inputShapes[0];
 //        _outputShape = *inputShape;
-        _outputShape = DataShapeMake(1, inputShape->depth, inputShape->depth);
+        _outputShape = DataShapeMake(1, inputShape->depth, 1);
         _oneChannelShape = DataShapeMake(inputShape->row, inputShape->column, 4);
         _multiplyShape = *inputShape;
+        _poolingShape = DataShapeMake(1, 1, inputShape->depth);
     }
 }
 
@@ -87,14 +91,15 @@
     
     MetalTensor sourceTensor = _inputImages[@(0)];
     DataShape *inputShape = &_inputShapes[0];
-    MetalTensor oneChannel = [[MTTensorCache sharedCache] fetchTensorWithShape:&_oneChannelShape source:nil commandBuffer:commandBuffer];
-    [oneChannel newContentOnCommandBuffer:commandBuffer];
+    MetalTensor oneChannel = [[MTTensorCache sharedCache] fetchTensorWithShape:&_oneChannelShape commandBuffer:commandBuffer];
+    MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_multiplyShape commandBuffer:commandBuffer];
+    MetalTensor poolingImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_poolingShape commandBuffer:commandBuffer];
     
-    MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_multiplyShape source:nil commandBuffer:commandBuffer];
-    [multiplyImage newContentOnCommandBuffer:commandBuffer];
-    
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
-    [_image newContentOnCommandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                    dataFormat:TensorDataFormatFloat16
+                                                numberOfImages:inputShape->depth
+                                                 commandBuffer:commandBuffer];
+    _image.source = self;
 
     _multiply.secondaryStrideInPixelsX = 1;
     _multiply.secondaryStrideInPixelsY = 1;
@@ -114,15 +119,18 @@
                             primaryImage:sourceTensor.content
                           secondaryImage:oneChannel.content
                         destinationImage:multiplyImage.content];    //  384x512x64
-        clipRect.origin.x = i;
-        [_mean setClipRect:clipRect];
         [_mean encodeToCommandBuffer:commandBuffer
                          sourceImage:multiplyImage.content
-                    destinationImage:_image.content];
+                    destinationImage:poolingImage.content];
+
+        clipRect.origin.z = i;
+        [_reshape setClipRect:clipRect];
+        [_reshape encodeToCommandBuffer:commandBuffer sourceImage:poolingImage.content destinationImage:_image.content];
     }
     
     [oneChannel unlock];
     [multiplyImage unlock];
+    [poolingImage unlock];
     
     if (!_needBackward) {
         [self removeCachedImages];
@@ -145,12 +153,9 @@
     MetalTensor sourceTensor = _inputImages[@(0)];
     int numOfChannels = sourceTensor.shape->depth;
     DataShape channelsWeightsShape = DataShapeMake(1, 1, numOfChannels);
-    MetalTensor gradients0 = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape source:nil commandBuffer:commandBuffer];
-    [gradients0 newContentOnCommandBuffer:commandBuffer];
-    MetalTensor gradients1 = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape source:nil commandBuffer:commandBuffer];
-    [gradients1 newContentOnCommandBuffer:commandBuffer];
-    MetalTensor channelsWeights = [[MTTensorCache sharedCache] fetchTensorWithShape:&channelsWeightsShape source:nil commandBuffer:commandBuffer];
-    [channelsWeights newContentOnCommandBuffer:commandBuffer];
+    MetalTensor gradients0 = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape commandBuffer:commandBuffer];
+    MetalTensor gradients1 = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape commandBuffer:commandBuffer];
+    MetalTensor channelsWeights = [[MTTensorCache sharedCache] fetchTensorWithShape:&channelsWeightsShape commandBuffer:commandBuffer];
 
     //  Make a channel-wise multiplication.
     _multiply.secondaryStrideInPixelsX = 0;

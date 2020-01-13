@@ -47,13 +47,13 @@ static int _reuseCounter = 0;
     [_reuseCacheMap removeObjectForKey:@(identifier)];
 }
 
-- (MetalTensor)fetchTensorWithShape:(DataShape *)shape source:(BackwardTarget)source commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    return [self fetchTensorWithShape:shape source:source dataFormat:TensorDataFormatFloat16 commandBuffer:commandBuffer];
+- (MetalTensor)fetchTensorWithShape:(DataShape *)shape commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    return [self fetchTensorWithShape:shape dataFormat:TensorDataFormatFloat16 numberOfImages:1 commandBuffer:commandBuffer];
 }
 
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape
-                             source:(BackwardTarget)source
                          dataFormat:(TensorDataFormat)dataFormat
+                     numberOfImages:(NSUInteger)numberOfImages
                       commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     if (shape == NULL) {
         return nil;
@@ -65,20 +65,20 @@ static int _reuseCounter = 0;
         MetalTensor tensor = nil;
         NSInteger reuseIdentifier = [commandBuffer.label integerValue];
         NSMutableDictionary *tensorCache = _reuseCacheMap[@(reuseIdentifier)];
-        NSString *key = KeyForTensorType(shape, dataFormat);
+        NSString *key = KeyForTensorType1(shape, dataFormat, numberOfImages);
         NSMutableSet<MetalTensor> *tensorSet = tensorCache[key];
         if (tensorSet.count > 0) {
             tensor = [tensorSet anyObject];
             [tensorSet removeObject:tensor];
         }
         else {
-            tensor = [[MTTensor alloc] initWithShape:shape dataFormat:dataFormat];
-            NSLog(@"Create a tensor: %@", KeyForTensorType(shape, dataFormat));
+            tensor = [[MTTensor alloc] initWithShape:shape dataFormat:dataFormat numberOfImage:numberOfImages];
+            NSLog(@"Create a tensor: %@", KeyForTensorType1(shape, dataFormat, numberOfImages));
         }
         
         tensor.reuseIdentifier = [commandBuffer.label integerValue];
-        tensor.source = source;
         [tensor lock];
+        [tensor newContentOnCommandBuffer:commandBuffer];
         return tensor;
     }
 }
@@ -132,7 +132,12 @@ static int _reuseCounter = 0;
 }
 
 NSString *KeyForTensorType(DataShape *shape, TensorDataFormat dataFormat) {
-    return [NSString stringWithFormat:@"[ROW %d][COLUMN %d][DEPTH %d][FLOAT %d]", shape->row, shape->column, shape->depth, dataFormat];
+    return KeyForTensorType1(shape, dataFormat, 1);
+}
+
+NSString *KeyForTensorType1(DataShape *shape, TensorDataFormat dataFormat, NSUInteger numberOfImages) {
+//    return [NSString stringWithFormat:@"[ROW %d][COLUMN %d][DEPTH %d][FLOAT %d][N%d]", shape->row, shape->column, shape->depth, dataFormat, (int)numberOfImages];
+    return [NSString stringWithFormat:@"<NHWC: %dx%dx%dx%d - float%d>", (int)numberOfImages, shape->row, shape->column, shape->depth, dataFormat];
 }
 
 @end

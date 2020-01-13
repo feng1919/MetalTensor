@@ -74,16 +74,12 @@
     
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
     
-    MetalTensor subtractImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic source:self commandBuffer:commandBuffer];
-    [subtractImage newContentOnCommandBuffer:commandBuffer];
-    MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic source:self commandBuffer:commandBuffer];
-    [multiplyImage newContentOnCommandBuffer:commandBuffer];
-    MetalTensor reduceRowImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceRowMean source:self commandBuffer:commandBuffer];
-    [reduceRowImage newContentOnCommandBuffer:commandBuffer];
-    MetalTensor reduceColumnImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceColumnMean source:self commandBuffer:commandBuffer];
-    [reduceColumnImage newContentOnCommandBuffer:commandBuffer];
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
-    [_image newContentOnCommandBuffer:commandBuffer];
+    MetalTensor subtractImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic commandBuffer:commandBuffer];
+    MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic commandBuffer:commandBuffer];
+    MetalTensor reduceRowImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceRowMean commandBuffer:commandBuffer];
+    MetalTensor reduceColumnImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceColumnMean commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image.source = self;
     
     [_subtract encodeToCommandBuffer:commandBuffer
                         primaryImage:_inputImages[@(0)].content
@@ -124,7 +120,7 @@
     BackwardTarget back0 = t0.source;
     BackwardTarget back1 = t1.source;
     
-    MetalTensor dv0 = [[MTTensorCache sharedCache] fetchTensorWithShape:t0.shape source:nil commandBuffer:commandBuffer];
+    MetalTensor dv0 = [[MTTensorCache sharedCache] fetchTensorWithShape:t0.shape commandBuffer:commandBuffer];
     
     DB_TRACE(-_verbose+2, "\n%s backward encoding...", self.labelUTF8);
     

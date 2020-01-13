@@ -213,8 +213,8 @@ static MPSCNNAdd *_reduceSumOperation = nil;
     }
     else {
         MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
-                                                                      source:self
                                                                commandBuffer:commandBuffer];
+        temp.source = self;
         if (_reduceSumOperation == nil) {
             _reduceSumOperation = [[MPSCNNAdd alloc] initWithDevice:_device];
         };
@@ -300,8 +300,8 @@ GRADIENT_SUM_FINISH:
     NSAssert(_operation, @"The computing operation has not been initialized.");
     NSAssert(_inputImages.count > 0, @"There is no input image received.");
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
-    [_image newContentOnCommandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image.source = self;
     
     MetalTensor sourceTensor = _inputImages[@(0)];
     if (_needBackward) {
@@ -351,7 +351,6 @@ GRADIENT_SUM_FINISH:
     NSAssert(sourceTensor.source, @"Invalid backward connection...");
     
     MetalTensor destinationGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape
-                                                                                 source:nil
                                                                           commandBuffer:commandBuffer];
     [_gradientOp encodeToCommandBuffer:commandBuffer
                         sourceGradient:_gradient.content

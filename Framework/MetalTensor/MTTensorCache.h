@@ -29,12 +29,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)unregisterReuseIdentifier:(NSInteger)identifier;
 
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape
-                             source:(BackwardTarget _Nullable)source
                       commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape
-                             source:(BackwardTarget _Nullable)source
                          dataFormat:(TensorDataFormat)dataFormat
+                        numberOfImages:(NSUInteger)numberOfImages
                       commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 
 - (void)cacheTensor:(MetalTensor)tensor;
@@ -43,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)endContextWithCommandBuffer:(id<MTLCommandBuffer>)commandBufferfer;
 
 NSString *KeyForTensorType(DataShape *shape, TensorDataFormat dataFormat);
+NSString *KeyForTensorType1(DataShape *shape, TensorDataFormat dataFormat, NSUInteger numberOfImages);
 
 @end
 

@@ -29,7 +29,7 @@ typedef NS_ENUM(int, TensorDataFormat) {
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithShape:(DataShape *)shape NS_DESIGNATED_INITIALIZER;
-- (instancetype)initWithShape:(DataShape *)shape dataFormat:(TensorDataFormat)dataFormat NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithShape:(DataShape *)shape dataFormat:(TensorDataFormat)dataFormat numberOfImage:(NSUInteger)numberOfImages NS_DESIGNATED_INITIALIZER;
 
 - (MPSImage *)content;
 - (DataShape *)shape;

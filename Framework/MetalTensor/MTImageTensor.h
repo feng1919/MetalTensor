@@ -24,8 +24,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) MPSImage *mpsImage;
 
+- (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithShape:(DataShape *)image NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithShape:(DataShape *)shape dataFormat:(TensorDataFormat)dataFormat numberOfImage:(NSUInteger)numberOfImages NS_UNAVAILABLE;
 
 - (void)loadData:(float16_t *)data length:(NSInteger)length;
 

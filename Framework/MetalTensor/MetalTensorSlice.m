@@ -117,8 +117,7 @@
     NSAssert(channelIndex < _numberOfChannel, @"Invalid channel index");
     
     DataShape dstShape = DataShapeMake(src.shape->row, src.shape->column, 4);
-    MetalTensor dst = [[MTTensorCache sharedCache] fetchTensorWithShape:&dstShape source:nil commandBuffer:commandBuffer];
-    [dst newContentOnCommandBuffer:commandBuffer];
+    MetalTensor dst = [[MTTensorCache sharedCache] fetchTensorWithShape:&dstShape commandBuffer:commandBuffer];
     
     [_dataSource activeChannelAtIndex:channelIndex];
     [_convolution reloadWeightsAndBiasesFromDataSource];

@@ -185,8 +185,8 @@
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
-    [_image newContentOnCommandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image.source = self;
     
     if (_needBackward) {
         _state = [_arithmetic temporaryResultStateForCommandBuffer:commandBuffer
@@ -222,7 +222,6 @@
     BackwardTarget secondaryBackward = secondaryTensor.source;
     
     MetalTensor primaryGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
-                                                                             source:nil
                                                                       commandBuffer:commandBuffer];
     [_primaryGradientOperation encodeToCommandBuffer:commandBuffer
                                       sourceGradient:_gradient.content
@@ -234,7 +233,6 @@
     
     if (secondaryBackward) {
         MetalTensor secondaryGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
-                                                                                   source:nil
                                                                             commandBuffer:commandBuffer];
         [_secondaryGradientOperation encodeToCommandBuffer:commandBuffer
                                             sourceGradient:_gradient.content

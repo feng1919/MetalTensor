@@ -64,8 +64,8 @@
     
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape source:self commandBuffer:commandBuffer];
-    [_image newContentOnCommandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image.source = self;
     
     for (int i = 0; i < _numOfImages; i++) {
         MetalTensor tensor = _inputImages[@(i)];

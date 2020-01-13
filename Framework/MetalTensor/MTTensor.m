@@ -47,19 +47,20 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat dataFormat) {
     return self;
 }
 
-- (instancetype)initWithShape:(DataShape *)shape dataFormat:(TensorDataFormat)dataFormat {
+- (instancetype)initWithShape:(DataShape *)shape dataFormat:(TensorDataFormat)dataFormat numberOfImage:(NSUInteger)numberOfImages {
     if (self = [super init]) {
         _dataFormat = dataFormat;
         _shape = shape[0];
         _referenceCounting = 0;
         _imageDescriptor = ImageDescriptor(shape, _dataFormat);
+        _imageDescriptor.numberOfImages = numberOfImages;
         _referenceCountingEnable = YES;
     }
     return self;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Tensor: %@", KeyForTensorType(&_shape, _dataFormat)];
+    return [NSString stringWithFormat:@"Tensor: %@", KeyForTensorType1(&_shape, _dataFormat, _imageDescriptor.numberOfImages)];
 }
 
 - (void)dealloc {
