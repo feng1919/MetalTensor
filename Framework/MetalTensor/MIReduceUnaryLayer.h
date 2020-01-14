@@ -15,25 +15,12 @@
 
 #import "MetalTensorLayer.h"
 
-typedef NS_ENUM(int, ReduceType) {
-    ReduceTypeSum = 0,
-    ReduceTypeMax,
-    ReduceTypeMin,
-    ReduceTypeMean,
-};
-
-typedef NS_ENUM(int, ReduceAxis) {
-    ReduceAxisRow = 0,
-    ReduceAxisColumn,
-    ReduceAxisDepth,
-};
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MIReduceUnaryLayer : MetalTensorLayer
 
 @property (nonatomic, assign) ReduceType type;
-@property (nonatomic, assign) ReduceAxis axis;
+@property (nonatomic, assign) ReduceAxisMask axis;
 
 @end
 

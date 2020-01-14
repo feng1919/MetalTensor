@@ -1,28 +1,27 @@
 //
-//  MIMSELayer.m
+//  MTMeanSquaredErrorLayer.m
 //  MetalTensor
 //
-//  Created by Feng Stone on 2020/1/1.
+//  Created by Feng Stone on 2020/1/14.
 //  Copyright © 2020 fengshi. All rights reserved.
 //
 
-#import "MIMSELayer.h"
+#import "MTMeanSquaredErrorLayer.h"
 #import "MTTensorCache.h"
+#import "MTChannelReduce.h"
 
-@implementation MIMSELayer
+@implementation MTMeanSquaredErrorLayer
 {
 @private
     DataShape _outputArithmetic;
-    DataShape _outputReduceRowMean;
-    DataShape _outputReduceColumnMean;
+    DataShape _outputPooling;
     
     MPSCNNSubtract *_subtract;
     MPSCNNNeuron *_power;
     MPSCNNNeuron *_negative;
     MPSCNNMultiply *_multiply;
-    MPSNNReduceRowMean *_reduceRowMean;
-    MPSNNReduceColumnMean *_reduceColumnMean;
-    MPSNNReduceFeatureChannelsMean *_reduceDepthMean;
+    MPSCNNPoolingAverage *_pooling;
+    MTChannelReduce *_channelReduceMean;
 }
 
 #pragma mark - override
@@ -31,6 +30,7 @@
     
     NSAssert(_numOfImages == 2, @"Invalid number of inputs, it must be two inputs.");
 //    NSAssert(DataShapesTheSame(&_inputShapes[0], &_inputShapes[1]), @"The two input tensors must have same shape.");
+    DataShape *inputShape = &_inputShapes[0];
     
     _subtract = [[MPSCNNSubtract alloc] initWithDevice:device];
     MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypePower
@@ -38,9 +38,14 @@
                                                                                          b:0.0f
                                                                                          c:2.0f];
     _power = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
-    _reduceRowMean = [[MPSNNReduceRowMean alloc] initWithDevice:device];
-    _reduceColumnMean = [[MPSNNReduceColumnMean alloc] initWithDevice:device];
-    _reduceDepthMean = [[MPSNNReduceFeatureChannelsMean alloc] initWithDevice:device];
+    _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:device
+                                                kernelWidth:inputShape->column
+                                               kernelHeight:inputShape->row
+                                            strideInPixelsX:inputShape->column
+                                            strideInPixelsY:inputShape->row];
+    
+    _channelReduceMean = [[MTChannelReduce alloc] initWithReduceType:ReduceTypeMean numberOfChannels:inputShape->depth];
+    [_channelReduceMean compile:device];
     
     if (_needBackward) {
         MPSNNNeuronDescriptor *negativeDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
@@ -50,9 +55,7 @@
         _negative = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:negativeDesc];
         
         _multiply = [[MPSCNNMultiply alloc] initWithDevice:device];
-        _multiply.secondaryStrideInPixelsX = 0;
-        _multiply.secondaryStrideInPixelsY = 0;
-        _multiply.secondaryStrideInFeatureChannels = 0;
+        
     }
 }
 
@@ -61,8 +64,7 @@
 
         _outputShape = DataShapeMake(1, 1, 1); // Output one scalar.
         _outputArithmetic = _inputShapes[0];
-        _outputReduceRowMean = DataShapeMake(1, _inputShapes[0].column, _inputShapes[0].depth);
-        _outputReduceColumnMean = DataShapeMake(1, 1, _inputShapes[0].depth);
+        _outputPooling = DataShapeMake(1, 1, _inputShapes[0].depth);
     }
 }
 
@@ -75,9 +77,9 @@
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
     
     MetalTensor subtractImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic commandBuffer:commandBuffer];
-    MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic commandBuffer:commandBuffer];
-    MetalTensor reduceRowImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceRowMean commandBuffer:commandBuffer];
-    MetalTensor reduceColumnImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputReduceColumnMean commandBuffer:commandBuffer];
+    MetalTensor squaredImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic commandBuffer:commandBuffer];
+    MetalTensor poolingImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputPooling commandBuffer:commandBuffer];
+    
     _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
     _image.source = self;
     
@@ -87,20 +89,18 @@
                     destinationImage:subtractImage.content];
     [_power encodeToCommandBuffer:commandBuffer
                       sourceImage:subtractImage.content
-                 destinationImage:multiplyImage.content];
-    [_reduceRowMean encodeToCommandBuffer:commandBuffer
-                              sourceImage:multiplyImage.content
-                         destinationImage:reduceRowImage.content];
-    [_reduceColumnMean encodeToCommandBuffer:commandBuffer
-                                 sourceImage:reduceRowImage.content
-                            destinationImage:reduceColumnImage.content];
-    [_reduceDepthMean encodeToCommandBuffer:commandBuffer
-                                sourceImage:reduceColumnImage.content
-                           destinationImage:_image.content];
+                 destinationImage:squaredImage.content];
+    [_pooling encodeToCommandBuffer:commandBuffer
+                        sourceImage:squaredImage.content
+                   destinationImage:poolingImage.content];
+    
+    [_channelReduceMean reduceOnCommandBuffer:commandBuffer
+                                 sourceTensor:poolingImage
+                            destinationTensor:_image];
+    
     [subtractImage unlock];
-    [multiplyImage unlock];
-    [reduceRowImage unlock];
-    [reduceColumnImage unlock];
+    [squaredImage unlock];
+    [poolingImage unlock];
     
     if (!_needBackward) {
         [self removeCachedImages];
@@ -147,5 +147,6 @@
     [back1 gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     
 }
+
 
 @end

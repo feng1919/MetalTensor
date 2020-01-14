@@ -13,16 +13,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(unsigned, ReduceAxisMask) {
-    ReduceAxisRow = 0x01U,
-    ReduceAxisColumn = 0x01U<<1,
-};
-
-typedef NS_ENUM(int, ReduceType) {
-    ReduceTypeMean = 0,
-    ReduceTypeSum,
-};
-
 @interface MetalTensorSpacialReduce : NSObject
 
 @property (nonatomic, assign) ReduceAxisMask axis;

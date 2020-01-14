@@ -48,7 +48,7 @@
     }
 }
 
-NSString *GetReduceClass(ReduceType type, ReduceAxis axis)
+NSString *GetReduceClass(ReduceType type, ReduceAxisMask axis)
 {
     NSString *t = DescWithReduceType(type);
     NSString *a = DescWithReduceAxis(axis);
@@ -73,7 +73,7 @@ NSString *DescWithReduceType(ReduceType type)
     }
 }
 
-NSString *DescWithReduceAxis(ReduceAxis axis)
+NSString *DescWithReduceAxis(ReduceAxisMask axis)
 {
     switch (axis) {
         case ReduceAxisRow:

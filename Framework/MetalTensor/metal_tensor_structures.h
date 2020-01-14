@@ -60,4 +60,18 @@ int pooling_offset(int kernel, int stride);
 int make_divisible_8(int v);
 int make_divisible(int v, int divisor, int min_value);
 
+
+typedef NS_ENUM(unsigned, ReduceAxisMask) {
+    ReduceAxisRow = 0x01U,
+    ReduceAxisColumn = 0x01U<<1,
+    ReduceAxisDepth = 0x01U<<2,
+};
+
+typedef NS_ENUM(int, ReduceType) {
+    ReduceTypeSum = 0,
+    ReduceTypeMax,
+    ReduceTypeMin,
+    ReduceTypeMean,
+};
+
 #endif /* metal_tensor_structures_h */

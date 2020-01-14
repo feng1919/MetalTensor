@@ -17,7 +17,6 @@
     MPSCNNMultiply *_multiply;
     MPSCNNPoolingAverage *_mean;
     MPSNNReduceFeatureChannelsSum *_reduceSumChannels;
-    MPSCNNNeuron *_neuron;
     
     DataShape _oneChannelShape;
     DataShape _multiplyShape;
@@ -53,9 +52,6 @@
     _slice = [[MetalTensorSlice alloc] initWithNumberOfChannel:inputShape->depth];
     [_slice compile:device];
     
-    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
-    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
-    
     _mean = [[MPSCNNPoolingAverage alloc] initWithDevice:device
                                              kernelWidth:inputShape->column
                                             kernelHeight:inputShape->row
@@ -72,7 +68,6 @@
     if (_device) {
         
         DataShape *inputShape = &_inputShapes[0];
-//        _outputShape = *inputShape;
         _outputShape = DataShapeMake(1, inputShape->depth, inputShape->depth);
         _oneChannelShape = DataShapeMake(inputShape->row, inputShape->column, 4);
         _multiplyShape = *inputShape;
@@ -86,9 +81,6 @@
     
     MetalTensor sourceTensor = _inputImages[@(0)];
     DataShape *inputShape = &_inputShapes[0];
-//    MetalTensor copyTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape commandBuffer:commandBuffer];
-//    [_neuron encodeToCommandBuffer:commandBuffer sourceImage:sourceTensor.content destinationImage:copyTensor.content];
-    
     MetalTensor oneChannel = [[MTTensorCache sharedCache] fetchTensorWithShape:&_oneChannelShape commandBuffer:commandBuffer];
     MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_multiplyShape commandBuffer:commandBuffer];
     
@@ -121,7 +113,6 @@
     
     [oneChannel unlock];
     [multiplyImage unlock];
-//    [copyTensor unlock];
     
     if (!_needBackward) {
         [self removeCachedImages];

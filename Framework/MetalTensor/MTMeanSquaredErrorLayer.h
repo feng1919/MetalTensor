@@ -1,8 +1,8 @@
 //
-//  MIMSELayer.h
+//  MTMeanSquaredErrorLayer.h
 //  MetalTensor
 //
-//  Created by Feng Stone on 2020/1/1.
+//  Created by Feng Stone on 2020/1/14.
 //  Copyright © 2020 fengshi. All rights reserved.
 //
 
@@ -15,7 +15,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MIMSELayer : MetalTensorLayer
+@interface MTMeanSquaredErrorLayer : MetalTensorLayer
 
 @end
 
