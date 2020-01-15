@@ -56,7 +56,7 @@ void ConvertKernelFirstToLast(float32_t *src, float32_t *dst, int col, int row, 
 void ConvertToTensorFlowLayout(float *dst, float *src, DataShape *shape)
 {
     if (shape->depth <= 4) {
-        npmemcpy(dst, src, ProductOfDataShape(shape)*sizeof(float));
+        npmemcpy(dst, src, ProductOfDataShapeDepth4Divisible(shape)*sizeof(float));
         return;
     }
     
@@ -73,10 +73,24 @@ void ConvertToTensorFlowLayout(float *dst, float *src, DataShape *shape)
 }
 
 
+void ConvertToTensorFlowLayout1(float *src, DataShape *shape) {
+    
+    if (shape->depth <= 4) {
+        return;
+    }
+    
+    unsigned long long buffer_size = ProductOfDataShapeDepth4Divisible(shape);
+    float *temp = malloc(buffer_size * sizeof(float));
+    ConvertToTensorFlowLayout(temp, src, shape);
+    npmemcpy(src, temp, buffer_size*sizeof(float));
+    free(temp);
+}
+
+
 void ConvertF16ToTensorFlowLayout(float16_t *dst, float16_t *src, DataShape *shape)
 {
     if (shape->depth <= 4) {
-        npmemcpy(dst, src, ProductOfDataShape(shape)*sizeof(float16_t));
+        npmemcpy(dst, src, ProductOfDataShapeDepth4Divisible(shape)*sizeof(float16_t));
         return;
     }
     
@@ -90,6 +104,19 @@ void ConvertF16ToTensorFlowLayout(float16_t *dst, float16_t *src, DataShape *sha
             }
         }
     }
+}
+
+void ConvertF16ToTensorFlowLayout1(float16_t *src, DataShape *shape)
+{
+    if (shape->depth <= 4) {
+        return;
+    }
+    
+    unsigned long long buffer_size = ProductOfDataShapeDepth4Divisible(shape);
+    float16_t *temp = malloc(buffer_size * sizeof(float16_t));
+    ConvertF16ToTensorFlowLayout(temp, src, shape);
+    npmemcpy(src, temp, buffer_size*sizeof(float16_t));
+    free(temp);
 }
 
 NeuronType NeuronTypeMake(MPSCNNNeuronType n, float a, float b) {

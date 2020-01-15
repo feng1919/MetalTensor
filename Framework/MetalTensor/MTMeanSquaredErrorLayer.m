@@ -24,6 +24,14 @@
     MTChannelReduce *_channelReduceMean;
 }
 
+- (instancetype)initWithInputShape:(DataShape *)dataShape {
+    DataShape *inputShapes[2] = {dataShape, dataShape};
+    if (self = [super initWithInputShapes1:inputShapes size:2]) {
+        
+    }
+    return self;
+}
+
 #pragma mark - override
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
@@ -43,6 +51,7 @@
                                                kernelHeight:inputShape->row
                                             strideInPixelsX:inputShape->column
                                             strideInPixelsY:inputShape->row];
+    _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
     
     _channelReduceMean = [[MTChannelReduce alloc] initWithReduceType:ReduceTypeMean numberOfChannels:inputShape->depth];
     [_channelReduceMean compile:device];
@@ -68,7 +77,50 @@
     }
 }
 
-#pragma mark - MTTensorForward Delegate
+#pragma mark - MTTensorForward delegate
+
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
+    [super setInputShape:dataShape atIndex:imageIndex];
+    
+    DataShape *inputShape = &_inputShapes[0];
+    _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:_device
+                                                kernelWidth:inputShape->column
+                                               kernelHeight:inputShape->row
+                                            strideInPixelsX:inputShape->column
+                                            strideInPixelsY:inputShape->row];
+    _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+    
+}
+
+- (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
+    NSAssert(DataShapesTheSame(newImage.shape, &_inputShapes[0]), @"Invalid input tensor shape.");
+    [super setImage:newImage atIndex:imageIndex];
+    if (_secondaryImage) {
+        [super setImage:(MetalTensor  _Nonnull)_secondaryImage atIndex:1];
+    }
+}
+
+- (void)imageReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer atIndex:(NSInteger)imageIndex {
+    [super imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
+    if (_secondaryImage) {
+        [super imageReadyOnCommandBuffer:commandBuffer atIndex:1];
+    }
+}
+
+- (void)reserveImageIndex:(NSInteger)index {
+    [super reserveImageIndex:index];
+    if (_secondaryImage) {
+        [super reserveImageIndex:1];
+    }
+}
+
+- (void)releaseImageIndex:(NSInteger)index {
+    [super releaseImageIndex:index];
+    if (_secondaryImage) {
+        [super releaseImageIndex:1];
+    }
+}
+
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     /*
      *  MSE f = 0.5*sum((v0-v1)^2).
@@ -82,7 +134,7 @@
     
     _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
     _image.source = self;
-    
+
     [_subtract encodeToCommandBuffer:commandBuffer
                         primaryImage:_inputImages[@(0)].content
                       secondaryImage:_inputImages[@(1)].content
@@ -93,7 +145,6 @@
     [_pooling encodeToCommandBuffer:commandBuffer
                         sourceImage:squaredImage.content
                    destinationImage:poolingImage.content];
-    
     [_channelReduceMean reduceOnCommandBuffer:commandBuffer
                                  sourceTensor:poolingImage
                             destinationTensor:_image];
@@ -147,6 +198,5 @@
     [back1 gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     
 }
-
 
 @end

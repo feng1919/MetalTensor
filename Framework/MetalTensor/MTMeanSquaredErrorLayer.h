@@ -12,10 +12,13 @@
  */
 
 #import "MetalTensorLayer.h"
+#import "MTImageTensor.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTMeanSquaredErrorLayer : MetalTensorLayer
+
+@property (nonatomic, strong, nullable) MTImageTensor *secondaryImage;
 
 @end
 

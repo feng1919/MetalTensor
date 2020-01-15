@@ -68,7 +68,12 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat dataFormat) {
     NSAssert(_referenceCountingEnable == NO || _referenceCounting == 0, @"Unexpected dealloc...");
     
     self.image = nil;
-    NSLog(@"Temporary image dealloc: %@", KeyForTensorType(&_shape, _dataFormat));
+    
+#if DEBUG
+    if (_referenceCountingEnable) {
+        NSLog(@"Temporary image dealloc: %@", KeyForTensorType(&_shape, _dataFormat));
+    }
+#endif
 }
 
 #pragma mark - Public Access

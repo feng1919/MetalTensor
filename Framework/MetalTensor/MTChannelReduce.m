@@ -113,6 +113,7 @@
 - (void)compile:(id<MTLDevice>)device {
     _device = device;
     _dataSource = [[ChannelReduceDataSource alloc] init];
+    _dataSource.numberOfChannels = _numberOfChannels;
     _dataSource.weight = _type==ReduceTypeSum?1.0f:1.0f/(float)_numberOfChannels;
     [_dataSource compile:device];
     

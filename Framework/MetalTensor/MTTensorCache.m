@@ -47,6 +47,11 @@ static int _reuseCounter = 0;
     [_reuseCacheMap removeObjectForKey:@(identifier)];
 }
 
+
+- (MetalTensor)fetchTensorWithShape1:(DataShape)shape commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    return [self fetchTensorWithShape:&shape commandBuffer:commandBuffer];
+}
+
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     return [self fetchTensorWithShape:shape dataFormat:TensorDataFormatFloat16 numberOfImages:1 commandBuffer:commandBuffer];
 }

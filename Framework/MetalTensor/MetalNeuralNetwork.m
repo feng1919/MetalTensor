@@ -127,7 +127,7 @@
             [_outputLayers addObject:(MetalTensorOutputLayer *)_allLayers[layerName]];
         }
     }
-    NSAssert(_outputLayers.count > 0, @"There must be at least one output layer.");
+//    NSAssert(_outputLayers.count > 0, @"There must be at least one output layer.");
     
 #ifdef DEBUG
     // Setting the console log verbose for all of the layers.

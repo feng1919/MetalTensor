@@ -61,17 +61,17 @@ int make_divisible_8(int v);
 int make_divisible(int v, int divisor, int min_value);
 
 
-typedef NS_ENUM(unsigned, ReduceAxisMask) {
+typedef enum ReduceAxisMask {
     ReduceAxisRow = 0x01U,
     ReduceAxisColumn = 0x01U<<1,
     ReduceAxisDepth = 0x01U<<2,
-};
+}ReduceAxisMask;
 
-typedef NS_ENUM(int, ReduceType) {
+typedef enum ReduceType {
     ReduceTypeSum = 0,
     ReduceTypeMax,
     ReduceTypeMin,
     ReduceTypeMean,
-};
+}ReduceType;
 
 #endif /* metal_tensor_structures_h */

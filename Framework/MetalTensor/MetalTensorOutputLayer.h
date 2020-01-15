@@ -18,8 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) TensorDataFormat dataFormat;
 @property (nonatomic, assign) NeuronType neuronType;
-@property (nonatomic, strong, readonly) MPSImage *outputImage;
+@property (nonatomic, strong) MPSImage *outputImage;
 
 @end
+
+typedef MetalTensorOutputLayer * MetalTensorOutput;
 
 NS_ASSUME_NONNULL_END

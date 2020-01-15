@@ -64,6 +64,18 @@
     return self;
 }
 
+- (instancetype)initWithContent:(MPSImage *)mpsImage {
+    NSAssert(![mpsImage isKindOfClass:[MPSTemporaryImage class]], @"Invalid content");
+    
+    DataShape shape = DataShapeMake((int)mpsImage.height, (int)mpsImage.width, (int)mpsImage.featureChannels);
+    if (self = [super initWithShape:&shape]) {
+        self.referenceCountingEnable = NO;
+        
+        _mpsImage = mpsImage;
+    }
+    return self;
+}
+
 - (void)loadData:(float16_t *)data length:(NSInteger)length {
     [_mpsImage writeBytes:data dataLayout:MPSDataLayoutHeightxWidthxFeatureChannels imageIndex:0];
 }
@@ -77,5 +89,66 @@
 - (MPSImage *)content {
     return _mpsImage;
 }
+
+#if DEBUG
+
+- (void)printResult {
+    
+    int size = ProductOfDataShapeDepth4Divisible(self.shape);
+    float16_t *result = malloc(size * sizeof(float16_t));
+    [_mpsImage toFloat16Array:result];
+    ConvertF16ToTensorFlowLayout1(result, self.shape);
+    
+    int row = self.shape->row;
+    int column = self.shape->column;
+    int depth = self.shape->depth;
+    
+    printf("\nTensor: %dx%dx%d", row, column, depth);
+    for (int i = 0; i < row; i++) {
+        printf("\nrow:%d", i);
+        printf("\n(");
+        for (int j = 0; j < column; j++) {
+            printf("\n  col:%d", j);
+            printf("\n  (");
+            for (int c = 0; c < depth; c++) {
+                printf("%f", result[(i*column+j)*depth+c]);
+                if (c < depth-1) {
+                    printf(", ");
+                }
+            }
+            printf("),");
+        }
+        printf("\n  )");
+    }
+    printf("\n");
+
+    free(result);
+}
+
+- (void)printLastPixel {
+    
+    int size = ProductOfDataShapeDepth4Divisible(self.shape);
+    float16_t *result = malloc(size * sizeof(float16_t));
+    [_mpsImage toFloat16Array:result];
+    ConvertF16ToTensorFlowLayout1(result, self.shape);
+    
+    int row = self.shape->row;
+    int column = self.shape->column;
+    int depth = self.shape->depth;
+    
+    printf("\nTensor: %dx%dx%d", row, column, depth);
+    printf("\nlast channel:");
+    printf("\n  (");
+    for (int c = 0; c < depth; c++) {
+        printf("%f", result[((row-1)*column+column-1)*depth+c]);
+        if (c < depth-1) {
+            printf(", ");
+        }
+    }
+    printf(")   \n");
+    free(result);
+}
+
+#endif
 
 @end

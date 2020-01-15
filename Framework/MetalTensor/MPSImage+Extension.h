@@ -44,7 +44,9 @@ void ConvertKernelFirstToLast(float32_t *src, float32_t *dst, int col, int row, 
  *  Convert the data layout from Metal to tensorflow.
  */
 void ConvertToTensorFlowLayout(float *dst, float *src, DataShape *shape);
+void ConvertToTensorFlowLayout1(float *src, DataShape *shape);
 void ConvertF16ToTensorFlowLayout(float16_t *dst, float16_t *src, DataShape *shape);
+void ConvertF16ToTensorFlowLayout1(float16_t *src, DataShape *shape);
 
 - (unsigned int)sizeOfComponent;
 - (void)toFloat16Array:(float16_t *)buffer;

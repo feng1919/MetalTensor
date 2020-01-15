@@ -31,6 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape
                       commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 
+- (MetalTensor)fetchTensorWithShape1:(DataShape)shape
+                       commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape
                          dataFormat:(TensorDataFormat)dataFormat
                         numberOfImages:(NSUInteger)numberOfImages

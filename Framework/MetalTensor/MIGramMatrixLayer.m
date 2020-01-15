@@ -76,6 +76,18 @@
 
 #pragma mark - MTTensorForward Delegate
 
+- (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
+    [super setInputShape:dataShape atIndex:imageIndex];
+    
+    DataShape *inputShape = &_inputShapes[0];
+    _mean = [[MPSCNNPoolingAverage alloc] initWithDevice:_device
+                                             kernelWidth:inputShape->column
+                                            kernelHeight:inputShape->row
+                                         strideInPixelsX:inputShape->column
+                                         strideInPixelsY:inputShape->row];
+    _mean.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+}
+
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
     
@@ -103,7 +115,7 @@
         [_multiply encodeToCommandBuffer:commandBuffer
                             primaryImage:sourceTensor.content
                           secondaryImage:oneChannel.content
-                        destinationImage:multiplyImage.content];    //  384x512x64
+                        destinationImage:multiplyImage.content];
         clipRect.origin.x = i;
         [_mean setClipRect:clipRect];
         [_mean encodeToCommandBuffer:commandBuffer
