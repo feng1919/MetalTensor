@@ -74,7 +74,7 @@
     
     _device = device;
     _convDesc = [MPSCNNDepthWiseConvolutionDescriptor cnnConvolutionDescriptorWithKernelWidth:_direction==0?2:1
-                                                                                 kernelHeight:_direction==1?1:2
+                                                                                 kernelHeight:_direction==0?1:2
                                                                          inputFeatureChannels:_numberOfChannels
                                                                         outputFeatureChannels:_numberOfChannels];
     [_convDesc setStrideInPixelsX:1];
@@ -85,8 +85,8 @@
     
     _data = calloc(_numberOfChannels*2, sizeof(float32_t));
     for (int i = 0; i < _numberOfChannels; i++) {
-        _data[i*2] = 1.0f;
-        _data[i*2+1] = -1.0f;
+        _data[i*2] = 255.0f;
+        _data[i*2+1] = -255.0f;
     }
 }
 
@@ -137,7 +137,6 @@
     
     MTChannelReduce *_channelReduce;
     MPSCNNPoolingAverage *_pooling;
-    MPSCNNAdd *_add;
 }
 
 @end
@@ -159,25 +158,36 @@
     _dataSourceVertical.numberOfChannels = inputShape->depth;
     [_dataSourceVertical compile:device];
     
-    _outputShape = DataShapeMake(1, 1, 1);
-    
+    MTLRegion clipRect;
+    clipRect.origin = MTLOriginMake(0, 0, 0);
+    clipRect.size = MTLSizeMake(-1, -1, -1);
     _convHorizontal = [[MPSCNNConvolution alloc] initWithDevice:device weights:_dataSourceHorizontal];
     [_convHorizontal setEdgeMode:MPSImageEdgeModeClamp];
+    [_convHorizontal setOffset:MPSOffsetMake(1, 0, 0)];
+    clipRect.origin.x = 1;
+    clipRect.origin.y = 0;
+    [_convHorizontal setClipRect:clipRect];
     
     _convVertical = [[MPSCNNConvolution alloc] initWithDevice:device weights:_dataSourceVertical];
     [_convVertical setEdgeMode:MPSImageEdgeModeClamp];
+    [_convVertical setOffset:MPSOffsetMake(0, 1, 0)];
+    clipRect.origin.x = 0;
+    clipRect.origin.y = 1;
+    [_convVertical setClipRect:clipRect];
     
-    _add = [[MPSCNNAdd alloc] initWithDevice:device];
-    _add.primaryScale = (float)(inputShape->row*inputShape->column);
-    _add.secondaryScale = (float)(inputShape->row*inputShape->column);
+    _channelReduce = [[MTChannelReduce alloc] initWithReduceType:ReduceTypeSum numberOfChannels:(inputShape->depth*2+3)>>2<<2];
+    [_channelReduce compile:device];
     
-    _channelReduce = [[MTChannelReduce alloc] initWithReduceType:ReduceTypeSum numberOfChannels:inputShape->depth];
     _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:device
                                                 kernelWidth:inputShape->column
                                                kernelHeight:inputShape->row
                                             strideInPixelsX:inputShape->column
                                             strideInPixelsY:inputShape->row];
     _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+}
+
+- (void)updateOutputShape {
+    _outputShape = DataShapeMake(1, 1, 1);
 }
 
 - (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
@@ -196,25 +206,18 @@
     
     DataShape *inputShape = &_inputShapes[0];
     MetalTensor sourceTensor = _inputImages[@(0)];
-    MetalTensor convResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(inputShape->row, inputShape->column, inputShape->depth)
-                                                                            commandBuffer:commandBuffer];
+    int depth = (inputShape->depth+3)>>2<<2;
+    MetalTensor convResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(inputShape->row, inputShape->column, depth*2)
+                                                                  commandBuffer:commandBuffer];
+    MetalTensor poolingResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(1, 1, depth*2)
+                                                                     commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image.source = self;
     
-    MetalTensor poolingResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(1, 1, inputShape->depth) commandBuffer:commandBuffer];
-    MetalTensor horizontalResult = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
-    MetalTensor verticalResult = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
-    
-    //  Computing horizontal variation.
     [_convHorizontal encodeToCommandBuffer:commandBuffer
                                sourceImage:sourceTensor.content
                           destinationImage:convResult.content];
-    [_pooling encodeToCommandBuffer:commandBuffer
-                        sourceImage:convResult.content
-                   destinationImage:poolingResult.content];
-    [_channelReduce reduceOnCommandBuffer:commandBuffer
-                             sourceTensor:poolingResult
-                        destinationTensor:horizontalResult];
-    
-    //  Computing vertical variation.
+    [_convVertical setDestinationFeatureChannelOffset:depth];
     [_convVertical encodeToCommandBuffer:commandBuffer
                              sourceImage:sourceTensor.content
                         destinationImage:convResult.content];
@@ -223,19 +226,8 @@
                    destinationImage:poolingResult.content];
     [_channelReduce reduceOnCommandBuffer:commandBuffer
                              sourceTensor:poolingResult
-                        destinationTensor:verticalResult];
+                        destinationTensor:_image];
     
-    //  Sum the vertical result and the horizontal result.
-    //  We use pooling average to sum spatial variation, so we have to scale the widthxheight.
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
-    _image.source = self;
-    [_add encodeToCommandBuffer:commandBuffer
-                   primaryImage:horizontalResult.content
-                 secondaryImage:verticalResult.content
-               destinationImage:_image.content];
-    
-    [verticalResult unlock];
-    [horizontalResult unlock];
     [poolingResult unlock];
     [convResult unlock];
     

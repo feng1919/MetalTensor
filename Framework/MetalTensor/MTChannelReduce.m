@@ -47,14 +47,15 @@
     }
     _device = device;
     _convDesc = [MPSCNNConvolutionDescriptor cnnConvolutionDescriptorWithKernelWidth:1
-                                                                         kernelHeight:1
-                                                                 inputFeatureChannels:_numberOfChannels
-                                                                outputFeatureChannels:1];
+                                                                        kernelHeight:1
+                                                                inputFeatureChannels:_numberOfChannels
+                                                               outputFeatureChannels:1];
     [_convDesc setStrideInPixelsX:1];
     [_convDesc setStrideInPixelsY:1];
     
-    _data = calloc(_numberOfChannels, sizeof(float32_t));
-    for (int i = 0; i < _numberOfChannels; i++) {
+    int numberOfChannels = (_numberOfChannels+3)>>2<<2;
+    _data = calloc(numberOfChannels, sizeof(float32_t));
+    for (int i = 0; i < numberOfChannels; i++) {
         _data[i] = _weight;
     }
 }
@@ -103,7 +104,8 @@
 
 - (instancetype)initWithReduceType:(ReduceType)type numberOfChannels:(int)numberOfChannels {
     if (self = [super init]) {
-        NSAssert(type == ReduceTypeSum || type == ReduceTypeMean, @"The reduce type is not supported, currently sum and mean operations are valid.");
+        NSAssert(type == ReduceTypeSum || type == ReduceTypeMean,
+                 @"The reduce type is not supported, currently sum and mean operations are valid.");
         _type = type;
         _numberOfChannels = numberOfChannels;
     }
