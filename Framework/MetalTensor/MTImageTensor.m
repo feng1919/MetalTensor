@@ -9,7 +9,12 @@
 #import "MTImageTensor.h"
 #import <MetalImage/MetalDevice.h>
 
-@implementation MTImageTensor
+@implementation MTImageTensor {
+    
+#if DEBUG
+    float16_t *_result;
+#endif
+}
 
 - (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized {
     int width = (int)image.size.width;
@@ -92,12 +97,17 @@
 
 #if DEBUG
 
-- (void)printResult {
+- (void)dump {
     
-    int size = ProductOfDataShapeDepth4Divisible(self.shape);
-    float16_t *result = malloc(size * sizeof(float16_t));
-    [_mpsImage toFloat16Array:result];
-    ConvertF16ToTensorFlowLayout1(result, self.shape);
+    if (_result == NULL) {
+        int size = ProductOfDataShapeDepth4Divisible(self.shape);
+        _result = malloc(size * sizeof(float16_t));
+        [_mpsImage toFloat16Array:_result];
+        ConvertF16ToTensorFlowLayout1(_result, self.shape);
+    }
+}
+
+- (void)printResult {
     
     int row = self.shape->row;
     int column = self.shape->column;
@@ -111,7 +121,7 @@
             printf("\n  col:%d", j);
             printf("\n  (");
             for (int c = 0; c < depth; c++) {
-                printf("%f", result[(i*column+j)*depth+c]);
+                printf("%f", _result[(i*column+j)*depth+c]);
                 if (c < depth-1) {
                     printf(", ");
                 }
@@ -121,32 +131,28 @@
         printf("\n  )");
     }
     printf("\n");
-
-    free(result);
 }
 
-- (void)printLastPixel {
-    
-    int size = ProductOfDataShapeDepth4Divisible(self.shape);
-    float16_t *result = malloc(size * sizeof(float16_t));
-    [_mpsImage toFloat16Array:result];
-    ConvertF16ToTensorFlowLayout1(result, self.shape);
+- (void)printPixelAtX:(int)x Y:(int)y {
     
     int row = self.shape->row;
     int column = self.shape->column;
     int depth = self.shape->depth;
     
+    assert(x < column);
+    assert(y < row);
+    
     printf("\nTensor: %dx%dx%d", row, column, depth);
-    printf("\nlast channel:");
-    printf("\n  (");
+    printf("\nPixel(%d, %d):", x, y);
+    printf("\n    (");
+    depth = MAX(depth, 4);
     for (int c = 0; c < depth; c++) {
-        printf("%f", result[((row-1)*column+column-1)*depth+c]);
+        printf("%f", _result[(y*column+x)*depth+c]);
         if (c < depth-1) {
             printf(", ");
         }
     }
     printf(")   \n");
-    free(result);
 }
 
 #endif

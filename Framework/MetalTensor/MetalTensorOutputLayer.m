@@ -56,9 +56,11 @@
     [super setInputShape:dataShape atIndex:imageIndex];
     
     if (_device) {
-        MPSImageDescriptor *desc = ImageDescriptor(&_outputShape, _dataFormat);
-        desc.storageMode = MTLStorageModeShared;
-        _outputImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:desc];
+        if (DataShapesTheSame(dataShape, &_outputShape) == NO) {
+            MPSImageDescriptor *desc = ImageDescriptor(&_outputShape, _dataFormat);
+            desc.storageMode = MTLStorageModeShared;
+            _outputImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:desc];
+        }
     }
 }
 

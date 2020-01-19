@@ -33,8 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)loadData:(float16_t *)data length:(NSInteger)length;
 
 #if DEBUG
+
+- (void)dump;
 - (void)printResult;
-- (void)printLastPixel;
+- (void)printPixelAtX:(int)x Y:(int)y;
+
 #endif
 
 @end

@@ -36,6 +36,7 @@
     if (self = [super init]) {
         _networkDesc = dictionary;
         _synchronizedProcessing = YES;
+        _needBackward = NO;
         _scheduledHandler = NULL;
         _completedHandler = NULL;
         _network_queue = dispatch_queue_create("metal_neuron_network_queue", DISPATCH_QUEUE_SERIAL);
@@ -128,6 +129,8 @@
         }
     }
 //    NSAssert(_outputLayers.count > 0, @"There must be at least one output layer.");
+    
+    [self setNeedBackward:_needBackward];
     
 #ifdef DEBUG
     // Setting the console log verbose for all of the layers.
@@ -238,6 +241,14 @@
         [command_buffer addCompletedHandler:_completedHandler];
     }
     [command_buffer commit];
+}
+
+- (void)setNeedBackward:(BOOL)needBackward {
+    _needBackward = needBackward;
+    
+    for (MetalTensorNode *node in _allLayers.allValues) {
+        node.needBackward = needBackward;
+    }
 }
 
 - (MTLUInt2)inputSize {

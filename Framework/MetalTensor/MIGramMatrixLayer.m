@@ -34,7 +34,7 @@
     NSParameterAssert(device);
     
     DataShape *inputShape = &_inputShapes[0];
-    
+  
     _multiply = [[MPSCNNMultiply alloc] initWithDevice:device];
     _multiply.primaryScale = 1.0f;
     _multiply.bias = 0.0f;
@@ -90,7 +90,7 @@
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s encoding...", self.labelUTF8);
-    
+
     MetalTensor sourceTensor = _inputImages[@(0)];
     DataShape *inputShape = &_inputShapes[0];
     MetalTensor oneChannel = [[MTTensorCache sharedCache] fetchTensorWithShape:&_oneChannelShape commandBuffer:commandBuffer];

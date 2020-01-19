@@ -16,6 +16,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTTotalVariationLayer : MetalTensorLayer
 
+/*
+ *  The scale of output value.
+ *  Default by 1.0f.
+ */
+@property (nonatomic, assign) float alpha;
+
 @end
 
 NS_ASSUME_NONNULL_END

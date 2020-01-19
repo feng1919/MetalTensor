@@ -8,6 +8,7 @@
 
 #import "MetalTensorNode.h"
 #import "MTTensor.h"
+#import "MTImageTensor.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -127,6 +128,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 #if DEBUG
 - (void)printInputAndOutputShapes;
+
+@property (nonatomic, strong, nullable) MTImageTensor *savedResult;
+- (void)saveTensor:(MetalTensor)tensor onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+
 #endif
 
 @end

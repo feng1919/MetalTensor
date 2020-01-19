@@ -9,6 +9,7 @@
 #import "MTTotalVariationLayer.h"
 #import "MTChannelReduce.h"
 #import "MTTensorCache.h"
+#import "MTImageTensor.h"
 
 @interface TVDataSource : NSObject <MPSCNNConvolutionDataSource, MPSNNPadding> {
     
@@ -137,11 +138,19 @@
     
     MTChannelReduce *_channelReduce;
     MPSCNNPoolingAverage *_pooling;
+    
+    MPSCNNNeuron *_neuron;
+    MPSCNNSubtract *_subtract;
+    MPSCNNNeuron *_neuronScale;
 }
 
 @end
 
 @implementation MTTotalVariationLayer
+
+- (void)initialize {
+    _alpha = 1.0f;
+}
 
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
@@ -176,6 +185,7 @@
     [_convVertical setClipRect:clipRect];
     
     _channelReduce = [[MTChannelReduce alloc] initWithReduceType:ReduceTypeSum numberOfChannels:(inputShape->depth*2+3)>>2<<2];
+    _channelReduce.scale = _alpha/6.0f;
     [_channelReduce compile:device];
     
     _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:device
@@ -184,6 +194,17 @@
                                             strideInPixelsX:inputShape->column
                                             strideInPixelsY:inputShape->row];
     _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+    
+    if (_needBackward) {
+        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear a:4.0f b:0.0f c:0.0f];
+        _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
+        
+        _subtract = [[MPSCNNSubtract alloc] initWithDevice:device];
+        [_subtract setSecondaryEdgeMode:MPSImageEdgeModeClamp];
+        
+        neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear a:_alpha b:0.0f c:0.0f];
+        _neuronScale = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
+    }
 }
 
 - (void)updateOutputShape {
@@ -234,6 +255,60 @@
     if (!_needBackward) {
         [self removeCachedImages];
     }
+}
+
+- (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    
+    MetalTensor sourceTensor = _inputImages[@(0)];
+    DataShape *inputShape = &_inputShapes[0];
+    MetalTensor copiedTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:inputShape
+                                                                   commandBuffer:commandBuffer];
+    [_neuron encodeToCommandBuffer:commandBuffer
+                       sourceImage:sourceTensor.content
+                  destinationImage:copiedTensor.content];
+    
+    MetalTensor resultTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:inputShape
+                                                                   commandBuffer:commandBuffer];
+    //  right
+    [_subtract setSecondaryOffset:MPSOffsetMake(1, 0, 0)];
+    [_subtract encodeToCommandBuffer:commandBuffer
+                        primaryImage:copiedTensor.content
+                      secondaryImage:sourceTensor.content
+                    destinationImage:resultTensor.content];
+    //  left
+    [_subtract setSecondaryOffset:MPSOffsetMake(-1, 0, 0)];
+    [_subtract encodeToCommandBuffer:commandBuffer
+                        primaryImage:resultTensor.content
+                      secondaryImage:sourceTensor.content
+                    destinationImage:copiedTensor.content];
+    //  down
+    [_subtract setSecondaryOffset:MPSOffsetMake(0, 1, 0)];
+    [_subtract encodeToCommandBuffer:commandBuffer
+                        primaryImage:copiedTensor.content
+                      secondaryImage:sourceTensor.content
+                    destinationImage:resultTensor.content];
+    //  up
+    [_subtract setSecondaryOffset:MPSOffsetMake(0, -1, 0)];
+    [_subtract encodeToCommandBuffer:commandBuffer
+                        primaryImage:resultTensor.content
+                      secondaryImage:sourceTensor.content
+                    destinationImage:copiedTensor.content];
+    
+    //  scale
+    [_neuronScale encodeToCommandBuffer:commandBuffer
+                            sourceImage:copiedTensor.content
+                       destinationImage:resultTensor.content];
+    
+    [self removeCachedImages];
+    [self removeGradient];
+    
+    [sourceTensor.source setGradient:resultTensor forwardTarget:self];
+    
+    [copiedTensor unlock];
+    [resultTensor unlock];
+    
+    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    
 }
 
 @end

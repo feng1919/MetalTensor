@@ -425,6 +425,17 @@ GRADIENT_SUM_FINISH:
     NSLog(@"Output: %@\n", NSStringFromDataShape(&_outputShape));
 }
 
+- (void)saveTensor:(MetalTensor)tensor onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    
+    NSAssert(tensor, @"Invalid tensor to save.");
+    
+    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
+    MPSCNNNeuron *neuron = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
+    
+    self.savedResult = [[MTImageTensor alloc] initWithShape:tensor.shape];
+    [neuron encodeToCommandBuffer:commandBuffer sourceImage:tensor.content destinationImage:_savedResult.content];
+}
+
 #endif
 
 @end

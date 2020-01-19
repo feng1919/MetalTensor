@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) ReduceType type;
 @property (nonatomic, readonly) int numberOfChannels;
 
+@property (nonatomic, assign) float alpha;
+
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithReduceType:(ReduceType)type numberOfChannels:(int)numberOfChannels NS_DESIGNATED_INITIALIZER;
 - (void)compile:(id<MTLDevice>)device;

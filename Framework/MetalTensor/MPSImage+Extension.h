@@ -14,6 +14,8 @@
 #import <MetalPerformanceShaders/MetalPerformanceShaders.h>
 #include "metal_tensor_structures.h"
 
+#define iOS_AVAILABLE_RETURN(x) if (@available(iOS x, *)) return
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MPSImage (Extension)

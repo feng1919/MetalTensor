@@ -89,6 +89,15 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
  */
 @property (nonatomic, assign) BOOL synchronizedProcessing;
 
+/*
+ *  If YES, the MetalTensorLayer will calculate the gradients and propagate
+ *  backwards.
+ *
+ *  Default is NO.
+ *
+ */
+@property (nonatomic, assign) BOOL needBackward;
+
 - (instancetype)init NS_UNAVAILABLE;
 
 /*

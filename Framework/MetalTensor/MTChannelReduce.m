@@ -108,6 +108,7 @@
                  @"The reduce type is not supported, currently sum and mean operations are valid.");
         _type = type;
         _numberOfChannels = numberOfChannels;
+        _alpha = 1.0f;
     }
     return self;
 }
@@ -116,7 +117,8 @@
     _device = device;
     _dataSource = [[ChannelReduceDataSource alloc] init];
     _dataSource.numberOfChannels = _numberOfChannels;
-    _dataSource.weight = _type==ReduceTypeSum?1.0f:1.0f/(float)_numberOfChannels;
+    float weight = _type == ReduceTypeSum?1.0f:1.0f/(float)_numberOfChannels;
+    [_dataSource setWeight:weight * _alpha];
     [_dataSource compile:device];
     
     _convolution = [[MPSCNNConvolution alloc] initWithDevice:device weights:_dataSource];
