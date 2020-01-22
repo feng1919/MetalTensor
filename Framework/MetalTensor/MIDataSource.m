@@ -51,6 +51,7 @@
         _neuron = neuron[0];
         _depthWise = depthWise;
         _data = weights;
+        _rotateSpatial180 = NO;
         
     }
     return self;
@@ -72,6 +73,9 @@
         _kernel = kernel[0];
         _neuron = neuron[0];
         _depthWise = depthWise;
+        _rotateSpatial180 = NO;
+        _transposeIO = NO;
+        _removeBias = NO;
     }
     return self;
 }
@@ -97,6 +101,10 @@
 }
 
 - (float32_t *)biasTerms {
+    
+    if (_removeBias) {
+        return NULL;
+    }
     
     int size;
     if (_depthWise) {
@@ -135,6 +143,12 @@
             fseek(fp, _range.location, SEEK_SET);
             Byte *buffer = malloc(_range.length * sizeof(Byte));
             fread(buffer, sizeof(Byte), _range.length, fp);
+            if (_rotateSpatial180) {
+                rotate_spatial_180((float32_t *)buffer, &_kernel);
+            }
+            if (_transposeIO) {
+                transpose_input_output_channels((float32_t*)buffer, &_kernel);
+            }
             _data = [NSData dataWithBytesNoCopy:buffer length:_range.length freeWhenDone:YES];
             fclose(fp);
         }
@@ -167,18 +181,20 @@
                                                                                  outputFeatureChannels:_kernel.depth];
         }
         else {
+            int depth = _transposeIO?_kernel.filters:_kernel.depth;
+            int filters = _transposeIO?_kernel.depth:_kernel.filters;
             _descriptor = [MPSCNNConvolutionDescriptor cnnConvolutionDescriptorWithKernelWidth:_kernel.column
                                                                                  kernelHeight:_kernel.row
-                                                                         inputFeatureChannels:_kernel.depth
-                                                                        outputFeatureChannels:_kernel.filters];
+                                                                         inputFeatureChannels:depth
+                                                                        outputFeatureChannels:filters];
         }
     
         [_descriptor setFusedNeuronDescriptor:[MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:_neuron.neuron
                                                                                               a:_neuron.a
                                                                                               b:_neuron.b]];
-        
         [_descriptor setStrideInPixelsX:_kernel.stride];
         [_descriptor setStrideInPixelsY:_kernel.stride];
+        
         if (_bn) {
             [_descriptor setBatchNormalizationParametersForInferenceWithMean:[_bn mean]
                                                                    variance:[_bn variance]
@@ -193,22 +209,30 @@
 - (id)copyWithZone:(NSZone *)zone {
     MICNNKernelDataSource *item = [MICNNKernelDataSource allocWithZone:zone];
     item.filePath = _filePath;
+    item.label = _label;
+    item.range = _range;
     item->_data = _data;
     item.kernel = _kernel;
     item.neuron = _neuron;
     item.depthWise = _depthWise;
     item.bn = _bn;
+    item.rotateSpatial180 = _rotateSpatial180;
+    item.transposeIO = _transposeIO;
     return item;
 }
 
 - (id)copy {
     MICNNKernelDataSource *item = [[MICNNKernelDataSource alloc] init];
     item.filePath = _filePath;
+    item.label = _label;
+    item.range = _range;
     item->_data = _data;
     item.kernel = _kernel;
     item.neuron = _neuron;
     item.depthWise = _depthWise;
     item.bn = _bn;
+    item.rotateSpatial180 = _rotateSpatial180;
+    item.transposeIO = _transposeIO;
     return item;
 }
 
@@ -273,6 +297,95 @@
 }
 
 @end
+
+void transpose_input_output_channels(float32_t *buffer, KernelShape *kernel) {
+    const int N = kernel->filters;
+    const int CH = kernel->depth;
+    const int H = kernel->row;
+    const int W = kernel->column;
+    
+    float32_t *temp = malloc(N*CH*H*W*sizeof(float32_t));
+    
+    for (int ch = 0; ch < CH; ch++) {
+        int off0 = ch * H * W * N;
+        for (int row = 0; row < H; row ++) {
+            int off1 = row * W * N;
+            for (int col = 0; col < W; col++) {
+                int off2 = col * N;
+                for (int n = 0; n < N; n++) {
+                    temp[off0+off1+off2+n] = buffer[n*H*W*CH+row*W*CH+col*CH+ch];
+                }
+            }
+        }
+    }
+    
+    npmemcpy(buffer, temp, N*CH*H*W*sizeof(float32_t));
+    
+    free(temp);
+}
+
+void rotate_spatial_180(float32_t *buffer, KernelShape *kernel) {
+    
+    const int N = kernel->filters;
+    const int CH = kernel->depth;
+    const int H = kernel->row;
+    const int W = kernel->column;
+    
+    const int CH_SIZE = CH * sizeof(float32_t);
+    
+    float32_t *temp = malloc(CH*H*W*sizeof(float32_t));
+    for (int i = 0; i < N; i++) {
+        int unit = i * H * W * CH;
+        for (int row = 0; row < H; row++) {
+            for (int col = 0; col < W; col ++) {
+                npmemcpy(temp+((H-row)*W-1-col)*CH, buffer+unit+(row*W+col)*CH, CH_SIZE);
+            }
+        }
+        
+//        if (i == 0) {
+//            printf("\nbefore rotate 180:");
+//            for (int row = 0; row < H; row++) {
+//                printf("\n[");
+//                for (int col = 0; col < W; col++) {
+//                    printf("[");
+//                    for (int c = 0; c < CH; c++) {
+//                        printf("%f", buffer[(row * W + col) * CH + c]);
+//                        if (c < CH-1) {
+//                            printf(", ");
+//                        }
+//                    }
+//                    printf("]");
+//                    if (col < W-1) {
+//                        printf("\n");
+//                    }
+//                }
+//                printf("]");
+//            }
+//        }
+        npmemcpy(buffer+unit, temp, CH_SIZE*H*W);
+//        if (i == 0) {
+//            printf("\nafter rotate 180: ");
+//            for (int row = 0; row < H; row++) {
+//                printf("\n[");
+//                for (int col = 0; col < W; col++) {
+//                    printf("[");
+//                    for (int c = 0; c < CH; c++) {
+//                        printf("%f", buffer[(row * W + col) * CH + c]);
+//                        if (c < CH-1) {
+//                            printf(", ");
+//                        }
+//                    }
+//                    printf("]");
+//                    if (col < W-1) {
+//                        printf("\n");
+//                    }
+//                }
+//                printf("]");
+//            }
+//        }
+    }
+    free(temp);
+}
 
 MICNNKernelDataSource *MakeDataSource(NSString *module_name, KernelShape *k, NeuronType *n)
 {

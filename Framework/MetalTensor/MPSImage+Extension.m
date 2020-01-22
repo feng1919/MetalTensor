@@ -212,6 +212,7 @@ NSString *NSStringFromRegion(MTLRegion region) {
     return [NSString stringWithFormat:@"(%d, %d, %d, %d, %d, %d)", (int)region.origin.x, (int)region.origin.y,
             (int)region.origin.z, (int)region.size.width, (int)region.size.height, (int)region.size.depth];
 }
+
 /*
  We receive the predicted output as an MPSImage. We need to convert this
  to an array of Floats that we can use from Swift.
@@ -275,8 +276,6 @@ NSString *NSStringFromRegion(MTLRegion region) {
     }
 }
 
-
-
 - (void)toFloat16Array:(float16_t *)buffer {
     int numOfSlices = ((int)self.featureChannels + 3)/4;
     
@@ -302,8 +301,6 @@ NSString *NSStringFromRegion(MTLRegion region) {
                      slice:slice];
 }
 
-
-
 - (void)toBuffer:(Byte *)buffer {
     int numOfSlices = ((int)self.featureChannels + 3)/4;
     
@@ -328,8 +325,6 @@ NSString *NSStringFromRegion(MTLRegion region) {
                mipmapLevel:0
                      slice:slice];
 }
-
-
 
 - (int)numberOfComponents {
     return self.featureChannels<3?:4;

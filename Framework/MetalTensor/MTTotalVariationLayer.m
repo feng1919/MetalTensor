@@ -185,7 +185,7 @@
     [_convVertical setClipRect:clipRect];
     
     _channelReduce = [[MTChannelReduce alloc] initWithReduceType:ReduceTypeSum numberOfChannels:(inputShape->depth*2+3)>>2<<2];
-    _channelReduce.scale = _alpha/6.0f;
+    _channelReduce.alpha = _alpha/6.0f;
     [_channelReduce compile:device];
     
     _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:device
@@ -259,7 +259,17 @@
 
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
+    /*
+     *  for pixel at (x, y), its derivative is
+     *  df/dv = (v(x,y)-v(x-1,y)) + (v(x,y)-v(x+1,y)) + (v(x,y)-v(x,y-1)) + (v(x,y)-v(x,y+1))
+     *        = 4.0 * v(x,y) - v(x-1,y) - v(x+1,y) - v(x,y-1) - v(x,y+1)
+     *
+     */
+    
     MetalTensor sourceTensor = _inputImages[@(0)];
+    BackwardTarget backwardTarget = sourceTensor.source;
+    NSAssert(backwardTarget, @"Invalid backward target...");
+    
     DataShape *inputShape = &_inputShapes[0];
     MetalTensor copiedTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:inputShape
                                                                    commandBuffer:commandBuffer];
@@ -302,12 +312,12 @@
     [self removeCachedImages];
     [self removeGradient];
     
-    [sourceTensor.source setGradient:resultTensor forwardTarget:self];
+    [backwardTarget setGradient:resultTensor forwardTarget:self];
     
     [copiedTensor unlock];
     [resultTensor unlock];
     
-    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     
 }
 

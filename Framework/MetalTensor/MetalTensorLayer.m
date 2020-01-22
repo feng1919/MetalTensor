@@ -187,12 +187,14 @@ static MPSCNNAdd *_reduceSumOperation = nil;
 }
 
 - (void)removeGradient {
-    DB_TRACE(-_verbose+2, "\n%s rm %s",
-             self.labelUTF8,
-             NSStringFromDataShape(_gradient.shape).UTF8String);
-    
-    [_gradient unlock];
-    _gradient = nil;
+    if (_gradient) {
+        DB_TRACE(-_verbose+2, "\n%s rm grad %s",
+                 self.labelUTF8,
+                 NSStringFromDataShape(_gradient.shape).UTF8String);
+        
+        [_gradient unlock];
+        _gradient = nil;
+    }
 }
 
 - (void)removeState {
@@ -334,7 +336,7 @@ GRADIENT_SUM_FINISH:
     [_inputGradients addObject:newGradient];
     [newGradient lock];
     
-    DB_TRACE(-_verbose+2, "\n%s <-- %s", self.labelUTF8, NSStringFromDataShape(newGradient.shape).UTF8String);
+    DB_TRACE(-_verbose+1, "\n%s <--<gradients:%s>-- %s\n", self.labelUTF8, NSStringFromDataShape(newGradient.shape).UTF8String, target.description.UTF8String);
 }
 
 - (void)gradientReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer forwardTarget:(ForwardTarget)target {
@@ -347,8 +349,12 @@ GRADIENT_SUM_FINISH:
 
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
+    NSAssert(_gradientOp, @"The backward propagating operation is not initialized yet,\
+                            set needBackward = YES before -compile: get called.");
+    
     MetalTensor sourceTensor = _inputImages[@(0)];
-    NSAssert(sourceTensor.source, @"Invalid backward connection...");
+    BackwardTarget backwardTarget = sourceTensor.source;
+    NSAssert(backwardTarget, @"Invalid backward connection...");
     
     MetalTensor destinationGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape
                                                                           commandBuffer:commandBuffer];
@@ -362,9 +368,9 @@ GRADIENT_SUM_FINISH:
     [self removeCachedImages];
     [self removeGradient];
     
-    [sourceTensor.source setGradient:destinationGradient forwardTarget:self];
+    [backwardTarget setGradient:destinationGradient forwardTarget:self];
     [destinationGradient unlock];
-    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
 }
 
 - (BOOL)isAllGradientsReceived {

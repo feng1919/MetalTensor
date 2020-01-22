@@ -6,6 +6,10 @@
 //  Copyright © 2019 fengshi. All rights reserved.
 //
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
 #ifndef metal_tensor_structures_h
 #define metal_tensor_structures_h
 
@@ -75,3 +79,7 @@ typedef enum ReduceType {
 }ReduceType;
 
 #endif /* metal_tensor_structures_h */
+    
+#ifdef __cplusplus
+} // extern "C"
+#endif

@@ -51,6 +51,11 @@
 
 }
 
+- (void)setNeedBackward:(BOOL)needBackward {
+    //  This layer is not disigned for backward propagation.
+    _needBackward = NO;
+}
+
 #pragma mark - MTTensorForward Delegate
 - (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
     [super setInputShape:dataShape atIndex:imageIndex];
@@ -76,9 +81,7 @@
                        sourceImage:_inputImages[@(0)].content
                   destinationImage:_outputImage];
     
-    if (!_needBackward) {
-        [self removeCachedImages];
-    }
+    [self removeCachedImages];
 }
 
 #pragma mark - MTTensorBackward Delegate
@@ -86,12 +89,12 @@
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s backward encoding...", self.labelUTF8);
     
-    MetalTensor sourceTensor = _inputImages[@(0)];
-    [sourceTensor.source setGradient:sourceTensor forwardTarget:self];
-    [self removeCachedImages];
-    [self removeGradient];
-    
-    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+//    MetalTensor sourceTensor = _inputImages[@(0)];
+//    [sourceTensor.source setGradient:sourceTensor forwardTarget:self];
+//    [self removeCachedImages];
+//    [self removeGradient];
+//
+//    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
 }
 
 #pragma mark - DEBUG

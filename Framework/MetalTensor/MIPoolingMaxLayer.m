@@ -12,8 +12,6 @@
 @interface MIPoolingMaxLayer() {
     MPSCNNPoolingMax *_pooling;
     MPSCNNPoolingMaxGradient *_poolingGradientOp;
-    
-    MPSCNNLoss *_loss;
 }
 
 @end

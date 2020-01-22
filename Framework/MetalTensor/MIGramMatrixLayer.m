@@ -10,13 +10,16 @@
 #import "MTTensorCache.h"
 #import "MetalTensorSlice.h"
 #import "MTImageTensor.h"
+#import "MTChannelCompress.h"
 
 @implementation MIGramMatrixLayer {
 @private
     MetalTensorSlice *_slice;
     MPSCNNMultiply *_multiply;
     MPSCNNPoolingAverage *_mean;
-    MPSNNReduceFeatureChannelsSum *_reduceSumChannels;
+    MPSNNReduceFeatureChannelsSum *_reduceChannels;
+    MPSCNNNeuron *_neuron;
+    MTChannelCompress *_compress;
     
     DataShape _oneChannelShape;
     DataShape _multiplyShape;
@@ -25,6 +28,7 @@
 #pragma mark - override
 
 - (void)initialize {
+    _weight = 1.0f;
     NSAssert((_inputShapes[0].column&0x01)==0 && (_inputShapes[0].row&0x01)==0, @"The dimensions have to be multiple of 2.");
 }
 
@@ -60,7 +64,16 @@
     _mean.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
     
     if (_needBackward) {
-        _reduceSumChannels = [[MPSNNReduceFeatureChannelsSum alloc] initWithDevice:device];
+        _reduceChannels = [[MPSNNReduceFeatureChannelsSum alloc] initWithDevice:device];
+        
+//        _reduceChannels.weight = 2.0f/(float)(inputShape->column*inputShape->row)/_weight/_weight;    //  It's MPS's bug here, not work on iOS 13.3.
+        
+        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear a:2.0f/(float)(inputShape->column*inputShape->row)/_weight/_weight b:0.0f c:0.0f];
+        _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
+        
+        _compress = [[MTChannelCompress alloc] initWithNumberOfChannels:inputShape->depth*4];
+        _compress.alpha = 1.0f;
+        [_compress compile:device];
     }
 }
 
@@ -79,13 +92,21 @@
 - (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
     [super setInputShape:dataShape atIndex:imageIndex];
     
-    DataShape *inputShape = &_inputShapes[0];
-    _mean = [[MPSCNNPoolingAverage alloc] initWithDevice:_device
-                                             kernelWidth:inputShape->column
-                                            kernelHeight:inputShape->row
-                                         strideInPixelsX:inputShape->column
-                                         strideInPixelsY:inputShape->row];
-    _mean.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+    if (_device) {
+
+        DataShape *inputShape = &_inputShapes[0];
+        _mean = [[MPSCNNPoolingAverage alloc] initWithDevice:_device
+                                                 kernelWidth:inputShape->column
+                                                kernelHeight:inputShape->row
+                                             strideInPixelsX:inputShape->column
+                                             strideInPixelsY:inputShape->row];
+        _mean.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+        
+//        _reduceChannels.weight = 2.0f/(float)(inputShape->column*inputShape->row)/_weight/_weight;    //  It's MPS's bug here, not work on iOS 13.3.
+        
+        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear a:2.0f/(float)(inputShape->column*inputShape->row)/_weight/_weight b:0.0f c:0.0f];
+        _neuron = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
+    }
 }
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
@@ -102,6 +123,9 @@
     _multiply.secondaryStrideInPixelsX = 1;
     _multiply.secondaryStrideInPixelsY = 1;
     _multiply.secondaryStrideInFeatureChannels = 0;
+    
+    _multiply.primaryScale = _weight;
+    _multiply.secondaryScale = _weight;
     
     MTLRegion clipRect;
     clipRect.origin = MTLOriginMake(0, 0, 0);
@@ -133,6 +157,7 @@
 
 #pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    
     /*
      *  g = Gradient(i), where i stands for i-th row of backward gradients.
      *
@@ -145,45 +170,55 @@
      */
     
     MetalTensor sourceTensor = _inputImages[@(0)];
+    BackwardTarget backwardTarget = sourceTensor.source;
+    NSAssert(backwardTarget, @"Invalid backward target...");
+    
     int numOfChannels = sourceTensor.shape->depth;
-    DataShape channelsWeightsShape = DataShapeMake(1, 1, numOfChannels);
     MetalTensor gradients0 = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape commandBuffer:commandBuffer];
-    MetalTensor gradients1 = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape commandBuffer:commandBuffer];
-    MetalTensor channelsWeights = [[MTTensorCache sharedCache] fetchTensorWithShape:&channelsWeightsShape commandBuffer:commandBuffer];
+    MetalTensor gradients1 = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(sourceTensor.shape->row, sourceTensor.shape->column, 1)
+                                                                  commandBuffer:commandBuffer];
+    MetalTensor result = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(sourceTensor.shape->row, sourceTensor.shape->column, 4*numOfChannels)
+                                                              commandBuffer:commandBuffer];
 
     //  Make a channel-wise multiplication.
     _multiply.secondaryStrideInPixelsX = 0;
     _multiply.secondaryStrideInPixelsY = 0;
     _multiply.secondaryStrideInFeatureChannels = 1;
     _multiply.secondaryOffset = MPSOffsetMake(0, 0, 0);
+    _multiply.primaryScale = 1.0f;
+    _multiply.secondaryScale = 1.0f;
     
     for (int i = 0; i < numOfChannels; i++) {
-        //  Copy the i-th row gradient.
-//        _neuron.offset = MPSOffsetMake(0, i, 0);
-//        [_neuron encodeToCommandBuffer:commandBuffer
-//                           sourceImage:_gradient.content
-//                      destinationImage:channelsWeights.content];
-        
         //  Data of each channel multipy its respect weight.
+        [_multiply setSecondaryOffset:MPSOffsetMake(i, 0, 0)];
         [_multiply encodeToCommandBuffer:commandBuffer
-                              primaryImage:sourceTensor.content
-                            secondaryImage:channelsWeights.content
-                          destinationImage:gradients0.content];
-        
-        //  Reduce sum the feature channels.
-        [_reduceSumChannels setClipRect:MTLRegionMake3D(0, 0, i, sourceTensor.shape->column, sourceTensor.shape->row, 1)];
-        [_reduceSumChannels encodeToCommandBuffer:commandBuffer sourceImage:gradients0.content destinationImage:gradients1.content];
-    }
+                            primaryImage:sourceTensor.content
+                          secondaryImage:_gradient.content
+                        destinationImage:gradients0.content];
     
-    [gradients0 unlock];
-    [channelsWeights unlock];
+        //  Reduce sum the feature channels.
+        [_reduceChannels encodeToCommandBuffer:commandBuffer
+                                   sourceImage:gradients0.content
+                              destinationImage:gradients1.content];
+    
+        [_neuron setDestinationFeatureChannelOffset:i<<2];
+        [_neuron encodeToCommandBuffer:commandBuffer
+                           sourceImage:gradients1.content
+                      destinationImage:result.content];
+    }
+    [gradients1 unlock];
+    
+    [_compress compressOnCommandBuffer:commandBuffer sourceTensor:result destinationTensor:gradients0];
+    [result unlock];
+    
     [self removeGradient];
     [self removeCachedImages];
     
-    [sourceTensor.source setGradient:gradients1 forwardTarget:self];
-    [gradients1 unlock];
+    [backwardTarget setGradient:gradients0 forwardTarget:self];
+    [gradients0 unlock];
     
-    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    
 }
 
 @end

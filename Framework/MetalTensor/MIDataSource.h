@@ -50,6 +50,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NeuronType neuron;
 @property (nonatomic, strong) MIBNParametersDataSource *bn;
 @property (nonatomic, assign) BOOL depthWise;
+@property (nonatomic, assign) BOOL removeBias;
+
+/*
+ *  Transpose input channels and output channels of weights.
+ *  Default by NO.
+ */
+@property (nonatomic, assign) BOOL transposeIO;
+
+/*
+ *  It is different weights treatments between tensorflow and Metal in
+ *  transpose convolution and backward gradients convolution.
+ *  Default by NO.
+ */
+@property (nonatomic, assign) BOOL rotateSpatial180;
 
 - (instancetype)initWithData:(NSData *)weights
                       kernel:(KernelShape *)kernel
@@ -64,6 +78,9 @@ NS_ASSUME_NONNULL_BEGIN
                             depthWise:(BOOL)depthWise;
 
 @end
+
+void transpose_input_output_channels(float32_t *buffer, KernelShape *kernel);
+void rotate_spatial_180(float32_t *buffer, KernelShape *kernel);
 
 MICNNKernelDataSource *MakeDataSource(NSString *module_name, KernelShape *k, NeuronType *n);
 MICNNKernelDataSource *MakeDataSource1(NSString *module_name, KernelShape *k, NeuronType *n, BOOL isDepthWise);

@@ -42,6 +42,7 @@
     DB_TRACE(-_verbose+2, "\n\n\n%s <-- (%ld, %ld, 4)", self.labelUTF8, bgraU8Texture.width, bgraU8Texture.height);
 //    [self debugInputTexture:bgraU8Texture];
     _outputImage.mpsImage = [[MPSImage alloc] initWithTexture:bgraU8Texture featureChannels:3];
+    _outputImage.source = self;
 }
 
 #pragma mark - MTTensorForward Delegate

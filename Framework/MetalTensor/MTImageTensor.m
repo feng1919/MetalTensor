@@ -113,6 +113,10 @@
     int column = self.shape->column;
     int depth = self.shape->depth;
     
+    int n_slice = (depth+3)/4;
+    int n_component = _mpsImage.numberOfComponents;
+    int buffer_depth = n_slice * n_component;
+    
     printf("\nTensor: %dx%dx%d", row, column, depth);
     for (int i = 0; i < row; i++) {
         printf("\nrow:%d", i);
@@ -120,8 +124,8 @@
         for (int j = 0; j < column; j++) {
             printf("\n  col:%d", j);
             printf("\n  (");
-            for (int c = 0; c < depth; c++) {
-                printf("%f", _result[(i*column+j)*depth+c]);
+            for (int c = 0; c < buffer_depth; c++) {
+                printf("%f", _result[(i*column+j)*buffer_depth+c]);
                 if (c < depth-1) {
                     printf(", ");
                 }
@@ -139,20 +143,28 @@
     int column = self.shape->column;
     int depth = self.shape->depth;
     
+    int n_slice = (depth+3)/4;
+    int n_component = _mpsImage.numberOfComponents;
+    int buffer_depth = n_slice * n_component;
+    
     assert(x < column);
     assert(y < row);
+    
+    float sum = 0.0f;
     
     printf("\nTensor: %dx%dx%d", row, column, depth);
     printf("\nPixel(%d, %d):", x, y);
     printf("\n    (");
-    depth = MAX(depth, 4);
-    for (int c = 0; c < depth; c++) {
-        printf("%f", _result[(y*column+x)*depth+c]);
-        if (c < depth-1) {
+    for (int c = 0; c < buffer_depth; c++) {
+        printf("%e", _result[(y*column+x)*buffer_depth+c]);
+        sum += _result[(y*column+x)*buffer_depth+c];
+        if (c < buffer_depth-1) {
             printf(", ");
         }
     }
     printf(")   \n");
+    
+    printf("Sum:%e\n", sum);
 }
 
 #endif

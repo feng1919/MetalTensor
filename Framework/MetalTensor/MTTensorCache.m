@@ -60,6 +60,7 @@ static int _reuseCounter = 0;
                          dataFormat:(TensorDataFormat)dataFormat
                      numberOfImages:(NSUInteger)numberOfImages
                       commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    
     if (shape == NULL) {
         return nil;
     }

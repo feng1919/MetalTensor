@@ -49,6 +49,16 @@
 
 - (void)dealloc {
     [_allLayers.allValues makeObjectsPerformSelector:@selector(removeAllTargets)];
+    for (MetalTensorNode *node in _allLayers.allValues) {
+        if ([node isKindOfClass:[MetalTensorLayer class]]) {
+            [(MetalTensorLayer *)node removeCachedImages];
+            [(MetalTensorLayer *)node removeGradient];
+            [(MetalTensorLayer *)node removeCachedGradients];
+            [(MetalTensorLayer *)node removeState];
+            [(MetalTensorLayer *)node removeImage];
+        }
+    }
+    
     [[MTTensorCache sharedCache] unregisterReuseIdentifier:_reuseIdentifier.integerValue];
 }
 
@@ -74,6 +84,7 @@
         Class layerClass = LayerWithType(desc.type);
         MetalTensorNode *layer = [[layerClass alloc] initWithDescriptor:desc];
         NSParameterAssert(layer);
+        [layer setNeedBackward:_needBackward];
         [layer compile:device];
         [layer setLabel:key];
         [_allLayers setObject:layer forKey:key];
@@ -241,14 +252,6 @@
         [command_buffer addCompletedHandler:_completedHandler];
     }
     [command_buffer commit];
-}
-
-- (void)setNeedBackward:(BOOL)needBackward {
-    _needBackward = needBackward;
-    
-    for (MetalTensorNode *node in _allLayers.allValues) {
-        node.needBackward = needBackward;
-    }
 }
 
 - (MTLUInt2)inputSize {

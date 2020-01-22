@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) int numberOfChannels;
 
 @property (nonatomic, assign) float alpha;
+@property (nonatomic, assign) MTLRegion clipRect;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithReduceType:(ReduceType)type numberOfChannels:(int)numberOfChannels NS_DESIGNATED_INITIALIZER;

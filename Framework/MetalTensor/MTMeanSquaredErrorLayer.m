@@ -19,7 +19,7 @@
     MPSCNNSubtract *_subtract;
     MPSCNNNeuron *_power;
     MPSCNNNeuron *_negative;
-    MPSCNNMultiply *_multiply;
+    MPSCNNNeuron *_alphaNeuron;
     MPSCNNPoolingAverage *_pooling;
     MTChannelReduce *_channelReduceMean;
 }
@@ -33,6 +33,11 @@
 }
 
 #pragma mark - override
+
+- (void)initialize {
+    _alpha = 1.0f;
+}
+
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     
@@ -54,17 +59,21 @@
     _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
     
     _channelReduceMean = [[MTChannelReduce alloc] initWithReduceType:ReduceTypeMean numberOfChannels:inputShape->depth];
+    _channelReduceMean.alpha = _alpha;
     [_channelReduceMean compile:device];
     
     if (_needBackward) {
-        MPSNNNeuronDescriptor *negativeDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
-                                                                                                a:-1.0f
-                                                                                                b:0.0f
-                                                                                                c:0.0f];
-        _negative = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:negativeDesc];
+        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
+                                                                                             a:-1.0f
+                                                                                             b:0.0f
+                                                                                             c:0.0f];
+        _negative = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
         
-        _multiply = [[MPSCNNMultiply alloc] initWithDevice:device];
-        
+        neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
+                                                                      a:_alpha/(float)ProductOfDataShape(inputShape)
+                                                                      b:0.0f
+                                                                      c:0.0f];
+        _alphaNeuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
     }
 }
 
@@ -123,7 +132,7 @@
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     /*
-     *  MSE f = 0.5*sum((v0-v1)^2).
+     *  MSE f = 0.5*mean((v0-v1)^2).
      */
     
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
@@ -161,15 +170,17 @@
 #pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     /*
-     *  MSE f = 0.5*sum((v0-v1)^2) = 0.5*sum(v0^2-2*v0*v1+v1^2).
-     *  The derivative of v0: df/dv0 = v0-v1.
-     *  The derivative of v1: df/dv1 = v1-v0 = -(df/dv0).
+     *  MSE f = 0.5*mean((v0-v1)^2) = 0.5*mean(v0^2-2*v0*v1+v1^2).
+     *  The derivative of v0: df/dv0 = (v0-v1)/volume.
+     *  The derivative of v1: df/dv1 = (v1-v0)/volume = -(df/dv0).
      */
     
     MetalTensor t0 = _inputImages[@(0)];
     MetalTensor t1 = _inputImages[@(1)];
     BackwardTarget back0 = t0.source;
+    NSAssert(back0, @"Invalid primary backward target...");
     BackwardTarget back1 = t1.source;
+//    NSAssert(back1, @"Invalid secondary backward target...");
     
     MetalTensor dv0 = [[MTTensorCache sharedCache] fetchTensorWithShape:t0.shape commandBuffer:commandBuffer];
     
@@ -180,20 +191,22 @@
                         primaryImage:t0.content
                       secondaryImage:t1.content
                     destinationImage:dv0.content];
-    [_multiply encodeToCommandBuffer:commandBuffer
-                        primaryImage:dv0.content
-                      secondaryImage:_gradient.content
-                    destinationImage:t0.content];
+    [_alphaNeuron encodeToCommandBuffer:commandBuffer
+                            sourceImage:dv0.content
+                       destinationImage:t0.content];
     [dv0 unlock];
     [self removeGradient];
     [back0 setGradient:t0 forwardTarget:self];
     
-    [_negative encodeToCommandBuffer:commandBuffer
-                         sourceImage:t0.content
-                    destinationImage:t1.content];
-    [back1 setGradient:t1 forwardTarget:self];
-    [self removeCachedImages];
+    if (back1) {
+        [_negative encodeToCommandBuffer:commandBuffer
+                             sourceImage:t0.content
+                        destinationImage:t1.content];
+        [back1 setGradient:t1 forwardTarget:self];
+    }
     
+    [self removeCachedImages];
+        
     [back0 gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     [back1 gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     

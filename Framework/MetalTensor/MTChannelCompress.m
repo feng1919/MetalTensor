@@ -1,15 +1,15 @@
 //
-//  MTChannelReduce.m
+//  MTChannelCompress.m
 //  MetalTensor
 //
-//  Created by Feng Stone on 2020/1/14.
+//  Created by Feng Stone on 2020/1/21.
 //  Copyright © 2020 fengshi. All rights reserved.
 //
 
-#import "MTChannelReduce.h"
+#import "MTChannelCompress.h"
 #import "MTTensorCache.h"
 
-@interface ChannelReduceDataSource : NSObject <MPSCNNConvolutionDataSource> {
+@interface ChannelCompressDataSource : NSObject <MPSCNNConvolutionDataSource> {
     
     MPSCNNConvolutionDescriptor *_convDesc;
     float32_t *_data;
@@ -23,10 +23,10 @@
 
 @end
 
-@implementation ChannelReduceDataSource
+@implementation ChannelCompressDataSource
 
 - (id)copyWithZone:(NSZone *)zone {
-    ChannelReduceDataSource *item = [ChannelReduceDataSource allocWithZone:zone];
+    ChannelCompressDataSource *item = [ChannelCompressDataSource allocWithZone:zone];
     item.numberOfChannels = _numberOfChannels;
     item.weight = _weight;
     [item compile:_device];
@@ -34,7 +34,7 @@
 }
 
 - (id)copy {
-    ChannelReduceDataSource *reduce = [[ChannelReduceDataSource alloc] init];
+    ChannelCompressDataSource *reduce = [[ChannelCompressDataSource alloc] init];
     reduce.numberOfChannels = _numberOfChannels;
     reduce.weight = _weight;
     [reduce compile:_device];
@@ -46,17 +46,21 @@
         return;
     }
     _device = device;
+    
+    int outputChannels = (_numberOfChannels+3)>>2;
     _convDesc = [MPSCNNConvolutionDescriptor cnnConvolutionDescriptorWithKernelWidth:1
                                                                         kernelHeight:1
                                                                 inputFeatureChannels:_numberOfChannels
-                                                               outputFeatureChannels:1];
+                                                               outputFeatureChannels:outputChannels];
     [_convDesc setStrideInPixelsX:1];
     [_convDesc setStrideInPixelsY:1];
     
-    int numberOfChannels = (_numberOfChannels+3)>>2<<2;
-    _data = calloc(numberOfChannels, sizeof(float32_t));
-    for (int i = 0; i < numberOfChannels; i++) {
-        _data[i] = _weight;
+    _data = calloc(_numberOfChannels*outputChannels, sizeof(float32_t));
+    for (int i = 0; i < outputChannels; i++) {
+        int index = i * _numberOfChannels;
+        for (int j = 0; j < _numberOfChannels; j++) {
+            _data[index+j] = (i*4) == j?_weight:0.0f;
+        }
     }
 }
 
@@ -94,19 +98,15 @@
 @end
 
 
-@implementation MTChannelReduce {
-    ReduceType _type;
+@implementation MTChannelCompress {
     int _numberOfChannels;
-    ChannelReduceDataSource *_dataSource;
+    ChannelCompressDataSource *_dataSource;
     id<MTLDevice> _device;
     MPSCNNConvolution *_convolution;
 }
 
-- (instancetype)initWithReduceType:(ReduceType)type numberOfChannels:(int)numberOfChannels {
+- (instancetype)initWithNumberOfChannels:(int)numberOfChannels {
     if (self = [super init]) {
-        NSAssert(type == ReduceTypeSum || type == ReduceTypeMean,
-                 @"The reduce type is not supported, currently sum and mean operations are valid.");
-        _type = type;
         _numberOfChannels = numberOfChannels;
         _alpha = 1.0f;
     }
@@ -115,22 +115,15 @@
 
 - (void)compile:(id<MTLDevice>)device {
     _device = device;
-    _dataSource = [[ChannelReduceDataSource alloc] init];
+    _dataSource = [[ChannelCompressDataSource alloc] init];
     _dataSource.numberOfChannels = _numberOfChannels;
-    float weight = _type == ReduceTypeSum?1.0f:(1.0f/(float)_numberOfChannels);
-    [_dataSource setWeight:weight * _alpha];
+    [_dataSource setWeight:_alpha];
     [_dataSource compile:device];
     
-    _convolution = [[MPSCNNConvolution alloc] initWithDevice:device
-                                                     weights:_dataSource];
+    _convolution = [[MPSCNNConvolution alloc] initWithDevice:device weights:_dataSource];
 }
 
-- (void)setClipRect:(MTLRegion)clipRect {
-    _clipRect = clipRect;
-    _convolution.clipRect = clipRect;
-}
-
-- (void)reduceOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer sourceTensor:(MetalTensor)src destinationTensor:(MetalTensor)dst {
+- (void)compressOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer sourceTensor:(MetalTensor)src destinationTensor:(MetalTensor)dst {
     [_convolution encodeToCommandBuffer:commandBuffer
                             sourceImage:src.content
                        destinationImage:dst.content];

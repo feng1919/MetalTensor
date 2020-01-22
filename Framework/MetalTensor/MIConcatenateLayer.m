@@ -87,11 +87,14 @@
     [_neuron setDestinationFeatureChannelOffset:0];
     for (int i = 0; i < _numOfImages; i++) {
         MetalTensor tensor = _inputImages[@(i)];
+        BackwardTarget backwardTarget = tensor.source;
+        NSAssert(backwardTarget, @"Invalid backward target[%d]...", i);
+        
         [_neuron setSourceFeatureChannelOffset:_offsets[i]];
         [_neuron encodeToCommandBuffer:commandBuffer sourceImage:_gradient.content destinationImage:tensor.content];
-        [tensor.source setGradient:tensor forwardTarget:self];
+        [backwardTarget setGradient:tensor forwardTarget:self];
         [tensor unlock];
-        [tensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+        [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     }
     
     [_inputImages removeAllObjects];

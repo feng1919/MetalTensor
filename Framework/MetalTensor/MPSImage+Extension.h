@@ -50,6 +50,7 @@ void ConvertToTensorFlowLayout1(float *src, DataShape *shape);
 void ConvertF16ToTensorFlowLayout(float16_t *dst, float16_t *src, DataShape *shape);
 void ConvertF16ToTensorFlowLayout1(float16_t *src, DataShape *shape);
 
+- (int)numberOfComponents;
 - (unsigned int)sizeOfComponent;
 - (void)toFloat16Array:(float16_t *)buffer;
 - (void)toFloat16Array:(float16_t *)buffer slice:(int)slice;

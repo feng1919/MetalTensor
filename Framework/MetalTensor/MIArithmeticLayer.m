@@ -219,7 +219,9 @@
     MetalTensor primaryTensor = _inputImages[@(0)];
     MetalTensor secondaryTensor = _inputImages[@(1)];
     BackwardTarget primaryBackward = primaryTensor.source;
+    NSAssert(primaryBackward, @"Invalid primary backward target...");
     BackwardTarget secondaryBackward = secondaryTensor.source;
+    NSAssert(secondaryTensor, @"Invalid secondary backward target...");
     
     MetalTensor primaryGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
                                                                       commandBuffer:commandBuffer];

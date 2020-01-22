@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTMeanSquaredErrorLayer : MetalTensorLayer
 
+@property (nonatomic, assign) float alpha;
 @property (nonatomic, strong, nullable) MTImageTensor *secondaryImage;
 
 @end

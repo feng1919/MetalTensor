@@ -15,6 +15,8 @@
 		5A4EA39E23BB349900B68DE5 /* MIMatrixMultiplyLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4EA39C23BB349900B68DE5 /* MIMatrixMultiplyLayer.m */; };
 		5A5B243323C9F45600BBEED3 /* MetalTensorSlice.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A5B243123C9F45600BBEED3 /* MetalTensorSlice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A5B243423C9F45600BBEED3 /* MetalTensorSlice.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B243223C9F45600BBEED3 /* MetalTensorSlice.m */; };
+		5A7FA55D23D6E34D006C7907 /* MTChannelCompress.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A7FA55B23D6E34D006C7907 /* MTChannelCompress.h */; };
+		5A7FA55E23D6E34D006C7907 /* MTChannelCompress.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7FA55C23D6E34D006C7907 /* MTChannelCompress.m */; };
 		5A8D23442341D767005F88E6 /* MetalTensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23422341D767005F88E6 /* MetalTensor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23952341DA03005F88E6 /* MIReshapeLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D234B2341D9FB005F88E6 /* MIReshapeLayer.m */; };
 		5A8D23962341DA03005F88E6 /* MIResidualModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D234C2341D9FB005F88E6 /* MIResidualModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -112,6 +114,8 @@
 		5A4EA39C23BB349900B68DE5 /* MIMatrixMultiplyLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MIMatrixMultiplyLayer.m; sourceTree = "<group>"; };
 		5A5B243123C9F45600BBEED3 /* MetalTensorSlice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalTensorSlice.h; sourceTree = "<group>"; };
 		5A5B243223C9F45600BBEED3 /* MetalTensorSlice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalTensorSlice.m; sourceTree = "<group>"; };
+		5A7FA55B23D6E34D006C7907 /* MTChannelCompress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTChannelCompress.h; sourceTree = "<group>"; };
+		5A7FA55C23D6E34D006C7907 /* MTChannelCompress.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTChannelCompress.m; sourceTree = "<group>"; };
 		5A8D233F2341D767005F88E6 /* MetalTensor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MetalTensor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A8D23422341D767005F88E6 /* MetalTensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalTensor.h; sourceTree = "<group>"; };
 		5A8D23432341D767005F88E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -296,6 +300,8 @@
 				5A5B243223C9F45600BBEED3 /* MetalTensorSlice.m */,
 				5AE0F48A23CD96B600D9E957 /* MTChannelReduce.h */,
 				5AE0F48B23CD96B600D9E957 /* MTChannelReduce.m */,
+				5A7FA55B23D6E34D006C7907 /* MTChannelCompress.h */,
+				5A7FA55C23D6E34D006C7907 /* MTChannelCompress.m */,
 				5AE0F48223CBF54000D9E957 /* MetalTensorSpacialReduce.h */,
 				5AE0F48323CBF54000D9E957 /* MetalTensorSpacialReduce.m */,
 				5A3BAAC523BB6AE40000D1BC /* MIReduceUnaryLayer.h */,
@@ -367,6 +373,7 @@
 				5AC43CD2237C306500E740EA /* ssd_prior_box.h in Headers */,
 				5A8D23992341DA03005F88E6 /* MPSImage+Extension.h in Headers */,
 				5A8D23AC2341DA03005F88E6 /* MITransposeConvolutionLayer.h in Headers */,
+				5A7FA55D23D6E34D006C7907 /* MTChannelCompress.h in Headers */,
 				5A8D23BE2341DA03005F88E6 /* MetalTensorLayerDescriptor.h in Headers */,
 				5AC43CD5237C306500E740EA /* SSDConfig.h in Headers */,
 				5A8D23C52341DA03005F88E6 /* metal_tensor_structures.h in Headers */,
@@ -511,6 +518,7 @@
 				5A8D23A82341DA03005F88E6 /* MIPoolingAverageLayer.m in Sources */,
 				5A8D23AF2341DA03005F88E6 /* MIPoolingMaxLayer.m in Sources */,
 				5A8D23B62341DA03005F88E6 /* MIDropoutLayer.m in Sources */,
+				5A7FA55E23D6E34D006C7907 /* MTChannelCompress.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

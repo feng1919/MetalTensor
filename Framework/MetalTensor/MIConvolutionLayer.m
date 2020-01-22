@@ -13,8 +13,16 @@
 @interface MIConvolutionLayer() {
     
     MPSCNNConvolution *_convolution;
-    MPSCNNConvolutionGradient *_convolutionGradientOp;
+    
+    MPSCNNNeuron *_neuronOp;
+    MPSCNNNeuronGradient *_neuronGradient;
+    MetalTensor _convTensor;
+    
+    MICNNKernelDataSource *_backwardDataSource;
+    MPSCNNConvolutionTranspose *_convTranspose;
 }
+
+@property (nonatomic, weak) BackwardTarget backwardTarget;
 
 @end
 
@@ -78,18 +86,120 @@
 - (void)updateComputing {
     
     if (_device && _dataSource) {
-        _convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
-        [_convolution setEdgeMode:_edgeMode];
-        [self setOffset:_offset];
         
         if (_needBackward) {
-            _convolutionGradientOp = [[MPSCNNConvolutionGradient alloc] initWithDevice:_device weights:_dataSource];
-            _convolutionGradientOp.gradientOption = MPSCNNConvolutionGradientOptionGradientWithData;
+            
+            /*
+             *  There is a bug of MPSCNNConvolutionGradient kernel, it does not handle activation,
+             *  so we depend on ourselves.
+             *
+             */
+            
+            _dataSource.neuron = NeuronTypeMake(MPSCNNNeuronTypeNone, 0.0f, 0.0f);
+            
+            _convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
+            [_convolution setEdgeMode:_edgeMode];
+            [self setOffset:_offset];
+            
+            _backwardDataSource = [_dataSource copy];
+            _backwardDataSource.neuron = NeuronTypeMake(MPSCNNNeuronTypeNone, 0.0f, 0.0f);
+            _backwardDataSource.rotateSpatial180 = YES;
+            _backwardDataSource.transposeIO = YES;
+            _backwardDataSource.removeBias = YES;
+            
+            _convTranspose = [[MPSCNNConvolutionTranspose alloc] initWithDevice:_device weights:_backwardDataSource];
+            _convTranspose.kernelOffsetX = trans_conv_offset(_kernel.column, _kernel.stride, _padding);
+            _convTranspose.kernelOffsetY = trans_conv_offset(_kernel.row, _kernel.stride, _padding);
+            
+            MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:_neuron.neuron
+                                                                                                 a:_neuron.a
+                                                                                                 b:_neuron.b
+                                                                                                 c:_neuron.c];
+            _neuronOp = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
+            _neuronGradient = [[MPSCNNNeuronGradient alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
         }
-        
-        _operation = _convolution;
-        _gradientOp = _convolutionGradientOp;
+        else {
+
+            _convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
+            [_convolution setEdgeMode:_edgeMode];
+            [self setOffset:_offset];
+        }
     }
+}
+
+- (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    DB_TRACE(-_verbose+3, "\n%s encoding...", self.labelUTF8);
+
+    NSAssert(_inputImages.count > 0, @"There is no input image received.");
+
+    if (_needBackward) {
+        
+        MetalTensor sourceTensor = _inputImages[@(0)];
+        self.backwardTarget = sourceTensor.source;
+        
+        _convTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+        _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+        _image.source = self;
+        
+        [_convolution encodeToCommandBuffer:commandBuffer
+                              sourceImage:sourceTensor.content
+                         destinationImage:_convTensor.content];
+        
+        _state = [_neuronOp temporaryResultStateForCommandBuffer:commandBuffer
+                                                     sourceImage:_convTensor.content
+                                                    sourceStates:nil
+                                                destinationImage:_image.content];
+        [_neuronOp encodeToCommandBuffer:commandBuffer
+                             sourceImage:_convTensor.content
+                        destinationState:_state
+                        destinationImage:_image.content];
+    }
+    else {
+        _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+        _image.source = self;
+
+        MetalTensor sourceTensor = _inputImages[@(0)];
+
+        [_convolution encodeToCommandBuffer:commandBuffer
+                              sourceImage:sourceTensor.content
+                         destinationImage:_image.content];
+
+    }
+    
+    [self removeCachedImages];
+}
+
+- (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+
+    BackwardTarget backwardTarget = self.backwardTarget;
+    NSAssert(backwardTarget, @"Invalid backward connection...");
+
+    MetalTensor activatedTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:_gradient.shape
+                                                                      commandBuffer:commandBuffer];
+    [_neuronGradient encodeToCommandBuffer:commandBuffer
+                            sourceGradient:_gradient.content
+                               sourceImage:_convTensor.content
+                             gradientState:_state
+                       destinationGradient:activatedTensor.content];
+    [_convTensor unlock];
+
+    MetalTensor destinationGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_inputShapes[0]
+                                                                          commandBuffer:commandBuffer];
+
+    [_convTranspose encodeToCommandBuffer:commandBuffer
+                              sourceImage:activatedTensor.content
+                         destinationImage:destinationGradient.content];
+
+    [backwardTarget setGradient:destinationGradient forwardTarget:self];
+    
+    [destinationGradient unlock];
+    [activatedTensor unlock];
+    
+    [self removeState];
+    [self removeCachedImages];
+    [self removeGradient];
+    
+    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
 }
 
 #pragma mark - Management of the weights

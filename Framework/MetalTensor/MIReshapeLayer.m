@@ -69,13 +69,16 @@
     
     //  Reshape the gradient from backward node to forward input tensor shape.
     MetalTensor sourceTensor = _inputImages[@(0)];
+    BackwardTarget backwardTarget = sourceTensor.source;
+    NSAssert(backwardTarget, @"Invalid backward target...");
+    
     [_reshape encodeToCommandBuffer:commandBuffer sourceImage:_gradient.content destinationImage:sourceTensor.content];
     
-    [sourceTensor.source setGradient:sourceTensor forwardTarget:self];
+    [backwardTarget setGradient:sourceTensor forwardTarget:self];
     [self removeCachedImages];
     [self removeGradient];
     
-    [sourceTensor.source gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     
 }
 

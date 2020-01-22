@@ -6,6 +6,10 @@
 //  Copyright © 2019 fengshi. All rights reserved.
 //
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef metal_tensor_log_h
 #define metal_tensor_log_h
 
@@ -25,3 +29,7 @@
 extern void     db_print(int level, const char *fmt, ...);
 
 #endif /* metal_tensor_log_h */
+    
+#ifdef __cplusplus
+} // extern "C"
+#endif

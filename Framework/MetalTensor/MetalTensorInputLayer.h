@@ -25,4 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+typedef MetalTensorInputLayer * MetalTensorInput;
+
 NS_ASSUME_NONNULL_END
