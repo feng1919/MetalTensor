@@ -110,6 +110,7 @@
             _convTranspose = [[MPSCNNConvolutionTranspose alloc] initWithDevice:_device weights:_backwardDataSource];
             _convTranspose.kernelOffsetX = trans_conv_offset(_kernel.column, _kernel.stride, _padding);
             _convTranspose.kernelOffsetY = trans_conv_offset(_kernel.row, _kernel.stride, _padding);
+            _convTranspose.edgeMode = _edgeMode;
             
             MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:_neuron.neuron
                                                                                                  a:_neuron.a

@@ -161,6 +161,9 @@
         if (c < buffer_depth-1) {
             printf(", ");
         }
+        if ((c+1)%4 == 0) {
+            printf("\n");
+        }
     }
     printf(")   \n");
     

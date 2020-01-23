@@ -43,6 +43,8 @@
                                                                             kernelHeight:_kernel.row
                                                                          strideInPixelsX:_kernel.stride
                                                                          strideInPixelsY:_kernel.stride];
+        _poolingAverageGradientOp.secondaryOffset = _offset;
+        _poolingAverageGradientOp.secondaryEdgeMode = _pooling.edgeMode;
     }
     
     _operation = _pooling;
