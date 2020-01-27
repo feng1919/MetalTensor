@@ -61,7 +61,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) DataShape outputShape;
 
 /*
- *  Invalid.
+ *  If YES, the node will not back propagate the gradients, but
+ *  output the gradients.
+ *  Defaylt by NO.
+ */
+@property (nonatomic, assign) BOOL stopGradient;
+
+/*
+ *  If stopGradient is set to YES, the processing result of gradients
+ *  computation will be saved to _savedGradients.
+ */
+@property (nonatomic, strong, nullable) MTImageTensor *savedGradients;
+
+/*
+ *  Unavailable.
  */
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -77,6 +90,12 @@ NS_ASSUME_NONNULL_BEGIN
  *  One input initialize.
  */
 - (instancetype)initWithInputShape:(DataShape *)inputShape;
+
+/*
+ *  Return an empty neuron.
+ *  You may use this for blitting the tensors at run time.
+ */
+- (MPSCNNNeuron *)blit;
 
 /*
  *  The input shapes for the MetalTensorLayer instance.

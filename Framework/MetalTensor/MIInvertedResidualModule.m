@@ -122,6 +122,15 @@
 }
 
 #pragma mark - public
+
+- (void)setStopGradient:(BOOL)stopGradient {
+    [_convExpand setStopGradient:stopGradient];
+}
+
+- (MTImageTensor *)savedGradients {
+    return _convExpand.savedGradients;
+}
+
 - (void)setOffset:(MTLInt2)offset {
     _offset = offset;
     _convDepthWise.offset = offset;

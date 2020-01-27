@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  This framework is for inference purpose, so there will be no
  *  computation of weights, bias or batch normalization parameters,
  *  etc.
- *  The default is NO.
+ *  Default by NO.
  */
 @property (nonatomic, assign) BOOL needBackward;
 

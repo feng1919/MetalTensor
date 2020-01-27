@@ -12,7 +12,6 @@
 #include "numpy.h"
 
 @interface MIConcatenateLayer() {
-    MPSCNNNeuron *_neuron;
     int *_offsets;
 }
 
@@ -36,14 +35,15 @@
     return _offsets;
 }
 
+- (void)setStopGradient:(BOOL)stopGradient {
+    NSAssert(NO, @"The arithmetic layer does not support stop gradient.");
+}
+
 #pragma mark - override
 
 - (void)compile:(id<MTLDevice>)device {
     
     [super compile:device];
-    
-    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
-    _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
 }
 
 - (void)updateOutputShape {
@@ -69,8 +69,8 @@
     
     for (int i = 0; i < _numOfImages; i++) {
         MetalTensor tensor = _inputImages[@(i)];
-        [_neuron setDestinationFeatureChannelOffset:_offsets[i]];
-        [_neuron encodeToCommandBuffer:commandBuffer sourceImage:tensor.content destinationImage:_image.content];
+        [self.blit setDestinationFeatureChannelOffset:_offsets[i]];
+        [self.blit encodeToCommandBuffer:commandBuffer sourceImage:tensor.content destinationImage:_image.content];
     }
     
     if (!_needBackward) {
@@ -84,14 +84,14 @@
     
     DB_TRACE(-_verbose+2, "\n%s backward encoding...", self.labelUTF8);
     
-    [_neuron setDestinationFeatureChannelOffset:0];
+    [self.blit setDestinationFeatureChannelOffset:0];
     for (int i = 0; i < _numOfImages; i++) {
         MetalTensor tensor = _inputImages[@(i)];
         BackwardTarget backwardTarget = tensor.source;
         NSAssert(backwardTarget, @"Invalid backward target[%d]...", i);
         
-        [_neuron setSourceFeatureChannelOffset:_offsets[i]];
-        [_neuron encodeToCommandBuffer:commandBuffer sourceImage:_gradient.content destinationImage:tensor.content];
+        [self.blit setSourceFeatureChannelOffset:_offsets[i]];
+        [self.blit encodeToCommandBuffer:commandBuffer sourceImage:_gradient.content destinationImage:tensor.content];
         [backwardTarget setGradient:tensor forwardTarget:self];
         [tensor unlock];
         [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];

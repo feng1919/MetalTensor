@@ -117,6 +117,10 @@
     }
 }
 
+- (void)setStopGradient:(BOOL)stopGradient {
+    NSAssert(NO, @"The arithmetic layer does not support stop gradient.");
+}
+
 + (Class)arithmeticWithType:(NSString *)arithmetic {
     if ([arithmetic isEqualToString:@"addition"]) {
         return [MPSCNNAdd class];

@@ -309,15 +309,21 @@
                             sourceImage:copiedTensor.content
                        destinationImage:resultTensor.content];
     
+    [copiedTensor unlock];
     [self removeCachedImages];
     [self removeGradient];
     
-    [backwardTarget setGradient:resultTensor forwardTarget:self];
-    
-    [copiedTensor unlock];
-    [resultTensor unlock];
-    
-    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    if (self.stopGradient) {
+        [self.blit encodeToCommandBuffer:commandBuffer
+                             sourceImage:resultTensor.content
+                        destinationImage:self.savedGradients.content];
+        [resultTensor unlock];
+    }
+    else {
+        [backwardTarget setGradient:resultTensor forwardTarget:self];
+        [resultTensor unlock];
+        [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    }
     
 }
 

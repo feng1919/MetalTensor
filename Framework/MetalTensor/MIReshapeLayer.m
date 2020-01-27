@@ -12,6 +12,7 @@
 
 @interface MIReshapeLayer() {
     MPSNNReshape *_reshape;
+    BackwardTarget _backwardTarget;
 }
 
 @end
@@ -54,8 +55,6 @@
 - (void)compile:(id<MTLDevice>)device {
     [super compile:device];
     _reshape = [[MPSNNReshape alloc] initWithDevice:device];
-    
-    _operation = _reshape;
 }
 
 #pragma mark - MTTensorForward Delegate
@@ -64,22 +63,51 @@
     NSLog(@"The reshape layer %@ need an output shape specified explicitly, the input shape is changed.", self.label);
 }
 
+- (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    DB_TRACE(-_verbose+3, "\n%s encoding...", self.labelUTF8);
+    
+    NSAssert(_operation, @"The computing operation has not been initialized.");
+    NSAssert(_inputImages.count > 0, @"There is no input image received.");
+    
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image.source = self;
+    
+    MetalTensor sourceTensor = _inputImages[@(0)];
+    _backwardTarget = sourceTensor.source;
+    
+    [_reshape encodeToCommandBuffer:commandBuffer
+                          sourceImage:sourceTensor.content
+                     destinationImage:_image.content];
+    
+    [self removeCachedImages];
+}
+
 #pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
     //  Reshape the gradient from backward node to forward input tensor shape.
-    MetalTensor sourceTensor = _inputImages[@(0)];
-    BackwardTarget backwardTarget = sourceTensor.source;
-    NSAssert(backwardTarget, @"Invalid backward target...");
+    MetalTensor destinationImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_inputShapes[0]
+                                                                       commandBuffer:commandBuffer];
+    NSAssert(_backwardTarget, @"Invalid backward target...");
     
-    [_reshape encodeToCommandBuffer:commandBuffer sourceImage:_gradient.content destinationImage:sourceTensor.content];
+    [_reshape encodeToCommandBuffer:commandBuffer
+                        sourceImage:_gradient.content
+                   destinationImage:destinationImage.content];
     
-    [backwardTarget setGradient:sourceTensor forwardTarget:self];
-    [self removeCachedImages];
     [self removeGradient];
     
-    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    if (self.stopGradient) {
+        [self.blit encodeToCommandBuffer:commandBuffer
+                             sourceImage:destinationImage.content
+                        destinationImage:self.savedGradients.content];
+        [destinationImage unlock];
+    }
+    else {
     
+        [_backwardTarget setGradient:destinationImage forwardTarget:self];
+        [destinationImage unlock];
+        [_backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    }
 }
 
 MIReshapeLayer *MakeReshapeLayer(DataShape *inputShape, DataShape *outputShape) {

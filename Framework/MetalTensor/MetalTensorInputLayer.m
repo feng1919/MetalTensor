@@ -8,9 +8,7 @@
 
 #import "MetalTensorInputLayer.h"
 
-@implementation MetalTensorInputLayer {
-    MPSCNNNeuron *_neuron;
-}
+@implementation MetalTensorInputLayer
 
 #pragma mark - override
 - (void)compile:(id<MTLDevice>)device {
@@ -18,11 +16,6 @@
     [super compile:device];
     
     [self buildupTensors];
-    
-    if (_needBackward) {
-        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
-        _neuron = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
-    }
 }
 
 #pragma mark - private
@@ -70,9 +63,9 @@
 #pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
-    [_neuron encodeToCommandBuffer:commandBuffer
-                       sourceImage:_gradient.content
-                  destinationImage:_gradientImage.mpsImage];
+    [self.blit encodeToCommandBuffer:commandBuffer
+                           sourceImage:_gradient.content
+                      destinationImage:_gradientImage.mpsImage];
     
     [self removeGradient];
 }

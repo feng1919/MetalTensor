@@ -208,17 +208,25 @@
     }
     [gradients1 unlock];
     
-    [_compress compressOnCommandBuffer:commandBuffer sourceTensor:result destinationTensor:gradients0];
+    [_compress compressOnCommandBuffer:commandBuffer
+                          sourceTensor:result
+                     destinationTensor:gradients0];
     [result unlock];
     
     [self removeGradient];
     [self removeCachedImages];
     
-    [backwardTarget setGradient:gradients0 forwardTarget:self];
-    [gradients0 unlock];
-    
-    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
-    
+    if (self.stopGradient) {
+        [self.blit encodeToCommandBuffer:commandBuffer
+                             sourceImage:gradients0.content
+                        destinationImage:self.savedGradients.content];
+        [gradients0 unlock];
+    }
+    else {
+        [backwardTarget setGradient:gradients0 forwardTarget:self];
+        [gradients0 unlock];
+        [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    }
 }
 
 @end

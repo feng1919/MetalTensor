@@ -190,17 +190,24 @@
     [_convTranspose encodeToCommandBuffer:commandBuffer
                               sourceImage:activatedTensor.content
                          destinationImage:destinationGradient.content];
-
-    [backwardTarget setGradient:destinationGradient forwardTarget:self];
     
-    [destinationGradient unlock];
     [activatedTensor unlock];
     
     [self removeState];
     [self removeCachedImages];
     [self removeGradient];
     
-    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    if (self.stopGradient) {
+        [self.blit encodeToCommandBuffer:commandBuffer
+                             sourceImage:destinationGradient.content
+                        destinationImage:self.savedGradients.content];
+        [destinationGradient unlock];
+    }
+    else {
+        [backwardTarget setGradient:destinationGradient forwardTarget:self];
+        [destinationGradient unlock];
+        [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    }
 }
 
 #pragma mark - Management of the weights

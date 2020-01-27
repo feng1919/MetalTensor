@@ -11,7 +11,13 @@
 #include "numpy.h"
 #import "MPSImage+Extension.h"
 
-static MPSCNNAdd *_reduceSumOperation = nil;
+@interface MetalTensorLayer () {
+    MPSCNNNeuron *_blit;
+}
+
+@property (nonatomic, strong, nullable) MPSCNNAdd *reduceSum;
+
+@end
 
 @implementation MetalTensorLayer
 
@@ -34,7 +40,8 @@ static MPSCNNAdd *_reduceSumOperation = nil;
         for (int i = 0; i < size; i++) {
             _inputShapes[i] = inputShapes[i][0];
         }
-        
+
+        _stopGradient = NO;
         _numOfImages = size;
         
         _inputImages = [NSMutableDictionary dictionaryWithCapacity:size];
@@ -69,7 +76,8 @@ static MPSCNNAdd *_reduceSumOperation = nil;
         _receivedImageFlags = 0x0ULL;
         _inputShapes = malloc(size * sizeof(DataShape));
         npmemcpy(_inputShapes, inputShapes, size*sizeof(DataShape));
-        
+
+        _stopGradient = NO;
         _numOfImages = size;
         
         _inputImages = [NSMutableDictionary dictionaryWithCapacity:size];
@@ -101,6 +109,21 @@ static MPSCNNAdd *_reduceSumOperation = nil;
 }
 
 #pragma mark - public
+
+- (MPSCNNNeuron *)blit {
+    if (!_blit) {
+        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
+        _blit = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
+    }
+    return _blit;
+}
+
+- (MTImageTensor *)savedGradients {
+    if (!_savedGradients) {
+        _savedGradients = [[MTImageTensor alloc] initWithShape:&_inputShapes[0]];
+    }
+    return _savedGradients;
+}
 
 - (void)initialize {
 }
@@ -217,16 +240,14 @@ static MPSCNNAdd *_reduceSumOperation = nil;
         MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
                                                                commandBuffer:commandBuffer];
         temp.source = self;
-        if (_reduceSumOperation == nil) {
-            _reduceSumOperation = [[MPSCNNAdd alloc] initWithDevice:_device];
-        };
+        
         MetalTensor t1 = _inputGradients[0];
         MetalTensor t2 = _inputGradients[1];
         _gradient = temp;
-        [_reduceSumOperation encodeToCommandBuffer:commandBuffer
-                                      primaryImage:t1.content
-                                    secondaryImage:t2.content
-                                  destinationImage:_gradient.content];
+        [self.reduceSum encodeToCommandBuffer:commandBuffer
+                                 primaryImage:t1.content
+                               secondaryImage:t2.content
+                             destinationImage:_gradient.content];
         if (numOfGradients == 2) {
             goto GRADIENT_SUM_FINISH;
         }
@@ -235,10 +256,10 @@ static MPSCNNAdd *_reduceSumOperation = nil;
             t1 = _inputGradients[i];
             t2 = _gradient;
             _gradient = _inputGradients[i-1];
-            [_reduceSumOperation encodeToCommandBuffer:commandBuffer
-                                          primaryImage:t1.content
-                                        secondaryImage:t2.content
-                                      destinationImage:_gradient.content];
+            [self.reduceSum encodeToCommandBuffer:commandBuffer
+                                     primaryImage:t1.content
+                                   secondaryImage:t2.content
+                                 destinationImage:_gradient.content];
         }
         [_gradient lock];
         [temp unlock];
@@ -247,6 +268,15 @@ static MPSCNNAdd *_reduceSumOperation = nil;
     
 GRADIENT_SUM_FINISH:
     [self removeCachedGradients];
+}
+
+#pragma mark - Private
+
+- (MPSCNNAdd *)reduceSum {
+    if (!_reduceSum) {
+        _reduceSum = [[MPSCNNAdd alloc] initWithDevice:_device];
+    }
+    return _reduceSum;
 }
 
 #pragma mark - MTTensorForward Delegate
@@ -368,9 +398,20 @@ GRADIENT_SUM_FINISH:
     [self removeCachedImages];
     [self removeGradient];
     
-    [backwardTarget setGradient:destinationGradient forwardTarget:self];
-    [destinationGradient unlock];
-    [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
+    if (_stopGradient) {
+        
+        [self.blit encodeToCommandBuffer:commandBuffer
+                                   sourceImage:destinationGradient.content
+                              destinationImage:self.savedGradients.content];
+        [destinationGradient unlock];
+    }
+    else {
+        [backwardTarget setGradient:destinationGradient
+                      forwardTarget:self];
+        [destinationGradient unlock];
+        [backwardTarget gradientReadyOnCommandBuffer:commandBuffer
+                                       forwardTarget:self];
+    }
 }
 
 - (BOOL)isAllGradientsReceived {
@@ -435,11 +476,10 @@ GRADIENT_SUM_FINISH:
     
     NSAssert(tensor, @"Invalid tensor to save.");
     
-    MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeNone];
-    MPSCNNNeuron *neuron = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
-    
     self.savedResult = [[MTImageTensor alloc] initWithShape:tensor.shape];
-    [neuron encodeToCommandBuffer:commandBuffer sourceImage:tensor.content destinationImage:_savedResult.content];
+    [self.blit encodeToCommandBuffer:commandBuffer
+                         sourceImage:tensor.content
+                    destinationImage:_savedResult.content];
 }
 
 #endif
