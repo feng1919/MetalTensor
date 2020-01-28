@@ -373,7 +373,18 @@ GRADIENT_SUM_FINISH:
     
     if ([self isAllGradientsReceived]) {
         [self reduceSumBatchGradientsOnCommandBuffer:commandBuffer];
-        [self processGradientsOnCommandBuffer:commandBuffer];
+        
+        if (!_needBackward) {
+            [self.blit encodeToCommandBuffer:commandBuffer
+                                 sourceImage:_gradient.content
+                            destinationImage:self.savedGradients.content];
+            [self removeGradient];
+            [self removeState];
+            [self removeCachedImages];
+        }
+        else {
+            [self processGradientsOnCommandBuffer:commandBuffer];
+        }
     }
 }
 

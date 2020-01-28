@@ -23,6 +23,7 @@
 @property (nonatomic, assign) int direction;
 
 @property (nonatomic, assign) int numberOfChannels;
+@property (nonatomic, assign) float scale;
 
 - (void)compile:(id<MTLDevice>)device;
 
@@ -38,6 +39,7 @@
         if (device) {
             [self compile:device];
         }
+        self.scale = [coder decodeIntForKey:@"scale"];
     }
     return self;
 }
@@ -46,6 +48,7 @@
     [coder encodeInt:_direction forKey:@"direction"];
     [coder encodeInt:_numberOfChannels forKey:@"numberOfChannels"];
     [coder encodeObject:_device forKey:@"device"];
+    [coder encodeFloat:_scale forKey:@"scale"];
 }
 
 + (BOOL)supportsSecureCoding {
@@ -55,6 +58,7 @@
 - (id)copyWithZone:(NSZone *)zone {
     TVDataSource *item = [TVDataSource allocWithZone:zone];
     item.numberOfChannels = _numberOfChannels;
+    item.scale = _scale;
     [item compile:_device];
     return item;
 }
@@ -62,6 +66,7 @@
 - (id)copy {
     TVDataSource *reduce = [[TVDataSource alloc] init];
     reduce.numberOfChannels = _numberOfChannels;
+    reduce.scale = _scale;
     [reduce compile:_device];
     return reduce;
 }
@@ -86,8 +91,8 @@
     
     _data = calloc(_numberOfChannels*2, sizeof(float32_t));
     for (int i = 0; i < _numberOfChannels; i++) {
-        _data[i*2] = 255.0f;
-        _data[i*2+1] = -255.0f;
+        _data[i*2] = _scale;
+        _data[i*2+1] = -_scale;
     }
 }
 
@@ -150,6 +155,7 @@
 
 - (void)initialize {
     _alpha = 1.0f;
+    _scale = 255.0f;
 }
 
 - (void)compile:(id<MTLDevice>)device {
@@ -159,11 +165,13 @@
     
     _dataSourceHorizontal = [[TVDataSource alloc] init];
     _dataSourceHorizontal.direction = 0;
+    _dataSourceHorizontal.scale = _scale;
     _dataSourceHorizontal.numberOfChannels = inputShape->depth;
     [_dataSourceHorizontal compile:device];
     
     _dataSourceVertical = [[TVDataSource alloc] init];
     _dataSourceVertical.direction = 1;
+    _dataSourceVertical.scale = _scale;
     _dataSourceVertical.numberOfChannels = inputShape->depth;
     [_dataSourceVertical compile:device];
     
@@ -202,7 +210,10 @@
         _subtract = [[MPSCNNSubtract alloc] initWithDevice:device];
         [_subtract setSecondaryEdgeMode:MPSImageEdgeModeClamp];
         
-        neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear a:_alpha b:0.0f c:0.0f];
+        neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
+                                                                      a:_alpha/(float)ProductOfDataShape(inputShape)
+                                                                      b:0.0f
+                                                                      c:0.0f];
         _neuronScale = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
     }
 }
@@ -221,6 +232,14 @@
                                             strideInPixelsX:inputShape->column
                                             strideInPixelsY:inputShape->row];
     _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+
+    if (_needBackward) {
+        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
+                                                                                             a:_alpha/(float)ProductOfDataShape(inputShape)
+                                                                                             b:0.0f
+                                                                                             c:0.0f];
+        _neuronScale = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
+    }
 }
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
@@ -324,7 +343,6 @@
         [resultTensor unlock];
         [backwardTarget gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     }
-    
 }
 
 @end
