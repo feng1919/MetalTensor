@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  *  If YES, the node will not back propagate the gradients, but
  *  output the gradients.
- *  Defaylt by NO.
+ *  Default by NO.
  */
 @property (nonatomic, assign) BOOL stopGradient;
 
