@@ -14,9 +14,16 @@
 #if DEBUG
     float16_t *_result;
 #endif
+    
+    float16_t *_buffer;
 }
 
+
 - (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized {
+    return [self initWithImage:image normalized:normalized frameBuffer:NO];
+}
+
+- (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized frameBuffer:(BOOL)frameBuffer {
     int width = (int)image.size.width;
     int height = (int)image.size.height;
     DataShape shape = DataShapeMake(height, width, 3);
@@ -37,23 +44,27 @@
         CGContextDrawImage(context, CGContextGetClipBoundingBox(context), image.CGImage);
         CGContextRelease(context);
         
-        float16_t *float16 = malloc(width * height * 3 * sizeof(float16_t));
+        _buffer = malloc(Product(&shape) * sizeof(float16_t));
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int index = row*width+col;
-                float16[index*3] = data[index*4+1];     // B
-                float16[index*3+1] = data[index*4+2];   // G
-                float16[index*3+2] = data[index*4+3];   // R
+                _buffer[index*3] = data[index*4+1];     // B
+                _buffer[index*3+1] = data[index*4+2];   // G
+                _buffer[index*3+2] = data[index*4+3];   // R
             }
         }
         free(data);
         if (normalized) {
             for (int i = 0; i < width*height*3; i++) {
-                float16[i] /= 255.0f;
+                _buffer[i] /= 255.0f;
             }
         }
-        [self loadData:float16 length:width * height * 3 * sizeof(float16_t)];
-        free(float16);
+        [self loadData:_buffer length:Product(&shape) * sizeof(float16_t)];
+        
+        if (frameBuffer == NO) {
+            free(_buffer);
+            _buffer = NULL;
+        }
     }
     return self;
 }
@@ -81,6 +92,24 @@
     return self;
 }
 
+- (void)dealloc {
+    if (_buffer) {
+        free(_buffer);
+        _buffer = NULL;
+    }
+}
+
+- (float16_t *)buffer {
+    return _buffer;
+}
+
+- (void)loadBuffer {
+    NSAssert(_buffer, @"There is no buffer to load.");
+    if (_buffer) {
+        [self loadData:_buffer length:Product(self.shape)*sizeof(float16_t)];
+    }
+}
+
 - (void)loadData:(float16_t *)data length:(NSInteger)length {
     [_mpsImage writeBytes:data dataLayout:MPSDataLayoutHeightxWidthxFeatureChannels imageIndex:0];
 }
@@ -100,7 +129,7 @@
 - (void)dump {
     
     if (_result == NULL) {
-        int size = ProductOfDataShapeDepth4Divisible(self.shape);
+        int size = ProductDepth4Divisible(self.shape);
         _result = malloc(size * sizeof(float16_t));
         [_mpsImage toFloat16Array:_result];
         ConvertF16ToTensorFlowLayout1(_result, self.shape);
@@ -168,6 +197,39 @@
     printf(")   \n");
     
     printf("Sum:%e\n", sum);
+}
+
+- (void)printPixelsFromX:(int)x0 toX:(int)x1 fromY:(int)y0 toY:(int)y1 {
+    
+    int row = self.shape->row;
+    int column = self.shape->column;
+    int depth = self.shape->depth;
+    
+    int n_slice = (depth+3)/4;
+    int n_component = _mpsImage.numberOfComponents;
+    int buffer_depth = n_slice * n_component;
+    
+    assert(x0 >= 0 && x0 < x1 && x1 < column);
+    assert(y0 >= 0 && y0 < y1 && y1 < row);
+    
+    printf("\nTensor: %dx%dx%d", row, column, depth);
+    printf("\nPixels[%d:%d, %d:%d, :]", y0, y1, x0, x1);
+    for (int y = y0; y < y1; y ++) {
+        printf("\n");
+        for (int x = x0; x < x1; x ++) {
+            printf("(%d, %d) (", y, x);
+            for (int c = 0; c < buffer_depth; c++) {
+                printf("%f", _result[(y*column+x)*buffer_depth+c]);
+                if (c < buffer_depth-1) {
+                    printf(", ");
+                    if ((c+1)%4 == 0) {
+                        printf("\n");
+                    }
+                }
+            }
+            printf(")\n");
+        }
+    }
 }
 
 #endif

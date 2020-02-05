@@ -233,16 +233,35 @@
     }
 }
 
-- (void)predict:(id<MTLTexture>)bgraU8Texture
-{
+- (void)predict:(id<MTLTexture>)bgraU8Texture {
+    
     [_inputLayer inputTexture:bgraU8Texture];
     
     id<MTLCommandQueue> command_queue = [MetalDevice sharedCommandQueue];
     id<MTLCommandBuffer> command_buffer = [command_queue commandBuffer];
     [command_buffer setLabel:_reuseIdentifier];
-//    [command_buffer enqueue];
     [[MTTensorCache sharedCache] beginContextWithCommandBuffer:command_buffer];
-    [_inputLayer processImagesOnCommandBuffer:command_buffer];
+    [_inputLayer notifyTargetsAboutNewImageOnCommandBuffer:command_buffer];
+    [[MTTensorCache sharedCache] endContextWithCommandBuffer:command_buffer];
+    
+    if (_scheduledHandler) {
+        [command_buffer addScheduledHandler:_scheduledHandler];
+    }
+    if (_completedHandler) {
+        [command_buffer addCompletedHandler:_completedHandler];
+    }
+    [command_buffer commit];
+}
+
+- (void)predictWithTensor:(MetalTensor)tensor {
+    
+    [_inputLayer inputTensor:tensor];
+    
+    id<MTLCommandQueue> command_queue = [MetalDevice sharedCommandQueue];
+    id<MTLCommandBuffer> command_buffer = [command_queue commandBuffer];
+    [command_buffer setLabel:_reuseIdentifier];
+    [[MTTensorCache sharedCache] beginContextWithCommandBuffer:command_buffer];
+    [_inputLayer notifyTargetsAboutNewImageOnCommandBuffer:command_buffer];
     [[MTTensorCache sharedCache] endContextWithCommandBuffer:command_buffer];
     
     if (_scheduledHandler) {

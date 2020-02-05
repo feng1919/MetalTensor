@@ -48,6 +48,8 @@
         _inputGradients = [NSMutableArray array];
         
 #ifdef DEBUG
+        _dumpResult = NO;
+        
         NSMutableString *string = [NSMutableString string];
         for (int i = 0; i < size; i++) {
             [string appendString:NSStringFromDataShape(inputShapes[i])];
@@ -82,7 +84,11 @@
         
         _inputImages = [NSMutableDictionary dictionaryWithCapacity:size];
         _inputGradients = [NSMutableArray array];
+        
 #if DEBUG
+        
+        _dumpResult = NO;
+        
         NSMutableString *string = [NSMutableString string];
         for (int i = 0; i < size; i++) {
             [string appendString:NSStringFromDataShape(&inputShapes[i])];
@@ -152,7 +158,7 @@
     [super compile:device];
     
     NSParameterAssert(_numOfImages > 0);
-    if (ProductOfDataShape(&_outputShape) == 0) {
+    if (Product(&_outputShape) == 0) {
         [self updateOutputShape];
     }
 }
@@ -194,8 +200,7 @@
     [self setImageToTargets];
     [self removeImage];
     
-    for (ForwardTarget currentTarget in _targets)
-    {
+    for (ForwardTarget currentTarget in _targets) {
         NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
         NSInteger imageIndex = [[_targetIndices objectAtIndex:indexOfObject] integerValue];
         [currentTarget imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
@@ -358,6 +363,12 @@ GRADIENT_SUM_FINISH:
         //  Release the source images.
         [self removeCachedImages];
     }
+    
+#if DEBUG
+    if (_dumpResult) {
+        [self saveTensor:_image onCommandBuffer:commandBuffer];
+    }
+#endif
 }
 
 #pragma mark - MTTensorBackward Delegate

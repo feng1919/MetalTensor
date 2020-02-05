@@ -193,7 +193,7 @@
     [_convVertical setClipRect:clipRect];
     
     _channelReduce = [[MTChannelReduce alloc] initWithReduceType:ReduceTypeSum numberOfChannels:(inputShape->depth*2+3)>>2<<2];
-    _channelReduce.alpha = _alpha/6.0f;
+    _channelReduce.alpha = _alpha/(float)inputShape->depth/2.0f;
     [_channelReduce compile:device];
     
     _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:device
@@ -211,7 +211,7 @@
         [_subtract setSecondaryEdgeMode:MPSImageEdgeModeClamp];
         
         neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
-                                                                      a:_alpha/(float)ProductOfDataShape(inputShape)
+                                                                      a:_alpha/(float)Product(inputShape)
                                                                       b:0.0f
                                                                       c:0.0f];
         _neuronScale = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
@@ -235,7 +235,7 @@
 
     if (_needBackward) {
         MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
-                                                                                             a:_alpha/(float)ProductOfDataShape(inputShape)
+                                                                                             a:_alpha/(float)Product(inputShape)
                                                                                              b:0.0f
                                                                                              c:0.0f];
         _neuronScale = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
@@ -274,6 +274,12 @@
     if (!_needBackward) {
         [self removeCachedImages];
     }
+
+#if DEBUG
+    if (self.dumpResult) {
+        [self saveTensor:_image onCommandBuffer:commandBuffer];
+    }
+#endif
 }
 
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {

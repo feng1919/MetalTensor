@@ -31,16 +31,16 @@ bool KernelShapeValid(KernelShape *s) {
             s->stride>0);
 }
 
-int ProductOfDataShape(DataShape *s) {
+int Product(DataShape *s) {
     return s->column * s->depth * s->row;
 }
 
-int ProductOfDataShapeDepth4Divisible(DataShape *s) {
+int ProductDepth4Divisible(DataShape *s) {
     return s->column*s->row*((s->depth+3)>>2)<<2;
 }
 
 DataShape Reshape(DataShape *shape, int row, int column, int depth) {
-    assert(ProductOfDataShape(shape) > 0);
+    assert(Product(shape) > 0);
     DataShape s;
     s.column = shape->column;
     s.depth = shape->depth;
@@ -89,7 +89,7 @@ int Reshape1(DataShape *shape, int *row, int *column, int *depth) {
     }
     
     if (unknown == -1) {
-        if (ProductOfDataShape(shape) == product) {
+        if (Product(shape) == product) {
             shape->row = *row;
             shape->column = *column;
             shape->depth = *depth;
@@ -100,7 +100,7 @@ int Reshape1(DataShape *shape, int *row, int *column, int *depth) {
         }
     }
     
-    int original = ProductOfDataShape(shape);
+    int original = Product(shape);
     if (original%product != 0) {
         goto InvalidArgument;
     }

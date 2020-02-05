@@ -104,7 +104,7 @@
     [command_buffer commit];
     [command_buffer waitUntilCompleted];
     
-    float16_t *result = malloc(ProductOfDataShape(&_outputShape)*sizeof(float16_t));
+    float16_t *result = malloc(Product(&_outputShape)*sizeof(float16_t));
     [_outputImage toFloat16Array:result];
     // Once we obtain the tensor buffer, we may do something blah blah blah...
     free(result);

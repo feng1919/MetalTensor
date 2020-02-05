@@ -70,7 +70,7 @@
         _negative = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
         
         neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
-                                                                      a:_alpha/(float)ProductOfDataShape(inputShape)
+                                                                      a:_alpha/(float)Product(inputShape)
                                                                       b:0.0f
                                                                       c:0.0f];
         _alphaNeuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
@@ -86,6 +86,16 @@
     }
 }
 
+- (void)setSecondaryImage:(MTImageTensor *)secondaryImage {
+    _secondaryImage = secondaryImage;
+    if (secondaryImage) {
+        [self reserveImageIndex:1];
+    }
+    else {
+        [self releaseImageIndex:1];
+    }
+}
+
 #pragma mark - MTTensorForward delegate
 
 - (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
@@ -98,14 +108,13 @@
                                             strideInPixelsX:inputShape->column
                                             strideInPixelsY:inputShape->row];
     _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
-    
 }
 
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
     NSAssert(DataShapesTheSame(newImage.shape, &_inputShapes[0]), @"Invalid input tensor shape.");
     [super setImage:newImage atIndex:imageIndex];
     if (_secondaryImage) {
-        [super setImage:(MetalTensor  _Nonnull)_secondaryImage atIndex:1];
+        [super setImage:_secondaryImage atIndex:1];
     }
 }
 
@@ -113,20 +122,6 @@
     [super imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
     if (_secondaryImage) {
         [super imageReadyOnCommandBuffer:commandBuffer atIndex:1];
-    }
-}
-
-- (void)reserveImageIndex:(NSInteger)index {
-    [super reserveImageIndex:index];
-    if (_secondaryImage) {
-        [super reserveImageIndex:1];
-    }
-}
-
-- (void)releaseImageIndex:(NSInteger)index {
-    [super releaseImageIndex:index];
-    if (_secondaryImage) {
-        [super releaseImageIndex:1];
     }
 }
 
@@ -165,6 +160,12 @@
     if (!_needBackward) {
         [self removeCachedImages];
     }
+
+#if DEBUG
+    if (self.dumpResult) {
+        [self saveTensor:_image onCommandBuffer:commandBuffer];
+    }
+#endif
 }
 
 #pragma mark - MTTensorBackward Delegate
@@ -183,6 +184,7 @@
 //    NSAssert(back1, @"Invalid secondary backward target...");
     
     MetalTensor dv0 = [[MTTensorCache sharedCache] fetchTensorWithShape:t0.shape commandBuffer:commandBuffer];
+    MetalTensor dv1 = [[MTTensorCache sharedCache] fetchTensorWithShape:t1.shape commandBuffer:commandBuffer];
     
     DB_TRACE(-_verbose+2, "\n%s backward encoding...", self.labelUTF8);
     
@@ -190,23 +192,26 @@
     [_subtract encodeToCommandBuffer:commandBuffer
                         primaryImage:t0.content
                       secondaryImage:t1.content
-                    destinationImage:dv0.content];
+                    destinationImage:dv1.content];
     [_alphaNeuron encodeToCommandBuffer:commandBuffer
-                            sourceImage:dv0.content
-                       destinationImage:t0.content];
-    [dv0 unlock];
+                            sourceImage:dv1.content
+                       destinationImage:dv0.content];
+    
     [self removeGradient];
-    [back0 setGradient:t0 forwardTarget:self];
+    [back0 setGradient:dv0 forwardTarget:self];
     
     if (back1) {
         [_negative encodeToCommandBuffer:commandBuffer
-                             sourceImage:t0.content
-                        destinationImage:t1.content];
-        [back1 setGradient:t1 forwardTarget:self];
+                             sourceImage:dv0.content
+                        destinationImage:dv1.content];
+        [back1 setGradient:dv1 forwardTarget:self];
     }
     
     [self removeCachedImages];
-        
+    
+    [dv0 unlock];
+    [dv1 unlock];
+    
     [back0 gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     [back1 gradientReadyOnCommandBuffer:commandBuffer forwardTarget:self];
     

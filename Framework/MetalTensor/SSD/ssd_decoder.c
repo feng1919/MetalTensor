@@ -25,8 +25,8 @@ ssd_decoder *ssd_decoder_create(DataShape *location_shape, DataShape *confidence
     assert(confidence_shape);
     assert(location_shape->depth==confidence_shape->depth);
     assert(location_shape->depth>0);
-    assert(ProductOfDataShape(location_shape)>0);
-    assert(ProductOfDataShape(confidence_shape)>0);
+    assert(Product(location_shape)>0);
+    assert(Product(confidence_shape)>0);
     assert(n_classes>1);
     
     ssd_decoder *decoder = malloc(sizeof(ssd_decoder));
@@ -39,8 +39,8 @@ ssd_decoder *ssd_decoder_create(DataShape *location_shape, DataShape *confidence
     decoder->normalize_coords = true;
     decoder->image_width = image_size?image_size->width:1.0f;
     decoder->image_height = image_size?image_size->height:1.0f;
-    decoder->location = malloc(ProductOfDataShape(location_shape)*sizeof(float));
-    decoder->confidence = malloc(ProductOfDataShape(confidence_shape)*sizeof(float));
+    decoder->location = malloc(Product(location_shape)*sizeof(float));
+    decoder->confidence = malloc(Product(confidence_shape)*sizeof(float));
     decoder->boxes = malloc(decoder->n_boxes*sizeof(pb_rect));
     decoder->n_objects = 0;
     decoder->objects = NULL;

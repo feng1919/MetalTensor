@@ -155,6 +155,16 @@
     return nil;
 }
 
+- (void)setSecondaryImage:(MTImageTensor *)secondaryImage {
+    _secondaryImage = secondaryImage;
+    if (secondaryImage) {
+        [self reserveImageIndex:1];
+    }
+    else {
+        [self releaseImageIndex:1];
+    }
+}
+
 #pragma mark - MTTensorForward delegate
 
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
@@ -169,20 +179,6 @@
     [super imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
     if (_secondaryImage) {
         [super imageReadyOnCommandBuffer:commandBuffer atIndex:1];
-    }
-}
-
-- (void)reserveImageIndex:(NSInteger)index {
-    [super reserveImageIndex:index];
-    if (_secondaryImage) {
-        [super reserveImageIndex:1];
-    }
-}
-
-- (void)releaseImageIndex:(NSInteger)index {
-    [super releaseImageIndex:index];
-    if (_secondaryImage) {
-        [super releaseImageIndex:1];
     }
 }
 
@@ -212,6 +208,12 @@
                           destinationImage:_image.content];
         [self removeCachedImages];
     }
+    
+#if DEBUG
+    if (self.dumpResult) {
+        [self saveTensor:_image onCommandBuffer:commandBuffer];
+    }
+#endif
 }
 
 #pragma mark - MTTensorBackward delegate

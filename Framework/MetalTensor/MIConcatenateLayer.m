@@ -76,6 +76,12 @@
     if (!_needBackward) {
         [self removeCachedImages];
     }
+
+#if DEBUG
+    if (self.dumpResult) {
+        [self saveTensor:_image onCommandBuffer:commandBuffer];
+    }
+#endif
 }
 
 #pragma mark - MTTensorBackward Delegate

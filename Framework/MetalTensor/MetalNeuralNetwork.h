@@ -155,6 +155,7 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
  *
  */
 - (void)predict:(id<MTLTexture>)bgraU8Texture;
+- (void)predictWithTensor:(MetalTensor)tensor;
 
 /*
  *  Network input image size.

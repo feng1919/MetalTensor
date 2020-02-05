@@ -148,6 +148,7 @@ NS_ASSUME_NONNULL_BEGIN
 #if DEBUG
 - (void)printInputAndOutputShapes;
 
+@property (nonatomic, assign) BOOL dumpResult;
 @property (nonatomic, strong, nullable) MTImageTensor *savedResult;
 - (void)saveTensor:(MetalTensor)tensor onCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 

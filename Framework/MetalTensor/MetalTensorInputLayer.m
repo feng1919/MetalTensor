@@ -36,6 +36,13 @@
 //    [self debugInputTexture:bgraU8Texture];
     _outputImage.mpsImage = [[MPSImage alloc] initWithTexture:bgraU8Texture featureChannels:3];
     _outputImage.source = self;
+    _image = _outputImage;
+}
+
+- (void)inputTensor:(MetalTensor)tensor {
+    _image = tensor;
+    _image.source = self;
+    [_image lock];
 }
 
 #pragma mark - MTTensorForward Delegate
@@ -45,20 +52,33 @@
 }
 
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-
-    for (ForwardTarget currentTarget in _targets) {
-        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
-        NSInteger imageIndex = [_targetIndices[indexOfObject] integerValue];
-        
-        [currentTarget setImage:_outputImage atIndex:imageIndex];
-        
-        DB_TRACE(-_verbose+1, "\n%s ---%s---> %s(%ld)", self.labelUTF8,
-                 NSStringFromDataShape(_outputImage.shape).UTF8String,
-                 [currentTarget description].UTF8String, imageIndex);
-        
-        [currentTarget imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
-    }
+    
 }
+
+- (void)notifyTargetsAboutNewImageOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+#if DEBUG
+    if (self.dumpResult) {
+        [self saveTensor:_image onCommandBuffer:commandBuffer];
+    }
+#endif
+    [super notifyTargetsAboutNewImageOnCommandBuffer:commandBuffer];
+}
+
+//- (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+//
+//    for (ForwardTarget currentTarget in _targets) {
+//        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
+//        NSInteger imageIndex = [_targetIndices[indexOfObject] integerValue];
+//
+//        [currentTarget setImage:_image atIndex:imageIndex];
+//
+//        DB_TRACE(-_verbose+1, "\n%s ---%s---> %s(%ld)", self.labelUTF8,
+//                 NSStringFromDataShape(_outputImage.shape).UTF8String,
+//                 [currentTarget description].UTF8String, imageIndex);
+//    }
+//
+//    [_image unlock];
+//}
 
 #pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {

@@ -168,6 +168,13 @@
     }
     
     [self removeCachedImages];
+    
+
+#if DEBUG
+    if (self.dumpResult) {
+        [self saveTensor:_image onCommandBuffer:commandBuffer];
+    }
+#endif
 }
 
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {

@@ -123,7 +123,7 @@
     _multiply.secondaryStrideInPixelsX = 1;
     _multiply.secondaryStrideInPixelsY = 1;
     _multiply.secondaryStrideInFeatureChannels = 0;
-    
+    _multiply.secondaryOffset = MPSOffsetMake(0, 0, 0);
     _multiply.primaryScale = _weight;
     _multiply.secondaryScale = _weight;
     
@@ -153,6 +153,12 @@
     if (!_needBackward) {
         [self removeCachedImages];
     }
+
+#if DEBUG
+    if (self.dumpResult) {
+        [self saveTensor:_image onCommandBuffer:commandBuffer];
+    }
+#endif
 }
 
 #pragma mark - MTTensorBackward Delegate

@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) MTImageTensor *gradientImage;
 
 - (void)inputTexture:(id<MTLTexture>)bgraU8Texture;
+- (void)inputTensor:(MetalTensor)tensor;
 
 @end
 
