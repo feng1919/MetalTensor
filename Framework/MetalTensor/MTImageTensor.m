@@ -209,8 +209,8 @@
     int n_component = _mpsImage.numberOfComponents;
     int buffer_depth = n_slice * n_component;
     
-    assert(x0 >= 0 && x0 < x1 && x1 < column);
-    assert(y0 >= 0 && y0 < y1 && y1 < row);
+    assert(x0 >= 0 && x0 < x1 && x1 <= column);
+    assert(y0 >= 0 && y0 < y1 && y1 <= row);
     
     printf("\nTensor: %dx%dx%d", row, column, depth);
     printf("\nPixels[%d:%d, %d:%d, :]", y0, y1, x0, x1);
@@ -219,7 +219,7 @@
         for (int x = x0; x < x1; x ++) {
             printf("(%d, %d) (", y, x);
             for (int c = 0; c < buffer_depth; c++) {
-                printf("%f", _result[(y*column+x)*buffer_depth+c]);
+                printf("%e", _result[(y*column+x)*buffer_depth+c]);
                 if (c < buffer_depth-1) {
                     printf(", ");
                     if ((c+1)%4 == 0) {
@@ -230,6 +230,36 @@
             printf(")\n");
         }
     }
+}
+
+- (void)checkNan {
+    int row = self.shape->row;
+    int column = self.shape->column;
+    int depth = self.shape->depth;
+    
+    unsigned long long count = row * column * depth;
+    unsigned long long nan_count = 0;
+    for (unsigned long long i = 0; i < count; i++) {
+        if (isnan(_result[i])) {
+            nan_count ++;
+        }
+    }
+    printf("\nnan count: %lld", nan_count);
+}
+
+- (void)checkInf {
+    int row = self.shape->row;
+    int column = self.shape->column;
+    int depth = self.shape->depth;
+    
+    unsigned long long count = row * column * depth;
+    unsigned long long inf_count = 0;
+    for (unsigned long long i = 0; i < count; i++) {
+        if (isinf(_result[i])) {
+            inf_count ++;
+        }
+    }
+    printf("\ninf count: %lld", inf_count);
 }
 
 #endif

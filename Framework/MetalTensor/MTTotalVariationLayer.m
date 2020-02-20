@@ -175,33 +175,32 @@
     _dataSourceVertical.numberOfChannels = inputShape->depth;
     [_dataSourceVertical compile:device];
     
-    MTLRegion clipRect;
-    clipRect.origin = MTLOriginMake(0, 0, 0);
-    clipRect.size = MTLSizeMake(-1, -1, -1);
     _convHorizontal = [[MPSCNNConvolution alloc] initWithDevice:device weights:_dataSourceHorizontal];
-    [_convHorizontal setEdgeMode:MPSImageEdgeModeClamp];
     [_convHorizontal setOffset:MPSOffsetMake(1, 0, 0)];
-    clipRect.origin.x = 1;
-    clipRect.origin.y = 0;
-    [_convHorizontal setClipRect:clipRect];
+    [_convHorizontal setEdgeMode:MPSImageEdgeModeClamp];
+//    clipRect.origin.x = 1;
+//    clipRect.origin.y = 0;
+//    [_convHorizontal setClipRect:clipRect];
     
     _convVertical = [[MPSCNNConvolution alloc] initWithDevice:device weights:_dataSourceVertical];
-    [_convVertical setEdgeMode:MPSImageEdgeModeClamp];
     [_convVertical setOffset:MPSOffsetMake(0, 1, 0)];
-    clipRect.origin.x = 0;
-    clipRect.origin.y = 1;
-    [_convVertical setClipRect:clipRect];
+    [_convVertical setEdgeMode:MPSImageEdgeModeClamp];
+//    clipRect.origin.x = 0;
+//    clipRect.origin.y = 1;
+//    [_convVertical setClipRect:clipRect];
     
     _channelReduce = [[MTChannelReduce alloc] initWithReduceType:ReduceTypeSum numberOfChannels:(inputShape->depth*2+3)>>2<<2];
     _channelReduce.alpha = _alpha/(float)inputShape->depth/2.0f;
     [_channelReduce compile:device];
     
-    _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:device
-                                                kernelWidth:inputShape->column
-                                               kernelHeight:inputShape->row
-                                            strideInPixelsX:inputShape->column
-                                            strideInPixelsY:inputShape->row];
-    _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+    int pooling_row = inputShape->row-1;
+    int pooling_column = inputShape->column-1;
+    _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:_device
+                                                kernelWidth:pooling_column
+                                               kernelHeight:pooling_row
+                                            strideInPixelsX:pooling_column
+                                            strideInPixelsY:pooling_row];
+    _pooling.offset = MPSOffsetMake(pooling_column>>1, pooling_row>>1, 0);
     
     if (_needBackward) {
         MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear a:4.0f b:0.0f c:0.0f];
@@ -226,12 +225,14 @@
     [super setInputShape:dataShape atIndex:imageIndex];
     
     DataShape *inputShape = &_inputShapes[0];
+    int pooling_row = inputShape->row-1;
+    int pooling_column = inputShape->column-1;
     _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:_device
-                                                kernelWidth:inputShape->column
-                                               kernelHeight:inputShape->row
-                                            strideInPixelsX:inputShape->column
-                                            strideInPixelsY:inputShape->row];
-    _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+                                                kernelWidth:pooling_column
+                                               kernelHeight:pooling_row
+                                            strideInPixelsX:pooling_column
+                                            strideInPixelsY:pooling_row];
+    _pooling.offset = MPSOffsetMake(pooling_column>>1, pooling_row>>1, 0);
 
     if (_needBackward) {
         MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
@@ -247,8 +248,10 @@
     DataShape *inputShape = &_inputShapes[0];
     MetalTensor sourceTensor = _inputImages[@(0)];
     int depth = (inputShape->depth+3)>>2<<2;
-    MetalTensor convResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(inputShape->row, inputShape->column, depth*2)
+    MetalTensor convResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(inputShape->row-1, inputShape->column-1, depth*2)
                                                                   commandBuffer:commandBuffer];
+    MetalTensor powerResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(inputShape->row-1, inputShape->column-1, depth*2)
+                                                                   commandBuffer:commandBuffer];
     MetalTensor poolingResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(1, 1, depth*2)
                                                                      commandBuffer:commandBuffer];
     _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
@@ -268,6 +271,7 @@
                              sourceTensor:poolingResult
                         destinationTensor:_image];
     
+    [powerResult unlock];
     [poolingResult unlock];
     [convResult unlock];
     

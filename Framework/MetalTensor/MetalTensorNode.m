@@ -107,7 +107,7 @@ static int _METAL_VERBOSE = 0;
             [targetToRemove releaseImageIndex:imageIndex];
         }
         
-        DB_TRACE(-_verbose+2, "\n%s(%ld) rm %s", self.label, indexOfObject, [targetToRemove description].UTF8String);
+        DB_TRACE(-_verbose+2, "\n%s(%ld) rm %s", self.label.UTF8String, indexOfObject, [targetToRemove description].UTF8String);
     }
 }
 
@@ -116,7 +116,7 @@ static int _METAL_VERBOSE = 0;
         [_targets removeAllObjects];
         [_targetIndices removeAllObjects];
         
-        DB_TRACE(-_verbose+2, "\n%s rm all forward targets", self.label);
+        DB_TRACE(-_verbose+2, "\n%s rm all forward targets", self.label.UTF8String);
     }
 }
 

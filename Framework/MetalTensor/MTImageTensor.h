@@ -41,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)printResult;
 - (void)printPixelAtX:(int)x Y:(int)y;
 - (void)printPixelsFromX:(int)x0 toX:(int)x1 fromY:(int)y0 toY:(int)y1;
+- (void)checkNan;
+- (void)checkInf;
 
 #endif
 

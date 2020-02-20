@@ -244,8 +244,6 @@
     else {
         MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
                                                                commandBuffer:commandBuffer];
-        temp.source = self;
-        
         MetalTensor t1 = _inputGradients[0];
         MetalTensor t2 = _inputGradients[1];
         _gradient = temp;
@@ -377,7 +375,7 @@ GRADIENT_SUM_FINISH:
     [_inputGradients addObject:newGradient];
     [newGradient lock];
     
-    DB_TRACE(-_verbose+1, "\n%s <--<gradients:%s>-- %s\n", self.labelUTF8, NSStringFromDataShape(newGradient.shape).UTF8String, target.description.UTF8String);
+    DB_TRACE(-_verbose+1, "\n%s <--(g:%s)-- %s\n", self.labelUTF8, NSStringFromDataShape(newGradient.shape).UTF8String, target.description.UTF8String);
 }
 
 - (void)gradientReadyOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer forwardTarget:(ForwardTarget)target {
@@ -423,8 +421,8 @@ GRADIENT_SUM_FINISH:
     if (_stopGradient) {
         
         [self.blit encodeToCommandBuffer:commandBuffer
-                                   sourceImage:destinationGradient.content
-                              destinationImage:self.savedGradients.content];
+                             sourceImage:destinationGradient.content
+                        destinationImage:self.savedGradients.content];
         [destinationGradient unlock];
     }
     else {
