@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MobileNetV2 : MetalNeuralNetwork
 
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
+
 @end
 
 extern NSNotificationName MOBILENET_PREDICTING_RESULT;

@@ -64,6 +64,28 @@
                                    UIViewAutoresizingFlexibleTopMargin);
     [self.view addSubview:self.labelFPS];
     
+    int test[100];
+    for (int i = 0; i < 100; i++) {
+        test[i] = i;
+    }
+    
+    NSMutableData *data = [NSMutableData data];
+    [data appendBytes:test length:100 * sizeof(100)];
+    
+    NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"test.data"];
+    
+    FILE *fp;
+    fp = fopen(filePath.UTF8String, "a");
+    if (fp == NULL) {
+        NSAssert(NO, @"Failed to load file: %@", filePath);
+    }
+    fseek(fp, SEEK_END, SEEK_SET);
+    
+    for (int i = 0; i < 10; i++) {
+        fwrite(test, sizeof(int), 100, fp);
+    }
+    
+    fclose(fp);
 }
 
 - (void)viewDidAppear:(BOOL)animated {
