@@ -52,7 +52,7 @@
     NSParameterAssert(_output);
     _outputShape = _output.outputShape;
     
-    int size = ProductOfDataShape(&_outputShape);
+    int size = Product(&_outputShape);
     NSParameterAssert(size > 0);
     
     if (_outputBuffer) {

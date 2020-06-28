@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) id<PortraitSegmentNetDelegate> delegate;
 
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
 - (MTLUInt2)outputMaskSize;
 
 @end
