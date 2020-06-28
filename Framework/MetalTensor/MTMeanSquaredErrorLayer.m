@@ -101,13 +101,25 @@
 - (void)setInputShape:(DataShape *)dataShape atIndex:(NSInteger)imageIndex {
     [super setInputShape:dataShape atIndex:imageIndex];
     
-    DataShape *inputShape = &_inputShapes[0];
-    _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:_device
-                                                kernelWidth:inputShape->column
-                                               kernelHeight:inputShape->row
-                                            strideInPixelsX:inputShape->column
-                                            strideInPixelsY:inputShape->row];
-    _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+    if (_device) {
+
+        DataShape *inputShape = &_inputShapes[0];
+        _pooling = [[MPSCNNPoolingAverage alloc] initWithDevice:_device
+                                                    kernelWidth:inputShape->column
+                                                   kernelHeight:inputShape->row
+                                                strideInPixelsX:inputShape->column
+                                                strideInPixelsY:inputShape->row];
+        _pooling.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
+        
+        if (_needBackward) {
+
+            MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear
+                                                                                                 a:_alpha/(float)Product(inputShape)
+                                                                                                 b:0.0f
+                                                                                                 c:0.0f];
+            _alphaNeuron = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
+        }
+    }
 }
 
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
@@ -132,11 +144,11 @@
     
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
     
-    MetalTensor subtractImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic commandBuffer:commandBuffer];
-    MetalTensor squaredImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic commandBuffer:commandBuffer];
-    MetalTensor poolingImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputPooling commandBuffer:commandBuffer];
+    MetalTensor subtractImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic dataType:_dataType commandBuffer:commandBuffer];
+    MetalTensor squaredImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputArithmetic dataType:_dataType commandBuffer:commandBuffer];
+    MetalTensor poolingImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputPooling dataType:_dataType commandBuffer:commandBuffer];
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape dataType:_dataType commandBuffer:commandBuffer];
     _image.source = self;
 
     [_subtract encodeToCommandBuffer:commandBuffer
@@ -170,6 +182,8 @@
 
 #pragma mark - MTTensorBackward Delegate
 - (void)processGradientsOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    DB_TRACE(-_verbose+2, "\n%s backward encoding...", self.labelUTF8);
+    
     /*
      *  MSE f = 0.5*mean((v0-v1)^2) = 0.5*mean(v0^2-2*v0*v1+v1^2).
      *  The derivative of v0: df/dv0 = (v0-v1)/volume.
@@ -183,10 +197,8 @@
     BackwardTarget back1 = t1.source;
 //    NSAssert(back1, @"Invalid secondary backward target...");
     
-    MetalTensor dv0 = [[MTTensorCache sharedCache] fetchTensorWithShape:t0.shape commandBuffer:commandBuffer];
-    MetalTensor dv1 = [[MTTensorCache sharedCache] fetchTensorWithShape:t1.shape commandBuffer:commandBuffer];
-    
-    DB_TRACE(-_verbose+2, "\n%s backward encoding...", self.labelUTF8);
+    MetalTensor dv0 = [[MTTensorCache sharedCache] fetchTensorWithShape:t0.shape dataType:_dataType commandBuffer:commandBuffer];
+    MetalTensor dv1 = [[MTTensorCache sharedCache] fetchTensorWithShape:t1.shape dataType:_dataType commandBuffer:commandBuffer];
     
     //  The derivative of v0.
     [_subtract encodeToCommandBuffer:commandBuffer

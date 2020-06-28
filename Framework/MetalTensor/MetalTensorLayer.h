@@ -19,6 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
     //  The data shape of forward result tensor.
     DataShape _outputShape;
     
+    //  The precision of the computation.
+    MPSDataType _dataType;
+    
     //  input image shapes
     DataShape *_inputShapes;
     //  number of input images
@@ -59,6 +62,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, assign) DataShape outputShape;
+
+/*
+ *  Default is MPSDataTypeFloat16
+ *
+ */
+@property (nonatomic, assign) MPSDataType dataType;
 
 /*
  *  If YES, the node will not back propagate the gradients, but

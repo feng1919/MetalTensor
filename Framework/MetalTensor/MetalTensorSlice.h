@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MetalTensorSlice : NSObject
 
+@property (nonatomic, assign) MPSDataType dataType;
+
 - (instancetype)initWithNumberOfChannel:(int)numberOfChannel;
 - (void)compile:(id<MTLDevice>)device;
 - (MetalTensor)sliceTensor:(MetalTensor)tensor channelIndex:(int)channelIndex commandBuffer:(id<MTLCommandBuffer>)commandBuffer;

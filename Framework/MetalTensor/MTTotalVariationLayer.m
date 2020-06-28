@@ -249,12 +249,17 @@
     MetalTensor sourceTensor = _inputImages[@(0)];
     int depth = (inputShape->depth+3)>>2<<2;
     MetalTensor convResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(inputShape->row-1, inputShape->column-1, depth*2)
+                                                                       dataType:_dataType
                                                                   commandBuffer:commandBuffer];
     MetalTensor powerResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(inputShape->row-1, inputShape->column-1, depth*2)
+                                                                        dataType:_dataType
                                                                    commandBuffer:commandBuffer];
     MetalTensor poolingResult = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(1, 1, depth*2)
+                                                                          dataType:_dataType
                                                                      commandBuffer:commandBuffer];
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                      dataType:_dataType
+                                                 commandBuffer:commandBuffer];
     _image.source = self;
     
     [_convHorizontal encodeToCommandBuffer:commandBuffer
@@ -301,12 +306,14 @@
     
     DataShape *inputShape = &_inputShapes[0];
     MetalTensor copiedTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:inputShape
+                                                                        dataType:_dataType
                                                                    commandBuffer:commandBuffer];
     [_neuron encodeToCommandBuffer:commandBuffer
                        sourceImage:sourceTensor.content
                   destinationImage:copiedTensor.content];
     
     MetalTensor resultTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:inputShape
+                                                                        dataType:_dataType
                                                                    commandBuffer:commandBuffer];
     //  right
     [_subtract setSecondaryOffset:MPSOffsetMake(1, 0, 0)];

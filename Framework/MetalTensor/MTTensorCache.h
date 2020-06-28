@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "MetalTensorProtocols.h"
 #import "MTTensor.h"
+#import "MTMatrix.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,27 +26,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (MTTensorCache *)sharedCache;
 
-- (NSInteger)registerReuseIdentifier;
-- (void)unregisterReuseIdentifier:(NSInteger)identifier;
+- (NSInteger)registerReusePoolIdentifier;
+- (void)unregisterReusePoolIdentifier:(NSInteger)identifier;
 
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape
+                      commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+- (MetalTensor)fetchTensorWithShape:(DataShape *)shape
+                           dataType:(MPSDataType)dataType
                       commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 
 - (MetalTensor)fetchTensorWithShape1:(DataShape)shape
                        commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
-
-- (MetalTensor)fetchTensorWithShape:(DataShape *)shape
-                         dataFormat:(TensorDataFormat)dataFormat
-                        numberOfImages:(NSUInteger)numberOfImages
+- (MetalTensor)fetchTensorWithShape1:(DataShape)shape
+                           dataType:(MPSDataType)dataType
                       commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 
-- (void)cacheTensor:(MetalTensor)tensor;
+- (MetalMatrix)fetchMatrixWithRows:(int)rows
+                           columns:(int)columns
+                          dataType:(MPSDataType)dataType
+                     commandBuffer:(id<MTLCommandBuffer>)commandBuffer;
+
+- (void)cacheResource:(id<MTResource>)resource;
 
 - (void)beginContextWithCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
 - (void)endContextWithCommandBuffer:(id<MTLCommandBuffer>)commandBufferfer;
-
-NSString *KeyForTensorType(DataShape *shape, TensorDataFormat dataFormat);
-NSString *KeyForTensorType1(DataShape *shape, TensorDataFormat dataFormat, NSUInteger numberOfImages);
 
 @end
 

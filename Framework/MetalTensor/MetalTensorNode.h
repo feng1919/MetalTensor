@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <MetalImage/MetalImage.h>
 #import <MetalImage/MetalImageFunction.h>
 #import "MetalTensorProtocols.h"
 

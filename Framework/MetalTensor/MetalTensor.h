@@ -60,6 +60,7 @@ FOUNDATION_EXPORT const unsigned char MetalTensorVersionString[];
 #import "MTChannelReduce.h"
 #import "MetalTensorSlice.h"
 #import "MTTotalVariationLayer.h"
+#import "MTGramMatrixLayer.h"
 
 
 #import "MPSImage+Extension.h"

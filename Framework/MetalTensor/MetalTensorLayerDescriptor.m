@@ -466,15 +466,9 @@ Class LayerWithType(NSString *type)
             }
         }
         else {
-            _neuronTypes[0].neuron = MPSCNNNeuronTypeReLUN;
-            _neuronTypes[0].a = 0.0f;
-            _neuronTypes[0].b = 6.0f;
-            _neuronTypes[1].neuron = MPSCNNNeuronTypeReLUN;
-            _neuronTypes[1].a = 0.0f;
-            _neuronTypes[1].b = 6.0f;
-            _neuronTypes[2].neuron = MPSCNNNeuronTypeNone;
-            _neuronTypes[2].a = 0.0f;
-            _neuronTypes[2].b = 0.0f;
+            _neuronTypes[0] = Relu6();
+            _neuronTypes[1] = Relu6();
+            _neuronTypes[2] = NeuronTypeNone();
         }
         
         NSParameterAssert(dictionary[@"weights"]);

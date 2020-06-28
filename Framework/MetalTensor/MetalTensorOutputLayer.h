@@ -16,7 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MetalTensorOutputLayer : MetalTensorLayer
 
-@property (nonatomic, assign) TensorDataFormat dataFormat;
 @property (nonatomic, assign) NeuronType neuronType;
 @property (nonatomic, strong) MPSImage *outputImage;
 

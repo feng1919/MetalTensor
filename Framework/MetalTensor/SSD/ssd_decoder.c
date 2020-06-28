@@ -254,6 +254,21 @@ void ssd_decoder_greedy_nms(ssd_object **objects, int count, float iou_thresh, i
     n_objects[0] = count-n_neg_objects;
 }
 
+float ssd_iou(ssd_object *obj1, ssd_object *obj2) {
+    
+    float dx = fminf(obj1->xmax-obj2->xmin, obj2->xmax-obj1->xmin);
+    if (dx <= 0.0f) {
+        return 0.0f;
+    }
+    float dy = fminf(obj1->ymax-obj2->ymin, obj2->xmax-obj1->xmin);
+    if (dy <= 0.0f) {
+        return 0.0f;
+    }
+    float s1 = (obj1->xmax-obj1->xmin)*(obj1->ymax-obj1->ymin);
+    float s2 = (obj2->xmax-obj2->xmin)*(obj2->ymax-obj2->ymin);
+    return dx * dy / (s1+s2-dx*dy);
+}
+
 void decode_minmax_coordinates(ssd_decoding_unit *unit, float *variances, float *xmin, float *xmax, float *ymin, float *ymax)
 {
     // 1.

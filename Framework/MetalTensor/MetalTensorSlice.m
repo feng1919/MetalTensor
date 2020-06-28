@@ -48,9 +48,9 @@
 }
 
 - (void)activeChannelAtIndex:(int)channelIndex {
-    for (int i = 0; i < _numberOfChannel; i++) {
-        for (int j = 0; j < 4; j ++) {
-            _data[i+j*_numberOfChannel] = i == channelIndex?1.0f:0.0f;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < _numberOfChannel; j++) {
+            _data[i*_numberOfChannel+j] = j == channelIndex?1.0f:0.0f;
         }
     }
 }
@@ -102,7 +102,8 @@
 - (instancetype)initWithNumberOfChannel:(int)numberOfChannel {
     if (self = [super init]) {
         _numberOfChannel = numberOfChannel;
-        _dataSource = [[SliceDataSource alloc] initWithNumberOfChannel:numberOfChannel];
+        _dataSource = [[SliceDataSource alloc] initWithNumberOfChannel:MIN(4, numberOfChannel)];
+        _dataType = MPSDataTypeFloat16;
     }
     return self;
 }
@@ -117,11 +118,8 @@
     NSAssert(channelIndex < _numberOfChannel, @"Invalid channel index");
     
     DataShape dstShape = DataShapeMake(src.shape->row, src.shape->column, 4);
-    MetalTensor dst = [[MTTensorCache sharedCache] fetchTensorWithShape:&dstShape commandBuffer:commandBuffer];
-    
-    [_dataSource activeChannelAtIndex:channelIndex];
-    MPSCNNConvolution *convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
-    [convolution encodeToCommandBuffer:commandBuffer sourceImage:src.content destinationImage:dst.content];
+    MetalTensor dst = [[MTTensorCache sharedCache] fetchTensorWithShape:&dstShape dataType:_dataType commandBuffer:commandBuffer];
+    [self sliceTensor:src toTensor:dst channelIndex:channelIndex commandBuffer:commandBuffer];
     return dst;
 }
 
@@ -132,8 +130,9 @@
     NSAssert(dst.shape->depth == 4, @"MetalTensorSlice only can output one channel each time.");
     NSAssert(src.shape->row == dst.shape->row && src.shape->column == dst.shape->column, @"MetalTensorSlice output tensor should be the same row and column.");
     
-    [_dataSource activeChannelAtIndex:channelIndex];
+    [_dataSource activeChannelAtIndex:channelIndex%4];
     MPSCNNConvolution *convolution = [[MPSCNNConvolution alloc] initWithDevice:_device weights:_dataSource];
+    [convolution setSourceFeatureChannelOffset:channelIndex>>2<<2];
     [convolution encodeToCommandBuffer:commandBuffer sourceImage:src.content destinationImage:dst.content];
 }
 

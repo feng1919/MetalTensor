@@ -53,7 +53,7 @@ void ConvertKernelFirstToLast(float32_t *src, float32_t *dst, int col, int row, 
     }
 }
 
-void ConvertToTensorFlowLayout(float *dst, float *src, DataShape *shape)
+void ConvertToTensorFlowLayout(float *dst, const float *src, const DataShape *shape)
 {
     if (shape->depth <= 4) {
         npmemcpy(dst, src, ProductDepth4Divisible(shape)*sizeof(float));
@@ -73,7 +73,7 @@ void ConvertToTensorFlowLayout(float *dst, float *src, DataShape *shape)
 }
 
 
-void ConvertToTensorFlowLayout1(float *src, DataShape *shape) {
+void ConvertToTensorFlowLayout1(float *src, const DataShape *shape) {
     
     if (shape->depth <= 4) {
         return;
@@ -87,8 +87,9 @@ void ConvertToTensorFlowLayout1(float *src, DataShape *shape) {
 }
 
 
-void ConvertF16ToTensorFlowLayout(float16_t *dst, float16_t *src, DataShape *shape)
+void ConvertF16ToTensorFlowLayout(float16_t *dst, const float16_t *src, const DataShape *shape)
 {
+    double interval = CFAbsoluteTimeGetCurrent();
     if (shape->depth <= 4) {
         npmemcpy(dst, src, ProductDepth4Divisible(shape)*sizeof(float16_t));
         return;
@@ -104,9 +105,10 @@ void ConvertF16ToTensorFlowLayout(float16_t *dst, float16_t *src, DataShape *sha
             }
         }
     }
+    printf("\nconvert to HWC: %f", (CFAbsoluteTimeGetCurrent()-interval)*1000.0f);
 }
 
-void ConvertF16ToTensorFlowLayout1(float16_t *src, DataShape *shape)
+void ConvertF16ToTensorFlowLayout1(float16_t *src, const DataShape *shape)
 {
     if (shape->depth <= 4) {
         return;
@@ -115,6 +117,57 @@ void ConvertF16ToTensorFlowLayout1(float16_t *src, DataShape *shape)
     unsigned long long buffer_size = ProductDepth4Divisible(shape);
     float16_t *temp = malloc(buffer_size * sizeof(float16_t));
     ConvertF16ToTensorFlowLayout(temp, src, shape);
+    npmemcpy(src, temp, buffer_size*sizeof(float16_t));
+    free(temp);
+}
+
+void ConvertF16ToCHWLayout(float16_t *dst, const float16_t *src, const DataShape *shape) {
+    const int rows = shape->row;
+    const int columns = shape->column;
+    const int depth = shape->depth;
+    const int stride = rows*columns;
+    
+    for (int dep = 0; dep < depth; dep++) {
+        int offset = (dep>>2) * stride * 4;
+        int offset_dep = dep % 4;
+        int texture_dep = MIN(4, depth-((dep>>2)<<2));
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
+                dst[dep*stride+row*columns+col] = src[offset+(row*columns+col)*texture_dep+offset_dep];
+            }
+        }
+    }
+}
+
+void ConvertF16ToCHWLayout1(float16_t *src, const DataShape *shape) {
+    unsigned long long buffer_size = ProductDepth4Divisible(shape);
+    float16_t *temp = malloc(buffer_size * sizeof(float16_t));
+    ConvertF16ToCHWLayout(temp, src, shape);
+    npmemcpy(src, temp, buffer_size*sizeof(float16_t));
+    free(temp);
+}
+
+void ConvertF16HWCToCHWLayout(float16_t *dst, const float16_t *src, const DataShape *shape) {
+    double interval = CFAbsoluteTimeGetCurrent();
+    const int rows = shape->row;
+    const int columns = shape->column;
+    const int depth = shape->depth;
+    const int stride = rows*columns;
+    
+    for (int dep = 0; dep < depth; dep++) {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
+                dst[dep*stride+row*columns+col] = src[(row*columns+col)*depth+dep];
+            }
+        }
+    }
+    printf("\nconvert HWC to CHW time cost: %f", (CFAbsoluteTimeGetCurrent()-interval)*1000.0f);
+}
+
+void ConvertF16HWCToCHWLayout1(float16_t *src, const DataShape *shape) {
+    unsigned long long buffer_size = ProductDepth4Divisible(shape);
+    float16_t *temp = malloc(buffer_size * sizeof(float16_t));
+    ConvertF16HWCToCHWLayout(temp, src, shape);
     npmemcpy(src, temp, buffer_size*sizeof(float16_t));
     free(temp);
 }
@@ -135,6 +188,18 @@ NeuronType NeuronTypeMake1(MPSCNNNeuronType n, float a, float b, float c) {
     s.b = b;
     s.c = c;
     return s;
+}
+
+NeuronType NeuronTypeNone(void) {
+    return NeuronTypeMake(MPSCNNNeuronTypeNone, 0.0f, 0.0f);
+}
+
+NeuronType Relu(void) {
+    return NeuronTypeMake(MPSCNNNeuronTypeReLU, 0.0f, 0.0f);
+}
+
+NeuronType Relu6(void) {
+    return NeuronTypeMake(MPSCNNNeuronTypeReLUN, 0.0f, 6.0f);
 }
 
 MPSCNNNeuronType NeuronTypeFromString(NSString *neuron)

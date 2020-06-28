@@ -9,27 +9,20 @@
 #import <Foundation/Foundation.h>
 #import "MPSImage+Extension.h"
 #import "metal_tensor_structures.h"
+#import "MTResourceProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(int, TensorDataFormat) {
-    TensorDataFormatFloat16 = 16,
-    TensorDataFormatFloat32 = 32,
-};
-
 @protocol MTBackwardDelegate;
-@interface MTTensor : NSObject
-
-@property (nonatomic, assign) BOOL referenceCountingEnable; //default YES
-@property (nonatomic, assign) NSInteger reuseIdentifier;
+@interface MTTensor : NSObject <MTResource>
 
 @property (nonatomic, weak, nullable) id<MTBackwardDelegate> source;
 
-@property (nonatomic, readonly) TensorDataFormat dataFormat;
+@property (nonatomic, readonly) MPSDataType dataFormat;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithShape:(DataShape *)shape NS_DESIGNATED_INITIALIZER;
-- (instancetype)initWithShape:(DataShape *)shape dataFormat:(TensorDataFormat)dataFormat numberOfImage:(NSUInteger)numberOfImages NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithShape:(DataShape *)shape dataType:(MPSDataType)dataType numberOfImage:(NSUInteger)numberOfImages NS_DESIGNATED_INITIALIZER;
 
 - (MPSImage *)content;
 - (DataShape *)shape;
@@ -39,17 +32,13 @@ typedef NS_ENUM(int, TensorDataFormat) {
 - (NSUInteger)depth;
 
 - (MPSImageDescriptor *)imageDescriptor;
-- (MPSTemporaryImage *)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer;
-- (void)deleteContent;
-
-- (void)lock;
-- (void)unlock;
-- (int)referenceCounting;
-
-MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat);
 
 @end
 
 typedef MTTensor * MetalTensor;
+
+MPSImageDescriptor *ImageDescriptor(DataShape *s, MPSDataType);
+NSString *KeyForTensorType(DataShape *shape, MPSDataType dataFormat);
+NSString *KeyForTensorType1(DataShape *shape, MPSDataType dataFormat, NSUInteger numberOfImages);
 
 NS_ASSUME_NONNULL_END

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -87,6 +87,12 @@
 		5A8D23DE2341DA04005F88E6 /* MIArithmeticLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23942341DA00005F88E6 /* MIArithmeticLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23E12341E020005F88E6 /* metal_tensor_log.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23DF2341E020005F88E6 /* metal_tensor_log.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23E22341E020005F88E6 /* metal_tensor_log.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23E02341E020005F88E6 /* metal_tensor_log.c */; };
+		5A8F18F723FEA3E1002CAB59 /* MTGramMatrixLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8F18F523FEA3E1002CAB59 /* MTGramMatrixLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5A8F18F823FEA3E1002CAB59 /* MTGramMatrixLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F18F623FEA3E1002CAB59 /* MTGramMatrixLayer.m */; };
+		5A9FB19D24167C36007A1F12 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9FB19C24167C35007A1F12 /* Metal.framework */; platformFilter = ios; };
+		5A9FB19F24167C3C007A1F12 /* MetalPerformanceShaders.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9FB19E24167C3C007A1F12 /* MetalPerformanceShaders.framework */; platformFilter = ios; };
+		5AB218E42470020D00738DF4 /* MetalImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB218E32470020D00738DF4 /* MetalImage.framework */; platformFilter = ios; settings = {ATTRIBUTES = (Required, ); }; };
+		5AB218E6247002BD00738DF4 /* MetalImage.framework in Sources */ = {isa = PBXBuildFile; fileRef = 5AB218E32470020D00738DF4 /* MetalImage.framework */; platformFilter = ios; };
 		5AC43CD2237C306500E740EA /* ssd_prior_box.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AC43CCA237C306500E740EA /* ssd_prior_box.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5AC43CD3237C306500E740EA /* ssd_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CCB237C306500E740EA /* ssd_decoder.c */; };
 		5AC43CD4237C306500E740EA /* SSDObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CCC237C306500E740EA /* SSDObject.m */; };
@@ -103,6 +109,9 @@
 		5AE0F48D23CD96B600D9E957 /* MTChannelReduce.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE0F48B23CD96B600D9E957 /* MTChannelReduce.m */; };
 		5AE0F4A023CEC2C700D9E957 /* MTTotalVariationLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AE0F49E23CEC2C700D9E957 /* MTTotalVariationLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5AE0F4A123CEC2C700D9E957 /* MTTotalVariationLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE0F49F23CEC2C700D9E957 /* MTTotalVariationLayer.m */; };
+		5AFA70DF23FEC0710021C56C /* MTMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AFA70DD23FEC0710021C56C /* MTMatrix.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5AFA70E023FEC0710021C56C /* MTMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFA70DE23FEC0710021C56C /* MTMatrix.m */; };
+		5AFA70E223FF778E0021C56C /* MTResourceProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AFA70E123FF778E0021C56C /* MTResourceProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -188,6 +197,11 @@
 		5A8D23942341DA00005F88E6 /* MIArithmeticLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIArithmeticLayer.h; sourceTree = "<group>"; };
 		5A8D23DF2341E020005F88E6 /* metal_tensor_log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = metal_tensor_log.h; sourceTree = "<group>"; };
 		5A8D23E02341E020005F88E6 /* metal_tensor_log.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = metal_tensor_log.c; sourceTree = "<group>"; };
+		5A8F18F523FEA3E1002CAB59 /* MTGramMatrixLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTGramMatrixLayer.h; sourceTree = "<group>"; };
+		5A8F18F623FEA3E1002CAB59 /* MTGramMatrixLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGramMatrixLayer.m; sourceTree = "<group>"; };
+		5A9FB19C24167C35007A1F12 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
+		5A9FB19E24167C3C007A1F12 /* MetalPerformanceShaders.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalPerformanceShaders.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/MetalPerformanceShaders.framework; sourceTree = DEVELOPER_DIR; };
+		5AB218E32470020D00738DF4 /* MetalImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalImage.framework; path = ../ThirdParts/MetalImage.framework; sourceTree = "<group>"; };
 		5AC43CCA237C306500E740EA /* ssd_prior_box.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssd_prior_box.h; sourceTree = "<group>"; };
 		5AC43CCB237C306500E740EA /* ssd_decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ssd_decoder.c; sourceTree = "<group>"; };
 		5AC43CCC237C306500E740EA /* SSDObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSDObject.m; sourceTree = "<group>"; };
@@ -204,6 +218,9 @@
 		5AE0F48B23CD96B600D9E957 /* MTChannelReduce.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTChannelReduce.m; sourceTree = "<group>"; };
 		5AE0F49E23CEC2C700D9E957 /* MTTotalVariationLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTTotalVariationLayer.h; sourceTree = "<group>"; };
 		5AE0F49F23CEC2C700D9E957 /* MTTotalVariationLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTTotalVariationLayer.m; sourceTree = "<group>"; };
+		5AFA70DD23FEC0710021C56C /* MTMatrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTMatrix.h; sourceTree = "<group>"; };
+		5AFA70DE23FEC0710021C56C /* MTMatrix.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTMatrix.m; sourceTree = "<group>"; };
+		5AFA70E123FF778E0021C56C /* MTResourceProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTResourceProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,17 +228,31 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A9FB19D24167C36007A1F12 /* Metal.framework in Frameworks */,
+				5AB218E42470020D00738DF4 /* MetalImage.framework in Frameworks */,
+				5A9FB19F24167C3C007A1F12 /* MetalPerformanceShaders.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5A59809424128E89007953EA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5AB218E32470020D00738DF4 /* MetalImage.framework */,
+				5A9FB19E24167C3C007A1F12 /* MetalPerformanceShaders.framework */,
+				5A9FB19C24167C35007A1F12 /* Metal.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		5A8D23352341D767005F88E6 = {
 			isa = PBXGroup;
 			children = (
 				5A8D23412341D767005F88E6 /* MetalTensor */,
 				5A8D23402341D767005F88E6 /* Products */,
+				5A59809424128E89007953EA /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -296,6 +327,8 @@
 				5A4EA39C23BB349900B68DE5 /* MIMatrixMultiplyLayer.m */,
 				5A3BAAC023BB69090000D1BC /* MIGramMatrixLayer.h */,
 				5A3BAAC123BB69090000D1BC /* MIGramMatrixLayer.m */,
+				5A8F18F523FEA3E1002CAB59 /* MTGramMatrixLayer.h */,
+				5A8F18F623FEA3E1002CAB59 /* MTGramMatrixLayer.m */,
 				5A5B243123C9F45600BBEED3 /* MetalTensorSlice.h */,
 				5A5B243223C9F45600BBEED3 /* MetalTensorSlice.m */,
 				5AE0F48A23CD96B600D9E957 /* MTChannelReduce.h */,
@@ -312,8 +345,11 @@
 				5AE0F49F23CEC2C700D9E957 /* MTTotalVariationLayer.m */,
 				5A8D23662341D9FC005F88E6 /* MISoftMaxLayer.h */,
 				5A8D234E2341D9FB005F88E6 /* MISoftMaxLayer.m */,
+				5AFA70E123FF778E0021C56C /* MTResourceProtocol.h */,
 				5A8D23562341D9FB005F88E6 /* MTTensor.h */,
 				5A8D23702341D9FD005F88E6 /* MTTensor.m */,
+				5AFA70DD23FEC0710021C56C /* MTMatrix.h */,
+				5AFA70DE23FEC0710021C56C /* MTMatrix.m */,
 				5A8D235A2341D9FC005F88E6 /* MTTensorCache.h */,
 				5A8D23732341D9FD005F88E6 /* MTTensorCache.m */,
 				5A8D23922341DA00005F88E6 /* MTImageTensor.h */,
@@ -361,6 +397,7 @@
 				5A8D23CE2341DA04005F88E6 /* MIConvolutionLayer.h in Headers */,
 				5A8D23AB2341DA03005F88E6 /* MIConcatenateLayer.h in Headers */,
 				5A8D23D72341DA04005F88E6 /* MetalTensorNode.h in Headers */,
+				5A8F18F723FEA3E1002CAB59 /* MTGramMatrixLayer.h in Headers */,
 				5A8D23AE2341DA03005F88E6 /* MetalTensorOutputLayer.h in Headers */,
 				5A8D23D42341DA04005F88E6 /* NSString+Extension.h in Headers */,
 				5A8D23D22341DA04005F88E6 /* MIInvertedResidualModule.h in Headers */,
@@ -392,6 +429,7 @@
 				5A8D23D12341DA04005F88E6 /* numpy.h in Headers */,
 				5A8D23DE2341DA04005F88E6 /* MIArithmeticLayer.h in Headers */,
 				5A8D23A42341DA03005F88E6 /* MTTensorCache.h in Headers */,
+				5AFA70E223FF778E0021C56C /* MTResourceProtocol.h in Headers */,
 				5A8D23A22341DA03005F88E6 /* MetalNeuralNetwork.h in Headers */,
 				5A3BAAC723BB6AE40000D1BC /* MIReduceUnaryLayer.h in Headers */,
 				5A4EA39D23BB349900B68DE5 /* MIMatrixMultiplyLayer.h in Headers */,
@@ -401,6 +439,7 @@
 				5A8D23E12341E020005F88E6 /* metal_tensor_log.h in Headers */,
 				5A8D23BF2341DA03005F88E6 /* MIDataSource.h in Headers */,
 				5A8D23A52341DA03005F88E6 /* MIFullyConnectedLayer.h in Headers */,
+				5AFA70DF23FEC0710021C56C /* MTMatrix.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -472,6 +511,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AB218E6247002BD00738DF4 /* MetalImage.framework in Sources */,
 				5A8D23CF2341DA04005F88E6 /* MIResidualModule.m in Sources */,
 				5A8D23B52341DA03005F88E6 /* MIConcatenateLayer.m in Sources */,
 				5AC43CD8237C306500E740EA /* SSDConfig.m in Sources */,
@@ -496,6 +536,7 @@
 				5A8D23A92341DA03005F88E6 /* MIArithmeticLayer.m in Sources */,
 				5A5B243423C9F45600BBEED3 /* MetalTensorSlice.m in Sources */,
 				5A8D23982341DA03005F88E6 /* MISoftMaxLayer.m in Sources */,
+				5A8F18F823FEA3E1002CAB59 /* MTGramMatrixLayer.m in Sources */,
 				5A8D239B2341DA03005F88E6 /* MTImageTensor.m in Sources */,
 				5A8D23DB2341DA04005F88E6 /* MetalTensorLayer.m in Sources */,
 				5AC43CD3237C306500E740EA /* ssd_decoder.c in Sources */,
@@ -517,6 +558,7 @@
 				5A8D23BD2341DA03005F88E6 /* MTTensorCache.m in Sources */,
 				5A8D23A82341DA03005F88E6 /* MIPoolingAverageLayer.m in Sources */,
 				5A8D23AF2341DA03005F88E6 /* MIPoolingMaxLayer.m in Sources */,
+				5AFA70E023FEC0710021C56C /* MTMatrix.m in Sources */,
 				5A8D23B62341DA03005F88E6 /* MIDropoutLayer.m in Sources */,
 				5A7FA55E23D6E34D006C7907 /* MTChannelCompress.m in Sources */,
 			);
@@ -667,6 +709,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.fengshi.MetalTensor;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -697,6 +740,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.fengshi.MetalTensor;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

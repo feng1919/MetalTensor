@@ -79,4 +79,6 @@ void ssd_decoder_process(ssd_decoder *decoder);
 void ssd_decoder_print_results(ssd_decoder *decoder);
 void ssd_decoder_destroy(ssd_decoder *decoder);
 
+float ssd_iou(ssd_object *obj1, ssd_object *obj2);
+
 #endif /* ssd_decoder_h */

@@ -11,25 +11,17 @@
 
 @interface MTTensor() {
     DataShape _shape;
-    int _referenceCounting;
     MPSImageDescriptor *_imageDescriptor;
     MPSTemporaryImage *_image;
 }
 
 @end
 
-MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat dataFormat) {
-    assert(s->row>0 && s->column>0 && s->depth>0);
-    MPSImageFeatureChannelFormat format = dataFormat == TensorDataFormatFloat16?MPSImageFeatureChannelFormatFloat16:MPSImageFeatureChannelFormatFloat32;
-    MPSImageDescriptor *desc = [MPSImageDescriptor imageDescriptorWithChannelFormat:format
-                                                                              width:s->column
-                                                                             height:s->row
-                                                                    featureChannels:s->depth];
-    desc.storageMode = MTLStorageModePrivate;
-    return desc;
-}
-
 @implementation MTTensor
+
+@synthesize poolIdentifier = _poolIdentifier;
+@synthesize referenceCountingEnable = _referenceCountingEnable;
+@synthesize referenceCounting = _referenceCounting;
 
 - (instancetype)init{
     NSAssert(NO, @"Invalid initialize function.");
@@ -38,7 +30,7 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat dataFormat) {
 
 - (instancetype)initWithShape:(DataShape *)shape {
     if (self = [super init]) {
-        _dataFormat = TensorDataFormatFloat16;
+        _dataFormat = MPSDataTypeFloat16;
         _shape = shape[0];
         _referenceCounting = 0;
         _imageDescriptor = ImageDescriptor(shape, _dataFormat);
@@ -47,9 +39,9 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat dataFormat) {
     return self;
 }
 
-- (instancetype)initWithShape:(DataShape *)shape dataFormat:(TensorDataFormat)dataFormat numberOfImage:(NSUInteger)numberOfImages {
+- (instancetype)initWithShape:(DataShape *)shape dataType:(MPSDataType)dataType numberOfImage:(NSUInteger)numberOfImages {
     if (self = [super init]) {
-        _dataFormat = dataFormat;
+        _dataFormat = dataType;
         _shape = shape[0];
         _referenceCounting = 0;
         _imageDescriptor = ImageDescriptor(shape, _dataFormat);
@@ -106,21 +98,6 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat dataFormat) {
     return _imageDescriptor;
 }
 
-- (MPSTemporaryImage *)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    @synchronized (self) {
-        if (!_image) {
-//        _image.readCount = 0;
-            _image = [MPSTemporaryImage temporaryImageWithCommandBuffer:commandBuffer imageDescriptor:_imageDescriptor];
-            _image.readCount = NSIntegerMax;
-        }
-        return _image;
-    }
-}
-
-- (void)deleteContent {
-    self.image = nil;
-}
-
 - (void)setImage:(MPSTemporaryImage *)image {
     NSAssert(image==nil||[image isKindOfClass:[MPSTemporaryImage class]], @"Invalid image type...");
     @synchronized (self) {
@@ -148,7 +125,7 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat dataFormat) {
             //            [(MPSTemporaryImage *)_image setReadCount:0];
             //        }
             //        self.image = nil;
-            [[MTTensorCache sharedCache] cacheTensor:self];
+            [[MTTensorCache sharedCache] cacheResource:self];
         }
     }
 }
@@ -157,4 +134,43 @@ MPSImageDescriptor *ImageDescriptor(DataShape *s, TensorDataFormat dataFormat) {
     return _referenceCounting;
 }
 
+- (void)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    @synchronized (self) {
+        if (!_image) {
+//        _image.readCount = 0;
+            _image = [MPSTemporaryImage temporaryImageWithCommandBuffer:commandBuffer imageDescriptor:_imageDescriptor];
+            _image.readCount = NSIntegerMax;
+        }
+    }
+}
+
+- (void)deleteContent {
+    self.image = nil;
+}
+
+- (NSString *)reuseIdentifier {
+    return KeyForTensorType(self.shape, self.dataFormat);
+}
+
 @end
+
+MPSImageDescriptor *ImageDescriptor(DataShape *s, MPSDataType dataFormat) {
+    assert(s->row>0 && s->column>0 && s->depth>0);
+    MPSImageFeatureChannelFormat format = dataFormat == MPSDataTypeFloat16?MPSImageFeatureChannelFormatFloat16:MPSImageFeatureChannelFormatFloat32;
+    MPSImageDescriptor *desc = [MPSImageDescriptor imageDescriptorWithChannelFormat:format
+                                                                              width:s->column
+                                                                             height:s->row
+                                                                    featureChannels:s->depth];
+    desc.storageMode = MTLStorageModePrivate;
+    return desc;
+}
+
+NSString *KeyForTensorType(DataShape *shape, MPSDataType dataFormat) {
+    return KeyForTensorType1(shape, dataFormat, 1);
+}
+
+NSString *KeyForTensorType1(DataShape *shape, MPSDataType dataFormat, NSUInteger numberOfImages) {
+//    return [NSString stringWithFormat:@"[ROW %d][COLUMN %d][DEPTH %d][FLOAT %d][N%d]", shape->row, shape->column, shape->depth, dataFormat, (int)numberOfImages];
+    return [NSString stringWithFormat:@"<NHWC: %dx%dx%dx%d - float%d>", (int)numberOfImages,
+            shape->row, shape->column, shape->depth, dataFormat==MPSDataTypeFloat16?16:32];
+}

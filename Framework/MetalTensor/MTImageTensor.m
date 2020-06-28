@@ -11,10 +11,6 @@
 
 @implementation MTImageTensor {
     
-#if DEBUG
-    float16_t *_result;
-#endif
-    
     float16_t *_buffer;
 }
 
@@ -30,7 +26,7 @@
     if (self = [super initWithShape:&shape]) {
         self.referenceCountingEnable = NO;
         
-        MPSImageDescriptor *descriptor = ImageDescriptor(&shape, TensorDataFormatFloat16);
+        MPSImageDescriptor *descriptor = ImageDescriptor(&shape, MPSDataTypeFloat16);
         descriptor.storageMode = MTLStorageModeShared;
         _mpsImage = [[MPSImage alloc] initWithDevice:[MetalDevice sharedMTLDevice] imageDescriptor:descriptor];
         
@@ -39,12 +35,20 @@
             colorSpace = CGColorSpaceCreateDeviceRGB();
         }
         Byte *data = malloc(width * height * 4 * sizeof(Byte));
+        if (!data) {
+            goto SKIP;
+        }
         // We have got a RGBA data layout format in litte endian, which equals to ABGR in big endian.
         CGContextRef context = CGBitmapContextCreate(data, width, height, 8, width*4, colorSpace, kCGImageByteOrder32Little|kCGImageAlphaPremultipliedLast);
         CGContextDrawImage(context, CGContextGetClipBoundingBox(context), image.CGImage);
         CGContextRelease(context);
         
         _buffer = malloc(Product(&shape) * sizeof(float16_t));
+        
+        if (!_buffer) {
+            goto SKIP;
+        }
+        
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int index = row*width+col;
@@ -53,27 +57,47 @@
                 _buffer[index*3+2] = data[index*4+3];   // R
             }
         }
-        free(data);
+        
         if (normalized) {
             for (int i = 0; i < width*height*3; i++) {
                 _buffer[i] /= 255.0f;
             }
         }
+        
         [self loadData:_buffer length:Product(&shape) * sizeof(float16_t)];
         
         if (frameBuffer == NO) {
             free(_buffer);
             _buffer = NULL;
         }
+    
+SKIP:
+        if (data) {
+            free(data);
+            data = NULL;
+        }
+        
     }
     return self;
 }
+
 
 - (instancetype)initWithShape:(DataShape *)shape {
     if (self = [super initWithShape:shape]) {
         self.referenceCountingEnable = NO;
         
-        MPSImageDescriptor *descriptor = ImageDescriptor(shape, TensorDataFormatFloat16);
+        MPSImageDescriptor *descriptor = ImageDescriptor(shape, MPSDataTypeFloat16);
+        descriptor.storageMode = MTLStorageModeShared;
+        _mpsImage = [[MPSImage alloc] initWithDevice:[MetalDevice sharedMTLDevice] imageDescriptor:descriptor];
+    }
+    return self;
+}
+
+- (instancetype)initWithShape:(DataShape *)shape dataType:(MPSDataType)dataType {
+    if (self = [super initWithShape:shape dataType:dataType numberOfImage:1]) {
+        self.referenceCountingEnable = NO;
+        
+        MPSImageDescriptor *descriptor = ImageDescriptor(shape, dataType);
         descriptor.storageMode = MTLStorageModeShared;
         _mpsImage = [[MPSImage alloc] initWithDevice:[MetalDevice sharedMTLDevice] imageDescriptor:descriptor];
     }
@@ -97,6 +121,12 @@
         free(_buffer);
         _buffer = NULL;
     }
+#if DEBUG
+    if (_result) {
+        free(_result);
+        _result = NULL;
+    }
+#endif
 }
 
 - (float16_t *)buffer {
@@ -114,10 +144,10 @@
     [_mpsImage writeBytes:data dataLayout:MPSDataLayoutHeightxWidthxFeatureChannels imageIndex:0];
 }
 
-- (MPSTemporaryImage *)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+- (void)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     NSAssert(NO, @"It is invalid to call on command buffer for 'MTImageTensor', which is a global variance.");
     _mpsImage = nil;
-    return [super newContentOnCommandBuffer:commandBuffer];
+    [super newContentOnCommandBuffer:commandBuffer];
 }
 
 - (MPSImage *)content {
@@ -129,10 +159,12 @@
 - (void)dump {
     
     if (_result == NULL) {
+        double interval = CACurrentMediaTime();
         int size = ProductDepth4Divisible(self.shape);
         _result = malloc(size * sizeof(float16_t));
         [_mpsImage toFloat16Array:_result];
         ConvertF16ToTensorFlowLayout1(_result, self.shape);
+        printf("\ndump tensor: %dx%dx%d, %f ms.", self.shape->row, self.shape->column, self.shape->depth, (CACurrentMediaTime()-interval)*1000.0f);
     }
 }
 
@@ -151,17 +183,62 @@
         printf("\nrow:%d", i);
         printf("\n(");
         for (int j = 0; j < column; j++) {
-            printf("\n  col:%d", j);
-            printf("\n  (");
+            if (buffer_depth >= 4) {
+                printf("\n  col:%d", j);
+                printf("\n  (");
+            }
             for (int c = 0; c < buffer_depth; c++) {
-                printf("%f", _result[(i*column+j)*buffer_depth+c]);
+                printf("%e", _result[(i*column+j)*buffer_depth+c]);
                 if (c < depth-1) {
                     printf(", ");
                 }
             }
-            printf("),");
+            if (buffer_depth >= 4) {
+                printf(")");
+            }
+            if (j < column-1) {
+                printf(", ");
+            }
         }
         printf("\n  )");
+    }
+    printf("\n");
+}
+
+- (void)printResultCHW {
+    
+    int row = self.shape->row;
+    int column = self.shape->column;
+    int depth = self.shape->depth;
+    
+    printf("\nTensor: %dx%dx%d\n\n", row, column, depth);
+    for (int ch = 0; ch < depth; ch++) {
+        for (int r = 0; r < row; r ++) {
+            for (int col = 0; col < column; col++) {
+                printf("%0.1f, ", _result[(r*column+col)*depth+ch]);
+            }
+            printf("\n");
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+- (void)printResultHWC {
+    
+    int row = self.shape->row;
+    int column = self.shape->column;
+    int depth = self.shape->depth;
+    
+    printf("\nTensor: %dx%dx%d\n\n", row, column, depth);
+    for (int h = 0; h < row; h++) {
+        for (int w = 0; w < column; w ++) {
+            for (int c = 0; c < depth; c++) {
+                printf("%0.1f, ", _result[(h*column+w)*depth+c]);
+            }
+            printf("\n");
+        }
+        printf("\n");
     }
     printf("\n");
 }
@@ -230,6 +307,53 @@
             printf(")\n");
         }
     }
+}
+
+- (void)innerChannelsProduct {
+    int row = self.shape->row;
+    int column = self.shape->column;
+    int depth = self.shape->depth;
+    
+    printf("\ninner product begin: %f", CACurrentMediaTime());
+    float32_t *buffer = malloc(Product(self.shape) * sizeof(float32_t));
+    
+    for (int r = 0; r < row; r++) {
+        for (int c = 0; c < column; c++) {
+            for (int d = 0; d < depth; d++) {
+                buffer[(r*column+c)*depth+d] = _result[(r*column+c)*depth+d] * _result[(column+c)*depth+d];
+            }
+        }
+    }
+
+    printf("\ninner product end: %f", CACurrentMediaTime());
+    printf("\nTensor: %dx%dx%d", row, column, depth);
+    int y0 = 0;
+    int y1 = 4;
+    int x0 = 0;
+    int x1 = 4;
+    
+    int n_slice = (depth+3)/4;
+    int n_component = _mpsImage.numberOfComponents;
+    int buffer_depth = n_slice * n_component;
+    
+    printf("\nPixels[%d:%d, %d:%d, :]", y0, y1, x0, x1);
+    for (int y = y0; y < y1; y ++) {
+        printf("\n");
+        for (int x = x0; x < x1; x ++) {
+            printf("(%d, %d) (", y, x);
+            for (int c = 0; c < buffer_depth; c++) {
+                printf("%e", buffer[(y*column+x)*buffer_depth+c]);
+                if (c < buffer_depth-1) {
+                    printf(", ");
+                    if ((c+1)%4 == 0) {
+                        printf("\n");
+                    }
+                }
+            }
+            printf(")\n");
+        }
+    }
+    free(buffer);
 }
 
 - (void)checkNan {

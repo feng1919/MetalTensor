@@ -185,7 +185,9 @@
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                      dataType:_dataType
+                                                 commandBuffer:commandBuffer];
     _image.source = self;
     
     if (_needBackward) {
@@ -230,6 +232,7 @@
     NSAssert(secondaryTensor, @"Invalid secondary backward target...");
     
     MetalTensor primaryGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                                           dataType:_dataType
                                                                       commandBuffer:commandBuffer];
     [_primaryGradientOperation encodeToCommandBuffer:commandBuffer
                                       sourceGradient:_gradient.content
@@ -241,6 +244,7 @@
     
     if (secondaryBackward) {
         MetalTensor secondaryGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                                                 dataType:_dataType
                                                                             commandBuffer:commandBuffer];
         [_secondaryGradientOperation encodeToCommandBuffer:commandBuffer
                                             sourceGradient:_gradient.content

@@ -102,10 +102,10 @@
                                              strideInPixelsY:inputShape->row];
         _mean.offset = MPSOffsetMake(inputShape->column>>1, inputShape->row>>1, 0);
         
-//        _reduceChannels.weight = 2.0f/(float)(inputShape->column*inputShape->row)/_weight/_weight;    //  It's MPS's bug here, not work on iOS 13.3.
-        
-        MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear a:2.0f/(float)(inputShape->column*inputShape->row)/_weight/_weight b:0.0f c:0.0f];
-        _neuron = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
+        if (_needBackward) {
+            MPSNNNeuronDescriptor *neuronDesc = [MPSNNNeuronDescriptor cnnNeuronDescriptorWithType:MPSCNNNeuronTypeLinear a:2.0f/(float)(inputShape->column*inputShape->row)/_weight/_weight b:0.0f c:0.0f];
+            _neuron = [[MPSCNNNeuron alloc] initWithDevice:_device neuronDescriptor:neuronDesc];
+        }
     }
 }
 
@@ -114,10 +114,16 @@
 
     MetalTensor sourceTensor = _inputImages[@(0)];
     DataShape *inputShape = &_inputShapes[0];
-    MetalTensor oneChannel = [[MTTensorCache sharedCache] fetchTensorWithShape:&_oneChannelShape commandBuffer:commandBuffer];
-    MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_multiplyShape commandBuffer:commandBuffer];
+    MetalTensor oneChannel = [[MTTensorCache sharedCache] fetchTensorWithShape:&_oneChannelShape
+                                                                      dataType:_dataType
+                                                                 commandBuffer:commandBuffer];
+    MetalTensor multiplyImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_multiplyShape
+                                                                         dataType:_dataType
+                                                                    commandBuffer:commandBuffer];
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                      dataType:_dataType
+                                                 commandBuffer:commandBuffer];
     _image.source = self;
 
     _multiply.secondaryStrideInPixelsX = 1;
@@ -180,10 +186,14 @@
     NSAssert(backwardTarget, @"Invalid backward target...");
     
     int numOfChannels = sourceTensor.shape->depth;
-    MetalTensor gradients0 = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape commandBuffer:commandBuffer];
+    MetalTensor gradients0 = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape
+                                                                      dataType:_dataType
+                                                                 commandBuffer:commandBuffer];
     MetalTensor gradients1 = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(sourceTensor.shape->row, sourceTensor.shape->column, 1)
+                                                                       dataType:_dataType
                                                                   commandBuffer:commandBuffer];
     MetalTensor result = [[MTTensorCache sharedCache] fetchTensorWithShape1:DataShapeMake(sourceTensor.shape->row, sourceTensor.shape->column, 4*numOfChannels)
+                                                                   dataType:_dataType
                                                               commandBuffer:commandBuffer];
 
     //  Make a channel-wise multiplication.

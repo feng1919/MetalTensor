@@ -35,13 +35,14 @@
     NSParameterAssert(dictionary.count > 0);
     if (self = [super init]) {
         _networkDesc = dictionary;
+        _dataType = MPSDataTypeFloat16;
         _synchronizedProcessing = YES;
         _needBackward = NO;
         _scheduledHandler = NULL;
         _completedHandler = NULL;
         _network_queue = dispatch_queue_create("metal_neuron_network_queue", DISPATCH_QUEUE_SERIAL);
         _network_semaphore = dispatch_semaphore_create(1);
-        NSInteger identifier = [[MTTensorCache sharedCache] registerReuseIdentifier];
+        NSInteger identifier = [[MTTensorCache sharedCache] registerReusePoolIdentifier];
         _reuseIdentifier = [NSString stringWithFormat:@"%ld", identifier];
     }
     return self;
@@ -59,7 +60,13 @@
         }
     }
     
-    [[MTTensorCache sharedCache] unregisterReuseIdentifier:_reuseIdentifier.integerValue];
+    [[MTTensorCache sharedCache] unregisterReusePoolIdentifier:_reuseIdentifier.integerValue];
+}
+
+- (void)setDataType:(MPSDataType)dataType {
+    NSAssert(dataType == MPSDataTypeFloat16 || dataType == MPSDataTypeFloat32, @"Invalid data type, only support float 16 and 32.");
+    _dataType = dataType;
+    NSAssert(_allLayers.count == 0, @"Set data type before the network been compiled.");
 }
 
 - (void)compile:(id<MTLDevice>)device {
@@ -82,9 +89,10 @@
         [_allLayerDescriptors setObject:desc forKey:key];
         
         Class layerClass = LayerWithType(desc.type);
-        MetalTensorNode *layer = [[layerClass alloc] initWithDescriptor:desc];
+        MetalTensorLayer *layer = [[layerClass alloc] initWithDescriptor:desc];
         NSParameterAssert(layer);
         [layer setNeedBackward:_needBackward];
+        [layer setDataType:_dataType];
         [layer compile:device];
         [layer setLabel:key];
         [_allLayers setObject:layer forKey:key];
@@ -235,42 +243,46 @@
 
 - (void)predict:(id<MTLTexture>)bgraU8Texture {
     
-    [_inputLayer inputTexture:bgraU8Texture];
-    
-    id<MTLCommandQueue> command_queue = [MetalDevice sharedCommandQueue];
-    id<MTLCommandBuffer> command_buffer = [command_queue commandBuffer];
-    [command_buffer setLabel:_reuseIdentifier];
-    [[MTTensorCache sharedCache] beginContextWithCommandBuffer:command_buffer];
-    [_inputLayer notifyTargetsAboutNewImageOnCommandBuffer:command_buffer];
-    [[MTTensorCache sharedCache] endContextWithCommandBuffer:command_buffer];
-    
-    if (_scheduledHandler) {
-        [command_buffer addScheduledHandler:_scheduledHandler];
+    @autoreleasepool {
+        [_inputLayer inputTexture:bgraU8Texture];
+        
+        id<MTLCommandQueue> command_queue = [MetalDevice sharedCommandQueue];
+        id<MTLCommandBuffer> command_buffer = [command_queue commandBuffer];
+        [command_buffer setLabel:_reuseIdentifier];
+        [[MTTensorCache sharedCache] beginContextWithCommandBuffer:command_buffer];
+        [_inputLayer notifyTargetsAboutNewImageOnCommandBuffer:command_buffer];
+        [[MTTensorCache sharedCache] endContextWithCommandBuffer:command_buffer];
+        
+        if (_scheduledHandler) {
+            [command_buffer addScheduledHandler:_scheduledHandler];
+        }
+        if (_completedHandler) {
+            [command_buffer addCompletedHandler:_completedHandler];
+        }
+        [command_buffer commit];
     }
-    if (_completedHandler) {
-        [command_buffer addCompletedHandler:_completedHandler];
-    }
-    [command_buffer commit];
 }
 
 - (void)predictWithTensor:(MetalTensor)tensor {
     
-    [_inputLayer inputTensor:tensor];
-    
-    id<MTLCommandQueue> command_queue = [MetalDevice sharedCommandQueue];
-    id<MTLCommandBuffer> command_buffer = [command_queue commandBuffer];
-    [command_buffer setLabel:_reuseIdentifier];
-    [[MTTensorCache sharedCache] beginContextWithCommandBuffer:command_buffer];
-    [_inputLayer notifyTargetsAboutNewImageOnCommandBuffer:command_buffer];
-    [[MTTensorCache sharedCache] endContextWithCommandBuffer:command_buffer];
-    
-    if (_scheduledHandler) {
-        [command_buffer addScheduledHandler:_scheduledHandler];
+    @autoreleasepool {
+        [_inputLayer inputTensor:tensor];
+        
+        id<MTLCommandQueue> command_queue = [MetalDevice sharedCommandQueue];
+        id<MTLCommandBuffer> command_buffer = [command_queue commandBuffer];
+        [command_buffer setLabel:_reuseIdentifier];
+        [[MTTensorCache sharedCache] beginContextWithCommandBuffer:command_buffer];
+        [_inputLayer notifyTargetsAboutNewImageOnCommandBuffer:command_buffer];
+        [[MTTensorCache sharedCache] endContextWithCommandBuffer:command_buffer];
+        
+        if (_scheduledHandler) {
+            [command_buffer addScheduledHandler:_scheduledHandler];
+        }
+        if (_completedHandler) {
+            [command_buffer addCompletedHandler:_completedHandler];
+        }
+        [command_buffer commit];
     }
-    if (_completedHandler) {
-        [command_buffer addCompletedHandler:_completedHandler];
-    }
-    [command_buffer commit];
 }
 
 - (MTLUInt2)inputSize {
@@ -336,6 +348,7 @@
     
     DataShape *dataShape = [(ForwardTarget)layer outputShapeRef];
     MetalTensorOutputLayer *outputLayer = [[MetalTensorOutputLayer alloc] initWithInputShape:dataShape];
+    [outputLayer setDataType:_dataType];
     [layer addTarget:outputLayer];
     return outputLayer;
 }

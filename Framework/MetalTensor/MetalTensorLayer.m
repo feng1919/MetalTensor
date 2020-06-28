@@ -43,6 +43,7 @@
 
         _stopGradient = NO;
         _numOfImages = size;
+        _dataType = MPSDataTypeFloat16;
         
         _inputImages = [NSMutableDictionary dictionaryWithCapacity:size];
         _inputGradients = [NSMutableArray array];
@@ -81,6 +82,7 @@
 
         _stopGradient = NO;
         _numOfImages = size;
+        _dataType = MPSDataTypeFloat16;
         
         _inputImages = [NSMutableDictionary dictionaryWithCapacity:size];
         _inputGradients = [NSMutableArray array];
@@ -243,6 +245,7 @@
     }
     else {
         MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                                    dataType:_dataType
                                                                commandBuffer:commandBuffer];
         MetalTensor t1 = _inputGradients[0];
         MetalTensor t2 = _inputGradients[1];
@@ -335,7 +338,9 @@ GRADIENT_SUM_FINISH:
     NSAssert(_operation, @"The computing operation has not been initialized.");
     NSAssert(_inputImages.count > 0, @"There is no input image received.");
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                      dataType:_dataType
+                                                 commandBuffer:commandBuffer];
     _image.source = self;
     
     MetalTensor sourceTensor = _inputImages[@(0)];
@@ -370,7 +375,7 @@ GRADIENT_SUM_FINISH:
 }
 
 #pragma mark - MTTensorBackward Delegate
-- (void)setGradient:(MetalTensor)newGradient forwardTarget:(ForwardTarget)target{
+- (void)setGradient:(MetalTensor)newGradient forwardTarget:(ForwardTarget)target {
     NSAssert(DataShapesTheSame(&_outputShape, [newGradient shape]), @"The input gradient's shape is not identical to the output shape.");
     [_inputGradients addObject:newGradient];
     [newGradient lock];
@@ -407,6 +412,7 @@ GRADIENT_SUM_FINISH:
     NSAssert(backwardTarget, @"Invalid backward connection...");
     
     MetalTensor destinationGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:sourceTensor.shape
+                                                                               dataType:_dataType
                                                                           commandBuffer:commandBuffer];
     [_gradientOp encodeToCommandBuffer:commandBuffer
                         sourceGradient:_gradient.content

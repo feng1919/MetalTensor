@@ -49,6 +49,8 @@
     
     _operation = _pooling;
     _gradientOp = _poolingAverageGradientOp;
+    
+    NSParameterAssert(_pooling);
 }
 
 - (void)updateOutputShape {

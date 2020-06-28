@@ -152,7 +152,7 @@
             destinationTensor:(MetalTensor)destinationTensor {
     if (_twice) {
         DataShape tempShape = DataShapeMake(_dataSource.kernelHeight, _dataSource.kernelWidth, _inputShape.depth);
-        MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&tempShape commandBuffer:commandBuffer];
+        MetalTensor temp = [[MTTensorCache sharedCache] fetchTensorWithShape:&tempShape dataType:_dataType commandBuffer:commandBuffer];
         [_convolution setClipRect:MPSRectNoClip];
         [_convolution encodeToCommandBuffer:commandBuffer sourceImage:sourceTensor.content destinationImage:temp.content];
         [_convolution setClipRect:_clipRect];

@@ -138,8 +138,12 @@
         MetalTensor sourceTensor = _inputImages[@(0)];
         self.backwardTarget = sourceTensor.source;
         
-        _convTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
-        _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+        _convTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                               dataType:_dataType
+                                                          commandBuffer:commandBuffer];
+        _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                          dataType:_dataType
+                                                     commandBuffer:commandBuffer];
         _image.source = self;
         
         [_convolution encodeToCommandBuffer:commandBuffer
@@ -156,7 +160,9 @@
                         destinationImage:_image.content];
     }
     else {
-        _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+        _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                          dataType:_dataType
+                                                     commandBuffer:commandBuffer];
         _image.source = self;
 
         MetalTensor sourceTensor = _inputImages[@(0)];
@@ -183,6 +189,7 @@
     NSAssert(backwardTarget, @"Invalid backward connection...");
 
     MetalTensor activatedTensor = [[MTTensorCache sharedCache] fetchTensorWithShape:_gradient.shape
+                                                                           dataType:_dataType
                                                                       commandBuffer:commandBuffer];
     [_neuronGradient encodeToCommandBuffer:commandBuffer
                             sourceGradient:_gradient.content
@@ -192,6 +199,7 @@
     [_convTensor unlock];
 
     MetalTensor destinationGradient = [[MTTensorCache sharedCache] fetchTensorWithShape:&_inputShapes[0]
+                                                                               dataType:_dataType
                                                                           commandBuffer:commandBuffer];
 
     [_convTranspose encodeToCommandBuffer:commandBuffer

@@ -64,7 +64,9 @@
     
     DB_TRACE(-_verbose+2, "\n%s forward encoding...", self.labelUTF8);
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                      dataType:_dataType
+                                                 commandBuffer:commandBuffer];
     _image.source = self;
     
     for (int i = 0; i < _numOfImages; i++) {

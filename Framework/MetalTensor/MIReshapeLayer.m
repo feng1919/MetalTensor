@@ -66,10 +66,11 @@
 - (void)processImagesOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     DB_TRACE(-_verbose+3, "\n%s encoding...", self.labelUTF8);
     
-    NSAssert(_operation, @"The computing operation has not been initialized.");
     NSAssert(_inputImages.count > 0, @"There is no input image received.");
     
-    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape commandBuffer:commandBuffer];
+    _image = [[MTTensorCache sharedCache] fetchTensorWithShape:&_outputShape
+                                                      dataType:_dataType
+                                                 commandBuffer:commandBuffer];
     _image.source = self;
     
     MetalTensor sourceTensor = _inputImages[@(0)];
@@ -93,6 +94,7 @@
     
     //  Reshape the gradient from backward node to forward input tensor shape.
     MetalTensor destinationImage = [[MTTensorCache sharedCache] fetchTensorWithShape:&_inputShapes[0]
+                                                                            dataType:_dataType
                                                                        commandBuffer:commandBuffer];
     NSAssert(_backwardTarget, @"Invalid backward target...");
     

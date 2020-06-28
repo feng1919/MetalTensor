@@ -98,6 +98,13 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
  */
 @property (nonatomic, assign) BOOL needBackward;
 
+/*
+ *  The precision of the neural network.
+ *  Default is MPSDataTypeFloat16
+ *
+ */
+@property (nonatomic, assign) MPSDataType dataType;
+
 - (instancetype)init NS_UNAVAILABLE;
 
 /*
@@ -172,7 +179,7 @@ typedef void (^NetworkCallback)(id<MTLCommandBuffer>);
 - (BOOL)removeLayer:(MetalTensorNode *)node;
 - (BOOL)removeLayerWithName:(NSString *)name;
 
-- (MetalTensorOutputLayer *)outputLayerWithName:(NSString *)layerName;
+- (MetalTensorOutputLayer * _Nullable)outputLayerWithName:(NSString *)layerName;
 
 #ifdef DEBUG
 // for debug

@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MetalTensorSpacialReduce : NSObject
 
+@property (nonatomic, assign) MPSDataType dataType;
 @property (nonatomic, assign) ReduceAxisMask axis;
 @property (nonatomic, assign) ReduceType type;
 @property (nonatomic, assign) DataShape inputShape;

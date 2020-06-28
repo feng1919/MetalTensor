@@ -28,6 +28,9 @@ typedef struct {
 }NeuronType;
 NeuronType NeuronTypeMake(MPSCNNNeuronType n, float a, float b);
 NeuronType NeuronTypeMake1(MPSCNNNeuronType n, float a, float b, float c);
+NeuronType NeuronTypeNone(void);
+NeuronType Relu(void);
+NeuronType Relu6(void);
 
 MTPaddingMode PaddingModeFromString(NSString *padding);
 
@@ -45,10 +48,16 @@ void ConvertKernelFirstToLast(float32_t *src, float32_t *dst, int col, int row, 
 /*
  *  Convert the data layout from Metal to tensorflow.
  */
-void ConvertToTensorFlowLayout(float *dst, float *src, DataShape *shape);
-void ConvertToTensorFlowLayout1(float *src, DataShape *shape);
-void ConvertF16ToTensorFlowLayout(float16_t *dst, float16_t *src, DataShape *shape);
-void ConvertF16ToTensorFlowLayout1(float16_t *src, DataShape *shape);
+void ConvertToTensorFlowLayout(float *dst, const float *src, const DataShape *shape);
+void ConvertToTensorFlowLayout1(float *src, const DataShape *shape);
+void ConvertF16ToTensorFlowLayout(float16_t *dst, const float16_t *src, const DataShape *shape);
+void ConvertF16ToTensorFlowLayout1(float16_t *src, const DataShape *shape);
+
+void ConvertF16ToCHWLayout(float16_t *dst, const float16_t *src, const DataShape *shape);
+void ConvertF16ToCHWLayout1(float16_t *src, const DataShape *shape);
+
+void ConvertF16HWCToCHWLayout(float16_t *dst, const float16_t *src, const DataShape *shape);
+void ConvertF16HWCToCHWLayout1(float16_t *src, const DataShape *shape);
 
 - (int)numberOfComponents;
 - (unsigned int)sizeOfComponent;

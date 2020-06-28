@@ -30,8 +30,8 @@ DataShape DataShapeTranspose(DataShape *shape, int row_i, int column_i, int dept
 int Reshape1(DataShape *shape, int *row, int *column, int *depth);
 bool DataShapeValid(DataShape *s);
 bool DataShapesTheSame(DataShape *s1, DataShape *s2);
-int Product(DataShape *shape);
-int ProductDepth4Divisible(DataShape *shape);
+int Product(const DataShape *shape);
+int ProductDepth4Divisible(const DataShape *shape);
 
 
 

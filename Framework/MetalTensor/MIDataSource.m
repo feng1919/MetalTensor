@@ -97,7 +97,7 @@
 }
 
 - (void *)weights {
-    return (float32_t *)[_data bytes];
+    return (void *)[_data bytes];
 }
 
 - (float32_t *)biasTerms {
@@ -279,7 +279,7 @@
 }
 
 - (float)epsilon {
-    return 0.001f;
+    return 0.00001f;
 }
 
 - (id)copyWithZone:(NSZone *)zone {

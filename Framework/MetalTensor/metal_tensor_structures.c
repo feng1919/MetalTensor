@@ -31,11 +31,11 @@ bool KernelShapeValid(KernelShape *s) {
             s->stride>0);
 }
 
-int Product(DataShape *s) {
+int Product(const DataShape *s) {
     return s->column * s->depth * s->row;
 }
 
-int ProductDepth4Divisible(DataShape *s) {
+int ProductDepth4Divisible(const DataShape *s) {
     return s->column*s->row*((s->depth+3)>>2)<<2;
 }
 

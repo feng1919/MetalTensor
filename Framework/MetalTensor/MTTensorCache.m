@@ -37,28 +37,33 @@ static int _reuseCounter = 0;
     return self;
 }
 
-- (NSInteger)registerReuseIdentifier {
+- (NSInteger)registerReusePoolIdentifier {
     _reuseCounter ++;
     _reuseCacheMap[@(_reuseCounter)] = [[NSMutableDictionary alloc] init];
     return _reuseCounter;
 }
 
-- (void)unregisterReuseIdentifier:(NSInteger)identifier {
+- (void)unregisterReusePoolIdentifier:(NSInteger)identifier {
     [_reuseCacheMap removeObjectForKey:@(identifier)];
 }
 
 
 - (MetalTensor)fetchTensorWithShape1:(DataShape)shape commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    return [self fetchTensorWithShape:&shape commandBuffer:commandBuffer];
+    return [self fetchTensorWithShape1:shape dataType:MPSDataTypeFloat16 commandBuffer:commandBuffer];
+}
+
+- (MetalTensor)fetchTensorWithShape1:(DataShape)shape
+                           dataType:(MPSDataType)dataType
+                      commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+    return [self fetchTensorWithShape:&shape dataType:dataType commandBuffer:commandBuffer];
 }
 
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    return [self fetchTensorWithShape:shape dataFormat:TensorDataFormatFloat16 numberOfImages:1 commandBuffer:commandBuffer];
+    return [self fetchTensorWithShape:shape dataType:MPSDataTypeFloat16 commandBuffer:commandBuffer];
 }
 
 - (MetalTensor)fetchTensorWithShape:(DataShape *)shape
-                         dataFormat:(TensorDataFormat)dataFormat
-                     numberOfImages:(NSUInteger)numberOfImages
+                           dataType:(MPSDataType)dataType
                       commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
     
     if (shape == NULL) {
@@ -71,79 +76,117 @@ static int _reuseCounter = 0;
         MetalTensor tensor = nil;
         NSInteger reuseIdentifier = [commandBuffer.label integerValue];
         NSMutableDictionary *tensorCache = _reuseCacheMap[@(reuseIdentifier)];
-        NSString *key = KeyForTensorType1(shape, dataFormat, numberOfImages);
+        NSString *key = KeyForTensorType1(shape, dataType, 1);
         NSMutableSet<MetalTensor> *tensorSet = tensorCache[key];
         if (tensorSet.count > 0) {
             tensor = [tensorSet anyObject];
             [tensorSet removeObject:tensor];
         }
         else {
-            tensor = [[MTTensor alloc] initWithShape:shape dataFormat:dataFormat numberOfImage:numberOfImages];
-            NSLog(@"Create a tensor: %@", KeyForTensorType1(shape, dataFormat, numberOfImages));
+            tensor = [[MTTensor alloc] initWithShape:shape dataType:dataType numberOfImage:1];
+            NSLog(@"Create a tensor: %@", KeyForTensorType1(shape, dataType, 1));
         }
         
-        tensor.reuseIdentifier = [commandBuffer.label integerValue];
+        tensor.poolIdentifier = [commandBuffer.label integerValue];
         [tensor lock];
         [tensor newContentOnCommandBuffer:commandBuffer];
         return tensor;
     }
 }
 
-- (void)cacheTensor:(MetalTensor)tensor {
-    if (tensor == nil) {
-        return;
+- (MetalMatrix)fetchMatrixWithRows:(int)rows
+                           columns:(int)columns
+                          dataType:(MPSDataType)dataType
+                     commandBuffer:(id<MTLCommandBuffer>)commandBuffer {
+                         
+    NSParameterAssert(rows > 0);
+    NSParameterAssert(columns > 0);
+     
+    @synchronized (self) {
+        MetalMatrix matrix = nil;
+        NSInteger reuseIdentifier = [commandBuffer.label integerValue];
+        NSMutableDictionary *cache = _reuseCacheMap[@(reuseIdentifier)];
+        NSString *key = KeyForMatrixType(rows, columns, dataType);
+        NSMutableSet<MetalMatrix> *matrixSet = cache[key];
+        if (matrixSet.count > 0) {
+            matrix = [matrixSet anyObject];
+            [matrixSet removeObject:matrix];
+        }
+        else {
+            matrix = [[MTMatrix alloc] initWithRows:rows columns:columns dataType:dataType];
+            NSLog(@"Create a matrix: %@", KeyForMatrixType(rows, columns, dataType));
+        }
+
+        matrix.poolIdentifier = [commandBuffer.label integerValue];
+        [matrix lock];
+        [matrix newContentOnCommandBuffer:commandBuffer];
+        return matrix;
     }
+}
+
+- (void)cacheResource:(id<MTResource>)resource {
+    NSParameterAssert(resource);
     
-    if (![_reuseCacheMap.allKeys containsObject:@(tensor.reuseIdentifier)]) {
+    if (![_reuseCacheMap.allKeys containsObject:@(resource.poolIdentifier)]) {
         return;
     }
     
     @synchronized (self) {
-        NSMutableDictionary *tensorCache = _reuseCacheMap[@(tensor.reuseIdentifier)];
-        NSString *key = KeyForTensorType(tensor.shape, tensor.dataFormat);
-        NSMutableSet<MetalTensor> *tensorSet = tensorCache[key];
-        if (tensorSet == nil) {
-            tensorSet = [[NSMutableSet alloc] init];
-            tensorCache[key] = tensorSet;
+        NSMutableDictionary *pool = _reuseCacheMap[@(resource.poolIdentifier)];
+        NSString *key = resource.reuseIdentifier;
+        NSMutableSet<id<MTResource>> *set = pool[key];
+        if (set == nil) {
+            set = [[NSMutableSet alloc] init];
+            pool[key] = set;
         }
-        [tensorSet addObject:tensor];
-        tensor.source = nil;
+        [set addObject:resource];
     }
 }
 
 - (void)beginContextWithCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    NSInteger identifier = [commandBuffer.label integerValue];
-    NSMutableDictionary *tensorCache = _reuseCacheMap[@(identifier)];
+    NSInteger poolIdentifier = [commandBuffer.label integerValue];
+    NSMutableDictionary *tensorCache = _reuseCacheMap[@(poolIdentifier)];
     NSMutableArray *tensorList = [NSMutableArray array];
+    NSMutableArray *matrixList = [NSMutableArray array];
     for (NSSet *set in tensorCache.allValues) {
-        for (MetalTensor tensor in set.allObjects) {
-            if (tensor.reuseIdentifier == identifier) {
-                [tensorList addObject:tensor.imageDescriptor];
+        id obj = set.anyObject;
+        if ([obj isKindOfClass:[MTTensor class]]) {
+            for (MetalTensor tensor in set.allObjects) {
+                if (tensor.poolIdentifier == poolIdentifier) {
+                    [tensorList addObject:tensor.imageDescriptor];
+                }
             }
         }
+        else if ([obj isKindOfClass:[MTMatrix class]]){
+            for (MetalMatrix matrix in set.allObjects) {
+                if (matrix.poolIdentifier == poolIdentifier) {
+                    [matrixList addObject:matrix.matrixDescriptor];
+                }
+            }
+        }
+        else {
+            NSAssert(NO, @"Unsupported resource type: %@", obj);
+        }
     }
-    [MPSTemporaryImage prefetchStorageWithCommandBuffer:commandBuffer imageDescriptorList:tensorList];
+    
+    if (tensorList.count > 0) {
+        [MPSTemporaryImage prefetchStorageWithCommandBuffer:commandBuffer imageDescriptorList:tensorList];
+    }
+    if (matrixList.count > 0) {
+        [MPSTemporaryMatrix prefetchStorageWithCommandBuffer:commandBuffer matrixDescriptorList:matrixList];
+    }
 }
 
 - (void)endContextWithCommandBuffer:(id<MTLCommandBuffer>)commandBufferfer {
     NSInteger identifier = [commandBufferfer.label integerValue];
     NSMutableDictionary *tensorCache = _reuseCacheMap[@(identifier)];
     for (NSSet *set in tensorCache.allValues) {
-        for (MetalTensor tensor in set.allObjects) {
-            if (tensor.reuseIdentifier == identifier) {
-                [tensor deleteContent];
+        for (id<MTResource> resource in set.allObjects) {
+            if (resource.poolIdentifier == identifier) {
+                [resource deleteContent];
             }
         }
     }
-}
-
-NSString *KeyForTensorType(DataShape *shape, TensorDataFormat dataFormat) {
-    return KeyForTensorType1(shape, dataFormat, 1);
-}
-
-NSString *KeyForTensorType1(DataShape *shape, TensorDataFormat dataFormat, NSUInteger numberOfImages) {
-//    return [NSString stringWithFormat:@"[ROW %d][COLUMN %d][DEPTH %d][FLOAT %d][N%d]", shape->row, shape->column, shape->depth, dataFormat, (int)numberOfImages];
-    return [NSString stringWithFormat:@"<NHWC: %dx%dx%dx%d - float%d>", (int)numberOfImages, shape->row, shape->column, shape->depth, dataFormat];
 }
 
 @end

@@ -22,10 +22,10 @@
 - (void)buildupTensors {
     
     if (_device) {
-        _outputImage = [[MTImageTensor alloc] initWithShape:&_outputShape];
+        _outputImage = [[MTImageTensor alloc] initWithShape:&_outputShape dataType:_dataType];
         
         if (_needBackward) {
-            _gradientImage = [[MTImageTensor alloc] initWithShape:&_outputShape];
+            _gradientImage = [[MTImageTensor alloc] initWithShape:&_outputShape dataType:_dataType];
         }
     }
 }

@@ -18,7 +18,6 @@
 
 #pragma mark - override
 - (void)initialize {
-    _dataFormat = TensorDataFormatFloat16;
     _neuronType.neuron = MPSCNNNeuronTypeNone;
     _neuronType.a = 0.0f;
     _neuronType.b = 0.0f;
@@ -41,7 +40,7 @@
                                                                                          c:_neuronType.c];
     _neuron = [[MPSCNNNeuron alloc] initWithDevice:device neuronDescriptor:neuronDesc];
     
-    MPSImageDescriptor *desc = ImageDescriptor(&_outputShape, _dataFormat);
+    MPSImageDescriptor *desc = ImageDescriptor(&_outputShape, _dataType);
     desc.storageMode = MTLStorageModeShared;
     _outputImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:desc];
     
@@ -62,7 +61,7 @@
     
     if (_device) {
         if (DataShapesTheSame(dataShape, &_outputShape) == NO) {
-            MPSImageDescriptor *desc = ImageDescriptor(&_outputShape, _dataFormat);
+            MPSImageDescriptor *desc = ImageDescriptor(&_outputShape, _dataType);
             desc.storageMode = MTLStorageModeShared;
             _outputImage = [[MPSImage alloc] initWithDevice:_device imageDescriptor:desc];
         }
