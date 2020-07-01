@@ -75,6 +75,8 @@
 #import "MILanczosResamplingFilter.h"
 #import "MILowPassFilter.h"
 #import "MIHighPassFilter.h"
+#import "MIBilateralFilter.h"
+#import "MIMaskBilateralFilter.h"
 
 // Blend
 #import "MISourceOverBlendFilter.h"
@@ -157,3 +159,4 @@
 #import "MetalImageVideoCamera.h"
 #import "MetalImageView.h"
 #import "UIImage+Texture.h"
+#import "MetalImageMath.h"

@@ -260,7 +260,7 @@ float ssd_iou(ssd_object *obj1, ssd_object *obj2) {
     if (dx <= 0.0f) {
         return 0.0f;
     }
-    float dy = fminf(obj1->ymax-obj2->ymin, obj2->xmax-obj1->xmin);
+    float dy = fminf(obj1->ymax-obj2->ymin, obj2->ymax-obj1->ymin);
     if (dy <= 0.0f) {
         return 0.0f;
     }
