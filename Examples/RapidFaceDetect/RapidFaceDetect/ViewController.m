@@ -48,10 +48,15 @@
     MetalImageFilter *lens = [[MetalImageFilter alloc] init];
     [self.videoCamera addTarget:lens];
     
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
+    MICropFilter *crop = [[MICropFilter alloc] initWithCropRegion:CGRectMake(0.0, (height-width)*0.5f/height, 1.0f, width/height)];
+    [lens addTarget:crop];
+    
     self.faceDetectFilter = [[RapidFaceDetectFilter alloc] init];
     [self.faceDetectFilter createNet];
     
-    [lens addTarget:self.faceDetectFilter];
+    [crop addTarget:self.faceDetectFilter];
     [self.faceDetectFilter addTarget:self.metalView];
     
     self.labelFPS = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(bounds)-100, CGRectGetWidth(bounds), 50)];

@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<RapidFaceDetectNetDelegate> delegate;
 @property (nonatomic, strong, nullable) NSArray<SSDObject *> *objects;
 
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
+
 @end
 
 @protocol RapidFaceDetectNetDelegate <NSObject>
