@@ -50,7 +50,7 @@
 		<key>inputs</key>
 		<string>80, 80, 16</string>
 		<key>expansion</key>
-		<string>4</string>
+		<string>6</string>
 		<key>filters</key>
 		<string>16</string>
 		<key>stride</key>
@@ -67,7 +67,7 @@
 		<key>inputs</key>
 		<string>80, 80, 16</string>
 		<key>expansion</key>
-		<string>4</string>
+		<string>6</string>
 		<key>filters</key>
 		<string>24</string>
 		<key>stride</key>
@@ -84,7 +84,7 @@
 		<key>inputs</key>
 		<string>40,40,24</string>
 		<key>expansion</key>
-		<string>4</string>
+		<string>6</string>
 		<key>filters</key>
 		<string>24</string>
 		<key>stride</key>
@@ -101,7 +101,7 @@
 		<key>inputs</key>
 		<string>40,40,24</string>
 		<key>expansion</key>
-		<string>4</string>
+		<string>6</string>
 		<key>filters</key>
 		<string>32</string>
 		<key>stride</key>
@@ -118,13 +118,13 @@
 		<key>inputs</key>
 		<string>20,20,32</string>
 		<key>expansion</key>
-		<string>4</string>
+		<string>6</string>
 		<key>filters</key>
 		<string>32</string>
 		<key>stride</key>
 		<string>1</string>
 		<key>targets</key>
-		<string>block_5, loc16, conf16</string>
+		<string>block_5, loc0, conf0</string>
 		<key>weights</key>
 		<string>block_4_expand, block_4_depthwise, block_4_project</string>
 	</dict>
@@ -135,7 +135,7 @@
 		<key>inputs</key>
 		<string>20,20,32</string>
 		<key>expansion</key>
-		<string>4</string>
+		<string>6</string>
 		<key>filters</key>
 		<string>24</string>
 		<key>stride</key>
@@ -152,13 +152,13 @@
 		<key>inputs</key>
 		<string>10,10,24</string>
 		<key>expansion</key>
-		<string>4</string>
+		<string>6</string>
 		<key>filters</key>
 		<string>24</string>
 		<key>stride</key>
 		<string>1</string>
 		<key>targets</key>
-		<string>block_7, loc8, conf8</string>
+		<string>block_7, loc1, conf1</string>
 		<key>weights</key>
 		<string>block_6_expand, block_6_depthwise, block_6_project</string>
 	</dict>
@@ -169,7 +169,7 @@
 		<key>inputs</key>
 		<string>10,10,24</string>
 		<key>expansion</key>
-		<string>4</string>
+		<string>6</string>
 		<key>filters</key>
 		<string>16</string>
 		<key>stride</key>
@@ -186,17 +186,17 @@
 		<key>inputs</key>
 		<string>5,5,16</string>
 		<key>expansion</key>
-		<string>4</string>
+		<string>6</string>
 		<key>filters</key>
 		<string>16</string>
 		<key>stride</key>
 		<string>1</string>
 		<key>targets</key>
-		<string>loc4, conf4,</string>
+		<string>loc2, conf2,</string>
 		<key>weights</key>
 		<string>block_8_expand, block_8_depthwise, block_8_project</string>
 	</dict>
-	<key>loc16</key>
+	<key>loc0</key>
 	<dict>
 		<key>inputs</key>
 		<string>20,20,32</string>
@@ -209,13 +209,13 @@
 		<key>depthwise</key>
 		<false/>
 		<key>weight</key>
-		<string>loc16</string>
+		<string>loc0</string>
 		<key>activation</key>
 		<string>none</string>
 		<key>targets</key>
-		<string>reshape_loc16</string>
+		<string>reshape_loc0</string>
 	</dict>
-	<key>loc8</key>
+	<key>loc1</key>
 	<dict>
 		<key>inputs</key>
 		<string>10,10,24</string>
@@ -228,13 +228,13 @@
 		<key>depthwise</key>
 		<false/>
 		<key>weight</key>
-		<string>loc8</string>
+		<string>loc1</string>
 		<key>activation</key>
 		<string>none</string>
 		<key>targets</key>
-		<string>reshape_loc8</string>
+		<string>reshape_loc1</string>
 	</dict>
-	<key>loc4</key>
+	<key>loc2</key>
 	<dict>
 		<key>inputs</key>
 		<string>5,5,16</string>
@@ -247,13 +247,13 @@
 		<key>depthwise</key>
 		<false/>
 		<key>weight</key>
-		<string>loc4</string>
+		<string>loc2</string>
 		<key>activation</key>
 		<string>none</string>
 		<key>targets</key>
-		<string>reshape_loc4</string>
+		<string>reshape_loc2</string>
 	</dict>
-	<key>conf16</key>
+	<key>conf0</key>
 	<dict>
 		<key>inputs</key>
 		<string>20,20,32</string>
@@ -266,13 +266,13 @@
 		<key>depthwise</key>
 		<false/>
 		<key>weight</key>
-		<string>conf16</string>
+		<string>conf0</string>
 		<key>activation</key>
 		<string>none</string>
 		<key>targets</key>
-		<string>reshape_conf16</string>
+		<string>reshape_conf0</string>
 	</dict>
-	<key>conf8</key>
+	<key>conf1</key>
 	<dict>
 		<key>inputs</key>
 		<string>10,10,24</string>
@@ -285,13 +285,13 @@
 		<key>depthwise</key>
 		<false/>
 		<key>weight</key>
-		<string>conf8</string>
+		<string>conf1</string>
 		<key>activation</key>
 		<string>none</string>
 		<key>targets</key>
-		<string>reshape_conf8</string>
+		<string>reshape_conf1</string>
 	</dict>
-	<key>conf4</key>
+	<key>conf2</key>
 	<dict>
 		<key>inputs</key>
 		<string>5,5,16</string>
@@ -304,13 +304,13 @@
 		<key>depthwise</key>
 		<false/>
 		<key>weight</key>
-		<string>conf4</string>
+		<string>conf2</string>
 		<key>activation</key>
 		<string>none</string>
 		<key>targets</key>
-		<string>reshape_conf4</string>
+		<string>reshape_conf2</string>
 	</dict>
-	<key>reshape_loc16</key>
+	<key>reshape_loc0</key>
 	<dict>
 		<key>type</key>
 		<string>reshape</string>
@@ -323,7 +323,7 @@
 		<key>indices</key>
 		<string>0</string>
 	</dict>
-	<key>reshape_loc8</key>
+	<key>reshape_loc1</key>
 	<dict>
 		<key>type</key>
 		<string>reshape</string>
@@ -336,7 +336,7 @@
 		<key>indices</key>
 		<string>1</string>
 	</dict>
-	<key>reshape_loc4</key>
+	<key>reshape_loc2</key>
 	<dict>
 		<key>inputs</key>
 		<string>5,5,24</string>
@@ -349,7 +349,7 @@
 		<key>indices</key>
 		<string>2</string>
 	</dict>
-	<key>reshape_conf16</key>
+	<key>reshape_conf0</key>
 	<dict>
 		<key>inputs</key>
 		<string>20, 20, 12</string>
@@ -362,7 +362,7 @@
 		<key>indices</key>
 		<string>0</string>
 	</dict>
-	<key>reshape_conf8</key>
+	<key>reshape_conf1</key>
 	<dict>
 		<key>inputs</key>
 		<string>10,10,12</string>
@@ -375,7 +375,7 @@
 		<key>indices</key>
 		<string>1</string>
 	</dict>
-	<key>reshape_conf4</key>
+	<key>reshape_conf2</key>
 	<dict>
 		<key>inputs</key>
 		<string>5, 5, 12</string>
