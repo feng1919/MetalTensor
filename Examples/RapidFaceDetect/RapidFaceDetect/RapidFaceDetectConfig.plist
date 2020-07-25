@@ -9,24 +9,22 @@
 	<key>network_size</key>
 	<string>160,160</string>
 	<key>n_pyramid_layers</key>
-	<string>3</string>
+	<string>2</string>
 	<key>feature_map_sizes</key>
 	<array>
-		<string>20,20</string>
 		<string>10,10</string>
 		<string>5,5</string>
 	</array>
 	<key>scales</key>
-	<string>0.125, 0.25, 0.50, 1.00</string>
+	<string>0.25, 0.50, 1.00</string>
 	<key>location_shapes</key>
-	<string>1, 4, 2400; 1, 4, 600;  1, 4, 150;</string>
+	<string>1, 4, 400;  1, 4, 100;</string>
 	<key>confidence_shapes</key>
-	<string>1, 2, 2400; 1, 2, 600;  1, 2, 150;</string>
+	<string>1, 2, 400; 1, 2, 100; </string>
 	<key>aspect_ratios</key>
 	<array>
-		<string>0.64, 0.8, 1.0, 1.25, 1.56</string>
-		<string>0.64, 0.8, 1.0, 1.25, 1.56</string>
-		<string>0.64, 0.8, 1.0, 1.25, 1.56</string>
+		<string>0.91, 1.0, 1.10</string>
+		<string>0.91, 1.0, 1.10</string>
 	</array>
 	<key>two_boxes_for_ar1</key>
 	<true/>
@@ -35,9 +33,9 @@
 	<key>clip_boxes</key>
 	<false/>
 	<key>confidence_thresh</key>
-	<string>0.95</string>
+	<string>0.85</string>
 	<key>iou_thresh</key>
-	<string>0.1</string>
+	<string>0.15</string>
 	<key>variances</key>
 	<string>0.1, 0.1, 0.2, 0.2</string>
 </dict>

@@ -48,8 +48,8 @@
     MetalImageFilter *lens = [[MetalImageFilter alloc] init];
     [self.videoCamera addTarget:lens];
     
-    CGFloat width = [UIScreen mainScreen].bounds.size.width;
-    CGFloat height = [UIScreen mainScreen].bounds.size.height;
+    CGFloat width = 1080.0f;
+    CGFloat height = 1920.0f;
     MICropFilter *crop = [[MICropFilter alloc] initWithCropRegion:CGRectMake(0.0, (height-width)*0.5f/height, 1.0f, width/height)];
     [lens addTarget:crop];
     
