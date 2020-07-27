@@ -329,7 +329,7 @@ int pooling_output_length(int input_length, int stride) {
 }
 
 int pooling_offset(int kernel, int stride) {
-    return stride - (kernel / 2);
+    return stride - ceilf(kernel / 2.0f);
 }
 
 //int pooling_offset(int input_length, int kernel, int stride) {
