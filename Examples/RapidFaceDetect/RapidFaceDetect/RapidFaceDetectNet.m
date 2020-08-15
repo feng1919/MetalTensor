@@ -104,13 +104,13 @@
     
     __weak __auto_type weakSelf = self;
     self.scheduledHandler = ^(id<MTLCommandBuffer> _Nonnull cmd) {
-        [[FPSCounter sharedCounter] start];
+//        [[FPSCounter sharedCounter] start];
     };
     self.completedHandler = ^(id<MTLCommandBuffer> _Nonnull cmd) {
             
         __strong __auto_type strongSelf = weakSelf;
         
-        [[FPSCounter sharedCounter] stop];
+//        [[FPSCounter sharedCounter] stop];
         
 //        {
 //            DataShape *shape = [strongSelf->_output outputShapeRef];

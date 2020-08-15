@@ -23,8 +23,8 @@
 	<string>1, 2, 400; 1, 2, 100; </string>
 	<key>aspect_ratios</key>
 	<array>
-		<string>0.91, 1.0, 1.10</string>
-		<string>0.91, 1.0, 1.10</string>
+		<string>0.90, 1.0, 1.11</string>
+		<string>0.90, 1.0, 1.11</string>
 	</array>
 	<key>two_boxes_for_ar1</key>
 	<true/>
@@ -33,7 +33,7 @@
 	<key>clip_boxes</key>
 	<false/>
 	<key>confidence_thresh</key>
-	<string>0.85</string>
+	<string>0.99</string>
 	<key>iou_thresh</key>
 	<string>0.15</string>
 	<key>variances</key>
