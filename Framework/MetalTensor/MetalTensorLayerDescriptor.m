@@ -640,8 +640,8 @@ Class LayerWithType(NSString *type)
             _neuronType.c = 0.0f;
         }
         
-        NSParameterAssert(dictionary[@"weight"]);
-        _weight = dictionary[@"weight"];
+        NSParameterAssert(dictionary[@"weights"]);
+        _weight = dictionary[@"weights"];
         
         if (dictionary[@"weight_range"]) {
             NSArray<NSString *> *rangeList = [dictionary[@"weight_range"] nonEmptyComponentsSeparatedByString:@","];
@@ -929,7 +929,7 @@ Class LayerWithType(NSString *type)
                 secondaryImage = [UIImage imageWithContentsOfFile:descriptor.secondaryImage];
             }
             NSAssert(secondaryImage, @"Failed to load the secondary image: %@", descriptor.secondaryImage);
-            self.secondaryImage = [[MTImageTensor alloc] initWithImage:secondaryImage normalized:YES];
+            self.secondaryImage = [[MTImageTensor alloc] initWithImage:secondaryImage normalized:YES frameBuffer:NO rgb:YES];
         }
         else if (descriptor.secondaryData) {
             NSData *data = [NSData dataWithContentsOfFile:descriptor.secondaryData];

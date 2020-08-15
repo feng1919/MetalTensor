@@ -34,7 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithShape:(DataShape *)shape dataType:(MPSDataType)dataType NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithContent:(MPSImage *)mpsImage NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized;
-- (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized frameBuffer:(BOOL)frameBuffer NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized frameBuffer:(BOOL)frameBuffer;
+- (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized frameBuffer:(BOOL)frameBuffer rgb:(BOOL)rgb NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithShape:(DataShape *)shape dataFormat:(MPSDataType)dataFormat numberOfImage:(NSUInteger)numberOfImages NS_UNAVAILABLE;
 
 - (void)loadData:(float16_t *)data length:(NSInteger)length;

@@ -20,6 +20,10 @@
 }
 
 - (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized frameBuffer:(BOOL)frameBuffer {
+    return [self initWithImage:image normalized:normalized frameBuffer:frameBuffer rgb:NO];
+}
+
+- (instancetype)initWithImage:(UIImage *)image normalized:(BOOL)normalized frameBuffer:(BOOL)frameBuffer rgb:(BOOL)rgb {
     int width = (int)image.size.width;
     int height = (int)image.size.height;
     DataShape shape = DataShapeMake(height, width, 3);
@@ -49,12 +53,26 @@
             goto SKIP;
         }
         
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                int index = row*width+col;
-                _buffer[index*3] = data[index*4+1];     // B
-                _buffer[index*3+1] = data[index*4+2];   // G
-                _buffer[index*3+2] = data[index*4+3];   // R
+        if (rgb) {
+            // RGB
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    int index = row*width+col;
+                    _buffer[index*3] = data[index*4+3];
+                    _buffer[index*3+1] = data[index*4+2];
+                    _buffer[index*3+2] = data[index*4+1];
+                }
+            }
+        }
+        else {
+            // BGR
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    int index = row*width+col;
+                    _buffer[index*3] = data[index*4+1];
+                    _buffer[index*3+1] = data[index*4+2];
+                    _buffer[index*3+2] = data[index*4+3];  
+                }
             }
         }
         
