@@ -11,6 +11,7 @@
 #import <MetalTensor/FPSCounter.h>
 #import <MetalTensor/MetalTensor.h>
 #import "RapidFaceDetectFilter.h"
+#import "LandmarksFilter.h"
 
 @interface ViewController ()
 
@@ -20,12 +21,52 @@
 @property (nonatomic, strong) MetalImageView *metalView;
 @property (nonatomic, strong) MetalImageVideoCamera *videoCamera;
 @property (nonatomic, strong) RapidFaceDetectFilter *faceDetectFilter;
+@property (nonatomic, strong) LandmarksFilter *landmarksFilter;
 
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
+    [super viewDidLoad];
+
+    CGRect bounds = self.view.bounds;
+        
+#if METAL_DEBUG
+    self.metalView = [[MetalImageDebugView alloc] initWithFrame:bounds];
+#else
+    self.metalView = [[MetalImageView alloc] initWithFrame:bounds];
+#endif
+    self.metalView.fillMode = kMetalImageFillModePreserveAspectRatio;
+    self.metalView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    [self.view addSubview:self.metalView];
+    
+    self.videoCamera = [[MetalImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1920x1080 cameraPosition:AVCaptureDevicePositionFront];
+    self.videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
+    self.videoCamera.horizontallyMirrorFrontFacingCamera = YES;
+    self.videoCamera.horizontallyMirrorRearFacingCamera = NO;
+    
+    MetalImageFilter *lens = [[MetalImageFilter alloc] init];
+    [self.videoCamera addTarget:lens];
+    
+    self.landmarksFilter = [[LandmarksFilter alloc] init];
+    [self.landmarksFilter createNet];
+    [lens addTarget:self.landmarksFilter];
+    
+    [self.landmarksFilter addTarget:self.metalView];
+    
+    self.labelFPS = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(bounds)-100, CGRectGetWidth(bounds), 50)];
+    self.labelFPS.textColor = [UIColor whiteColor];
+    self.labelFPS.font = [UIFont boldSystemFontOfSize:13];
+    self.labelFPS.textAlignment = NSTextAlignmentCenter;
+    self.labelFPS.autoresizingMask = (UIViewAutoresizingFlexibleWidth |
+                                   UIViewAutoresizingFlexibleTopMargin);
+    [self.view addSubview:self.labelFPS];
+    
+}
+
+- (void)viewDidLoad1 {
     [super viewDidLoad];
 
     CGRect bounds = self.view.bounds;

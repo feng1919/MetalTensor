@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A3429132504D65F0021F0FC /* std_mean.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5A3429112504D65E0021F0FC /* std_mean.plist */; };
+		5A690A8924CC355C00FE2C6D /* Landmarks.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5A690A8624CC355C00FE2C6D /* Landmarks.bin */; };
+		5A690A8A24CC355C00FE2C6D /* Landmarks.json in Resources */ = {isa = PBXBuildFile; fileRef = 5A690A8824CC355C00FE2C6D /* Landmarks.json */; };
+		5A690A8C24CC379000FE2C6D /* Landmarks.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5A690A8B24CC379000FE2C6D /* Landmarks.plist */; };
+		5A690A8E24CC37E000FE2C6D /* LandmarksSummory in Resources */ = {isa = PBXBuildFile; fileRef = 5A690A8D24CC37E000FE2C6D /* LandmarksSummory */; };
+		5A690A9524CC3F3800FE2C6D /* LandmarksNet.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A690A9424CC3F3800FE2C6D /* LandmarksNet.m */; };
+		5A690A9824CC4EFD00FE2C6D /* LandmarksFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A690A9724CC4EFD00FE2C6D /* LandmarksFilter.m */; };
+		5A690A9B24CCDF3300FE2C6D /* CropFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A690A9A24CCDF3300FE2C6D /* CropFilter.m */; };
+		5A690A9E24D04BFF00FE2C6D /* std96.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A690A9C24D04BFE00FE2C6D /* std96.png */; };
+		5A690A9F24D04BFF00FE2C6D /* mean96.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A690A9D24D04BFF00FE2C6D /* mean96.png */; };
 		5AC43CAF237C22BE00E740EA /* RapidFaceDetect.json in Resources */ = {isa = PBXBuildFile; fileRef = 5AC43CAC237C22BE00E740EA /* RapidFaceDetect.json */; };
 		5AC43CB0237C22BE00E740EA /* RapidFaceDetect.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5AC43CAE237C22BE00E740EA /* RapidFaceDetect.bin */; };
 		5AC43CB5237C235F00E740EA /* RapidFaceDetectSummory in Resources */ = {isa = PBXBuildFile; fileRef = 5AC43CB2237C235F00E740EA /* RapidFaceDetectSummory */; };
@@ -53,6 +63,19 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5A3429112504D65E0021F0FC /* std_mean.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = std_mean.plist; sourceTree = "<group>"; };
+		5A690A8624CC355C00FE2C6D /* Landmarks.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = Landmarks.bin; sourceTree = "<group>"; };
+		5A690A8824CC355C00FE2C6D /* Landmarks.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Landmarks.json; sourceTree = "<group>"; };
+		5A690A8B24CC379000FE2C6D /* Landmarks.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Landmarks.plist; sourceTree = "<group>"; };
+		5A690A8D24CC37E000FE2C6D /* LandmarksSummory */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LandmarksSummory; sourceTree = "<group>"; };
+		5A690A9324CC3F3800FE2C6D /* LandmarksNet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LandmarksNet.h; sourceTree = "<group>"; };
+		5A690A9424CC3F3800FE2C6D /* LandmarksNet.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LandmarksNet.m; sourceTree = "<group>"; };
+		5A690A9624CC4EFD00FE2C6D /* LandmarksFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LandmarksFilter.h; sourceTree = "<group>"; };
+		5A690A9724CC4EFD00FE2C6D /* LandmarksFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LandmarksFilter.m; sourceTree = "<group>"; };
+		5A690A9924CCDF3300FE2C6D /* CropFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CropFilter.h; sourceTree = "<group>"; };
+		5A690A9A24CCDF3300FE2C6D /* CropFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CropFilter.m; sourceTree = "<group>"; };
+		5A690A9C24D04BFE00FE2C6D /* std96.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = std96.png; sourceTree = "<group>"; };
+		5A690A9D24D04BFF00FE2C6D /* mean96.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mean96.png; sourceTree = "<group>"; };
 		5AC43CAC237C22BE00E740EA /* RapidFaceDetect.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = RapidFaceDetect.json; sourceTree = "<group>"; };
 		5AC43CAE237C22BE00E740EA /* RapidFaceDetect.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = RapidFaceDetect.bin; sourceTree = "<group>"; };
 		5AC43CB2237C235F00E740EA /* RapidFaceDetectSummory */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = RapidFaceDetectSummory; sourceTree = "<group>"; };
@@ -116,6 +139,19 @@
 				5ACC081F23506B83004CD815 /* AppDelegate.m */,
 				5ACC082423506B83004CD815 /* ViewController.h */,
 				5ACC082523506B83004CD815 /* ViewController.m */,
+				5A690A8624CC355C00FE2C6D /* Landmarks.bin */,
+				5A690A8824CC355C00FE2C6D /* Landmarks.json */,
+				5A690A8B24CC379000FE2C6D /* Landmarks.plist */,
+				5A690A8D24CC37E000FE2C6D /* LandmarksSummory */,
+				5A690A9324CC3F3800FE2C6D /* LandmarksNet.h */,
+				5A690A9424CC3F3800FE2C6D /* LandmarksNet.m */,
+				5A690A9624CC4EFD00FE2C6D /* LandmarksFilter.h */,
+				5A690A9724CC4EFD00FE2C6D /* LandmarksFilter.m */,
+				5A690A9924CCDF3300FE2C6D /* CropFilter.h */,
+				5A690A9A24CCDF3300FE2C6D /* CropFilter.m */,
+				5A690A9D24D04BFF00FE2C6D /* mean96.png */,
+				5A690A9C24D04BFE00FE2C6D /* std96.png */,
+				5A3429112504D65E0021F0FC /* std_mean.plist */,
 				5AC43CAE237C22BE00E740EA /* RapidFaceDetect.bin */,
 				5AC43CAC237C22BE00E740EA /* RapidFaceDetect.json */,
 				5AC43CB3237C235F00E740EA /* RapidFaceDetect.plist */,
@@ -224,13 +260,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A3429132504D65F0021F0FC /* std_mean.plist in Resources */,
 				5AC43CAF237C22BE00E740EA /* RapidFaceDetect.json in Resources */,
+				5A690A9E24D04BFF00FE2C6D /* std96.png in Resources */,
 				5AC43CB5237C235F00E740EA /* RapidFaceDetectSummory in Resources */,
 				5AC43CB7237C235F00E740EA /* RapidFaceDetectConfig.plist in Resources */,
+				5A690A8A24CC355C00FE2C6D /* Landmarks.json in Resources */,
+				5A690A8924CC355C00FE2C6D /* Landmarks.bin in Resources */,
 				5AC43CB6237C235F00E740EA /* RapidFaceDetect.plist in Resources */,
+				5A690A8C24CC379000FE2C6D /* Landmarks.plist in Resources */,
 				5ACC082E23506B85004CD815 /* LaunchScreen.storyboard in Resources */,
 				5AC43CB9237C25AB00E740EA /* RapidFaceDetect.png in Resources */,
+				5A690A8E24CC37E000FE2C6D /* LandmarksSummory in Resources */,
 				5AC43CB0237C22BE00E740EA /* RapidFaceDetect.bin in Resources */,
+				5A690A9F24D04BFF00FE2C6D /* mean96.png in Resources */,
 				5ACC082B23506B85004CD815 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -242,12 +285,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A690A9524CC3F3800FE2C6D /* LandmarksNet.m in Sources */,
 				5AC43CDE237C313500E740EA /* RapidFaceDetectNet.m in Sources */,
 				5AC43CE7237C49E300E740EA /* ObjectRender.metal in Sources */,
 				5ACC082623506B83004CD815 /* ViewController.m in Sources */,
 				5ACC082023506B83004CD815 /* AppDelegate.m in Sources */,
 				5AC43CE4237C476C00E740EA /* RapidFaceDetectFilter.m in Sources */,
 				5ACC083123506B85004CD815 /* main.m in Sources */,
+				5A690A9824CC4EFD00FE2C6D /* LandmarksFilter.m in Sources */,
+				5A690A9B24CCDF3300FE2C6D /* CropFilter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,7 +440,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fengshi.RapidFaceDetect;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = fengshi_20200225;
+				PROVISIONING_PROFILE_SPECIFIER = fengshi_20200910;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -418,7 +464,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fengshi.RapidFaceDetect;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = fengshi_20200225;
+				PROVISIONING_PROFILE_SPECIFIER = fengshi_20200910;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

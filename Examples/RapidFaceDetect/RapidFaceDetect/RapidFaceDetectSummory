@@ -14,210 +14,210 @@ conv_0_bn (BatchNormalization)  (None, 80, 80, 16)   64          conv_0[0][0]
 __________________________________________________________________________________________________
 conv_0_act (Activation)         (None, 80, 80, 16)   0           conv_0_bn[0][0]
 __________________________________________________________________________________________________
-block_0_expand (Conv2D)         (None, 80, 80, 96)   1536        conv_0_act[0][0]
+block_0_expand (Conv2D)         (None, 80, 80, 64)   1024        conv_0_act[0][0]
 __________________________________________________________________________________________________
-block_0_expand_BN (BatchNormali (None, 80, 80, 96)   384         block_0_expand[0][0]
+block_0_expand_BN (BatchNormali (None, 80, 80, 64)   256         block_0_expand[0][0]
 __________________________________________________________________________________________________
-block_0_expand_relu (ReLU)      (None, 80, 80, 96)   0           block_0_expand_BN[0][0]
+block_0_expand_relu (ReLU)      (None, 80, 80, 64)   0           block_0_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_0_depthwise (DepthwiseCon (None, 80, 80, 96)   2400        block_0_expand_relu[0][0]
+block_0_depthwise (DepthwiseCon (None, 80, 80, 64)   1600        block_0_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_0_depthwise_BN (BatchNorm (None, 80, 80, 96)   384         block_0_depthwise[0][0]
+block_0_depthwise_BN (BatchNorm (None, 80, 80, 64)   256         block_0_depthwise[0][0]
 __________________________________________________________________________________________________
-block_0_depthwise_relu (ReLU)   (None, 80, 80, 96)   0           block_0_depthwise_BN[0][0]
+block_0_depthwise_relu (ReLU)   (None, 80, 80, 64)   0           block_0_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_0_project (Conv2D)        (None, 80, 80, 16)   1536        block_0_depthwise_relu[0][0]
+block_0_project (Conv2D)        (None, 80, 80, 16)   1024        block_0_depthwise_relu[0][0]
 __________________________________________________________________________________________________
 block_0_project_BN (BatchNormal (None, 80, 80, 16)   64          block_0_project[0][0]
 __________________________________________________________________________________________________
 block_0_add (Add)               (None, 80, 80, 16)   0           conv_0_act[0][0]
                                                                  block_0_project_BN[0][0]
 __________________________________________________________________________________________________
-block_1_expand (Conv2D)         (None, 80, 80, 96)   1536        block_0_add[0][0]
+block_1_expand (Conv2D)         (None, 80, 80, 64)   1024        block_0_add[0][0]
 __________________________________________________________________________________________________
-block_1_expand_BN (BatchNormali (None, 80, 80, 96)   384         block_1_expand[0][0]
+block_1_expand_BN (BatchNormali (None, 80, 80, 64)   256         block_1_expand[0][0]
 __________________________________________________________________________________________________
-block_1_expand_relu (ReLU)      (None, 80, 80, 96)   0           block_1_expand_BN[0][0]
+block_1_expand_relu (ReLU)      (None, 80, 80, 64)   0           block_1_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_1_depthwise (DepthwiseCon (None, 40, 40, 96)   2400        block_1_expand_relu[0][0]
+block_1_depthwise (DepthwiseCon (None, 40, 40, 64)   1600        block_1_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_1_depthwise_BN (BatchNorm (None, 40, 40, 96)   384         block_1_depthwise[0][0]
+block_1_depthwise_BN (BatchNorm (None, 40, 40, 64)   256         block_1_depthwise[0][0]
 __________________________________________________________________________________________________
-block_1_depthwise_relu (ReLU)   (None, 40, 40, 96)   0           block_1_depthwise_BN[0][0]
+block_1_depthwise_relu (ReLU)   (None, 40, 40, 64)   0           block_1_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_1_project (Conv2D)        (None, 40, 40, 32)   3072        block_1_depthwise_relu[0][0]
+block_1_project (Conv2D)        (None, 40, 40, 32)   2048        block_1_depthwise_relu[0][0]
 __________________________________________________________________________________________________
 block_1_project_BN (BatchNormal (None, 40, 40, 32)   128         block_1_project[0][0]
 __________________________________________________________________________________________________
-block_2_expand (Conv2D)         (None, 40, 40, 192)  6144        block_1_project_BN[0][0]
+block_2_expand (Conv2D)         (None, 40, 40, 128)  4096        block_1_project_BN[0][0]
 __________________________________________________________________________________________________
-block_2_expand_BN (BatchNormali (None, 40, 40, 192)  768         block_2_expand[0][0]
+block_2_expand_BN (BatchNormali (None, 40, 40, 128)  512         block_2_expand[0][0]
 __________________________________________________________________________________________________
-block_2_expand_relu (ReLU)      (None, 40, 40, 192)  0           block_2_expand_BN[0][0]
+block_2_expand_relu (ReLU)      (None, 40, 40, 128)  0           block_2_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_2_depthwise (DepthwiseCon (None, 40, 40, 192)  4800        block_2_expand_relu[0][0]
+block_2_depthwise (DepthwiseCon (None, 40, 40, 128)  3200        block_2_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_2_depthwise_BN (BatchNorm (None, 40, 40, 192)  768         block_2_depthwise[0][0]
+block_2_depthwise_BN (BatchNorm (None, 40, 40, 128)  512         block_2_depthwise[0][0]
 __________________________________________________________________________________________________
-block_2_depthwise_relu (ReLU)   (None, 40, 40, 192)  0           block_2_depthwise_BN[0][0]
+block_2_depthwise_relu (ReLU)   (None, 40, 40, 128)  0           block_2_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_2_project (Conv2D)        (None, 40, 40, 32)   6144        block_2_depthwise_relu[0][0]
+block_2_project (Conv2D)        (None, 40, 40, 32)   4096        block_2_depthwise_relu[0][0]
 __________________________________________________________________________________________________
 block_2_project_BN (BatchNormal (None, 40, 40, 32)   128         block_2_project[0][0]
 __________________________________________________________________________________________________
 block_2_add (Add)               (None, 40, 40, 32)   0           block_1_project_BN[0][0]
                                                                  block_2_project_BN[0][0]
 __________________________________________________________________________________________________
-block_3_expand (Conv2D)         (None, 40, 40, 192)  6144        block_2_add[0][0]
+block_3_expand (Conv2D)         (None, 40, 40, 128)  4096        block_2_add[0][0]
 __________________________________________________________________________________________________
-block_3_expand_BN (BatchNormali (None, 40, 40, 192)  768         block_3_expand[0][0]
+block_3_expand_BN (BatchNormali (None, 40, 40, 128)  512         block_3_expand[0][0]
 __________________________________________________________________________________________________
-block_3_expand_relu (ReLU)      (None, 40, 40, 192)  0           block_3_expand_BN[0][0]
+block_3_expand_relu (ReLU)      (None, 40, 40, 128)  0           block_3_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_3_depthwise (DepthwiseCon (None, 20, 20, 192)  4800        block_3_expand_relu[0][0]
+block_3_depthwise (DepthwiseCon (None, 20, 20, 128)  3200        block_3_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_3_depthwise_BN (BatchNorm (None, 20, 20, 192)  768         block_3_depthwise[0][0]
+block_3_depthwise_BN (BatchNorm (None, 20, 20, 128)  512         block_3_depthwise[0][0]
 __________________________________________________________________________________________________
-block_3_depthwise_relu (ReLU)   (None, 20, 20, 192)  0           block_3_depthwise_BN[0][0]
+block_3_depthwise_relu (ReLU)   (None, 20, 20, 128)  0           block_3_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_3_project (Conv2D)        (None, 20, 20, 32)   6144        block_3_depthwise_relu[0][0]
+block_3_project (Conv2D)        (None, 20, 20, 64)   8192        block_3_depthwise_relu[0][0]
 __________________________________________________________________________________________________
-block_3_project_BN (BatchNormal (None, 20, 20, 32)   128         block_3_project[0][0]
+block_3_project_BN (BatchNormal (None, 20, 20, 64)   256         block_3_project[0][0]
 __________________________________________________________________________________________________
-block_4_expand (Conv2D)         (None, 20, 20, 192)  6144        block_3_project_BN[0][0]
+block_4_expand (Conv2D)         (None, 20, 20, 256)  16384       block_3_project_BN[0][0]
 __________________________________________________________________________________________________
-block_4_expand_BN (BatchNormali (None, 20, 20, 192)  768         block_4_expand[0][0]
+block_4_expand_BN (BatchNormali (None, 20, 20, 256)  1024        block_4_expand[0][0]
 __________________________________________________________________________________________________
-block_4_expand_relu (ReLU)      (None, 20, 20, 192)  0           block_4_expand_BN[0][0]
+block_4_expand_relu (ReLU)      (None, 20, 20, 256)  0           block_4_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_4_depthwise (DepthwiseCon (None, 20, 20, 192)  4800        block_4_expand_relu[0][0]
+block_4_depthwise (DepthwiseCon (None, 20, 20, 256)  6400        block_4_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_4_depthwise_BN (BatchNorm (None, 20, 20, 192)  768         block_4_depthwise[0][0]
+block_4_depthwise_BN (BatchNorm (None, 20, 20, 256)  1024        block_4_depthwise[0][0]
 __________________________________________________________________________________________________
-block_4_depthwise_relu (ReLU)   (None, 20, 20, 192)  0           block_4_depthwise_BN[0][0]
+block_4_depthwise_relu (ReLU)   (None, 20, 20, 256)  0           block_4_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_4_project (Conv2D)        (None, 20, 20, 32)   6144        block_4_depthwise_relu[0][0]
+block_4_project (Conv2D)        (None, 20, 20, 64)   16384       block_4_depthwise_relu[0][0]
 __________________________________________________________________________________________________
-block_4_project_BN (BatchNormal (None, 20, 20, 32)   128         block_4_project[0][0]
+block_4_project_BN (BatchNormal (None, 20, 20, 64)   256         block_4_project[0][0]
 __________________________________________________________________________________________________
-block_4_add (Add)               (None, 20, 20, 32)   0           block_3_project_BN[0][0]
+block_4_add (Add)               (None, 20, 20, 64)   0           block_3_project_BN[0][0]
                                                                  block_4_project_BN[0][0]
 __________________________________________________________________________________________________
-block_5_expand (Conv2D)         (None, 20, 20, 192)  6144        block_4_add[0][0]
+block_5_expand (Conv2D)         (None, 20, 20, 256)  16384       block_4_add[0][0]
 __________________________________________________________________________________________________
-block_5_expand_BN (BatchNormali (None, 20, 20, 192)  768         block_5_expand[0][0]
+block_5_expand_BN (BatchNormali (None, 20, 20, 256)  1024        block_5_expand[0][0]
 __________________________________________________________________________________________________
-block_5_expand_relu (ReLU)      (None, 20, 20, 192)  0           block_5_expand_BN[0][0]
+block_5_expand_relu (ReLU)      (None, 20, 20, 256)  0           block_5_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_5_depthwise (DepthwiseCon (None, 10, 10, 192)  4800        block_5_expand_relu[0][0]
+block_5_depthwise (DepthwiseCon (None, 10, 10, 256)  6400        block_5_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_5_depthwise_BN (BatchNorm (None, 10, 10, 192)  768         block_5_depthwise[0][0]
+block_5_depthwise_BN (BatchNorm (None, 10, 10, 256)  1024        block_5_depthwise[0][0]
 __________________________________________________________________________________________________
-block_5_depthwise_relu (ReLU)   (None, 10, 10, 192)  0           block_5_depthwise_BN[0][0]
+block_5_depthwise_relu (ReLU)   (None, 10, 10, 256)  0           block_5_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_5_project (Conv2D)        (None, 10, 10, 32)   6144        block_5_depthwise_relu[0][0]
+block_5_project (Conv2D)        (None, 10, 10, 128)  32768       block_5_depthwise_relu[0][0]
 __________________________________________________________________________________________________
-block_5_project_BN (BatchNormal (None, 10, 10, 32)   128         block_5_project[0][0]
+block_5_project_BN (BatchNormal (None, 10, 10, 128)  512         block_5_project[0][0]
 __________________________________________________________________________________________________
-block_6_expand (Conv2D)         (None, 10, 10, 192)  6144        block_5_project_BN[0][0]
+block_6_expand (Conv2D)         (None, 10, 10, 512)  65536       block_5_project_BN[0][0]
 __________________________________________________________________________________________________
-block_6_expand_BN (BatchNormali (None, 10, 10, 192)  768         block_6_expand[0][0]
+block_6_expand_BN (BatchNormali (None, 10, 10, 512)  2048        block_6_expand[0][0]
 __________________________________________________________________________________________________
-block_6_expand_relu (ReLU)      (None, 10, 10, 192)  0           block_6_expand_BN[0][0]
+block_6_expand_relu (ReLU)      (None, 10, 10, 512)  0           block_6_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_6_depthwise (DepthwiseCon (None, 10, 10, 192)  4800        block_6_expand_relu[0][0]
+block_6_depthwise (DepthwiseCon (None, 10, 10, 512)  12800       block_6_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_6_depthwise_BN (BatchNorm (None, 10, 10, 192)  768         block_6_depthwise[0][0]
+block_6_depthwise_BN (BatchNorm (None, 10, 10, 512)  2048        block_6_depthwise[0][0]
 __________________________________________________________________________________________________
-block_6_depthwise_relu (ReLU)   (None, 10, 10, 192)  0           block_6_depthwise_BN[0][0]
+block_6_depthwise_relu (ReLU)   (None, 10, 10, 512)  0           block_6_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_6_project (Conv2D)        (None, 10, 10, 32)   6144        block_6_depthwise_relu[0][0]
+block_6_project (Conv2D)        (None, 10, 10, 128)  65536       block_6_depthwise_relu[0][0]
 __________________________________________________________________________________________________
-block_6_project_BN (BatchNormal (None, 10, 10, 32)   128         block_6_project[0][0]
+block_6_project_BN (BatchNormal (None, 10, 10, 128)  512         block_6_project[0][0]
 __________________________________________________________________________________________________
-block_6_add (Add)               (None, 10, 10, 32)   0           block_5_project_BN[0][0]
+block_6_add (Add)               (None, 10, 10, 128)  0           block_5_project_BN[0][0]
                                                                  block_6_project_BN[0][0]
 __________________________________________________________________________________________________
-block_7_expand (Conv2D)         (None, 10, 10, 192)  6144        block_6_add[0][0]
+block_7_expand (Conv2D)         (None, 10, 10, 512)  65536       block_6_add[0][0]
 __________________________________________________________________________________________________
-block_7_expand_BN (BatchNormali (None, 10, 10, 192)  768         block_7_expand[0][0]
+block_7_expand_BN (BatchNormali (None, 10, 10, 512)  2048        block_7_expand[0][0]
 __________________________________________________________________________________________________
-block_7_expand_relu (ReLU)      (None, 10, 10, 192)  0           block_7_expand_BN[0][0]
+block_7_expand_relu (ReLU)      (None, 10, 10, 512)  0           block_7_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_7_depthwise (DepthwiseCon (None, 10, 10, 192)  4800        block_7_expand_relu[0][0]
+block_7_depthwise (DepthwiseCon (None, 10, 10, 512)  12800       block_7_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_7_depthwise_BN (BatchNorm (None, 10, 10, 192)  768         block_7_depthwise[0][0]
+block_7_depthwise_BN (BatchNorm (None, 10, 10, 512)  2048        block_7_depthwise[0][0]
 __________________________________________________________________________________________________
-block_7_depthwise_relu (ReLU)   (None, 10, 10, 192)  0           block_7_depthwise_BN[0][0]
+block_7_depthwise_relu (ReLU)   (None, 10, 10, 512)  0           block_7_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_7_project (Conv2D)        (None, 10, 10, 32)   6144        block_7_depthwise_relu[0][0]
+block_7_project (Conv2D)        (None, 10, 10, 128)  65536       block_7_depthwise_relu[0][0]
 __________________________________________________________________________________________________
-block_7_project_BN (BatchNormal (None, 10, 10, 32)   128         block_7_project[0][0]
+block_7_project_BN (BatchNormal (None, 10, 10, 128)  512         block_7_project[0][0]
 __________________________________________________________________________________________________
-block_7_add (Add)               (None, 10, 10, 32)   0           block_6_add[0][0]
+block_7_add (Add)               (None, 10, 10, 128)  0           block_6_add[0][0]
                                                                  block_7_project_BN[0][0]
 __________________________________________________________________________________________________
-block_8_expand (Conv2D)         (None, 10, 10, 192)  6144        block_7_add[0][0]
+block_8_expand (Conv2D)         (None, 10, 10, 512)  65536       block_7_add[0][0]
 __________________________________________________________________________________________________
-block_8_expand_BN (BatchNormali (None, 10, 10, 192)  768         block_8_expand[0][0]
+block_8_expand_BN (BatchNormali (None, 10, 10, 512)  2048        block_8_expand[0][0]
 __________________________________________________________________________________________________
-block_8_expand_relu (ReLU)      (None, 10, 10, 192)  0           block_8_expand_BN[0][0]
+block_8_expand_relu (ReLU)      (None, 10, 10, 512)  0           block_8_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_8_depthwise (DepthwiseCon (None, 5, 5, 192)    4800        block_8_expand_relu[0][0]
+block_8_depthwise (DepthwiseCon (None, 5, 5, 512)    12800       block_8_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_8_depthwise_BN (BatchNorm (None, 5, 5, 192)    768         block_8_depthwise[0][0]
+block_8_depthwise_BN (BatchNorm (None, 5, 5, 512)    2048        block_8_depthwise[0][0]
 __________________________________________________________________________________________________
-block_8_depthwise_relu (ReLU)   (None, 5, 5, 192)    0           block_8_depthwise_BN[0][0]
+block_8_depthwise_relu (ReLU)   (None, 5, 5, 512)    0           block_8_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_8_project (Conv2D)        (None, 5, 5, 32)     6144        block_8_depthwise_relu[0][0]
+block_8_project (Conv2D)        (None, 5, 5, 128)    65536       block_8_depthwise_relu[0][0]
 __________________________________________________________________________________________________
-block_8_project_BN (BatchNormal (None, 5, 5, 32)     128         block_8_project[0][0]
+block_8_project_BN (BatchNormal (None, 5, 5, 128)    512         block_8_project[0][0]
 __________________________________________________________________________________________________
-block_9_expand (Conv2D)         (None, 5, 5, 192)    6144        block_8_project_BN[0][0]
+block_9_expand (Conv2D)         (None, 5, 5, 512)    65536       block_8_project_BN[0][0]
 __________________________________________________________________________________________________
-block_9_expand_BN (BatchNormali (None, 5, 5, 192)    768         block_9_expand[0][0]
+block_9_expand_BN (BatchNormali (None, 5, 5, 512)    2048        block_9_expand[0][0]
 __________________________________________________________________________________________________
-block_9_expand_relu (ReLU)      (None, 5, 5, 192)    0           block_9_expand_BN[0][0]
+block_9_expand_relu (ReLU)      (None, 5, 5, 512)    0           block_9_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_9_depthwise (DepthwiseCon (None, 5, 5, 192)    4800        block_9_expand_relu[0][0]
+block_9_depthwise (DepthwiseCon (None, 5, 5, 512)    12800       block_9_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_9_depthwise_BN (BatchNorm (None, 5, 5, 192)    768         block_9_depthwise[0][0]
+block_9_depthwise_BN (BatchNorm (None, 5, 5, 512)    2048        block_9_depthwise[0][0]
 __________________________________________________________________________________________________
-block_9_depthwise_relu (ReLU)   (None, 5, 5, 192)    0           block_9_depthwise_BN[0][0]
+block_9_depthwise_relu (ReLU)   (None, 5, 5, 512)    0           block_9_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_9_project (Conv2D)        (None, 5, 5, 32)     6144        block_9_depthwise_relu[0][0]
+block_9_project (Conv2D)        (None, 5, 5, 128)    65536       block_9_depthwise_relu[0][0]
 __________________________________________________________________________________________________
-block_9_project_BN (BatchNormal (None, 5, 5, 32)     128         block_9_project[0][0]
+block_9_project_BN (BatchNormal (None, 5, 5, 128)    512         block_9_project[0][0]
 __________________________________________________________________________________________________
-block_9_add (Add)               (None, 5, 5, 32)     0           block_8_project_BN[0][0]
+block_9_add (Add)               (None, 5, 5, 128)    0           block_8_project_BN[0][0]
                                                                  block_9_project_BN[0][0]
 __________________________________________________________________________________________________
-block_10_expand (Conv2D)        (None, 5, 5, 192)    6144        block_9_add[0][0]
+block_10_expand (Conv2D)        (None, 5, 5, 512)    65536       block_9_add[0][0]
 __________________________________________________________________________________________________
-block_10_expand_BN (BatchNormal (None, 5, 5, 192)    768         block_10_expand[0][0]
+block_10_expand_BN (BatchNormal (None, 5, 5, 512)    2048        block_10_expand[0][0]
 __________________________________________________________________________________________________
-block_10_expand_relu (ReLU)     (None, 5, 5, 192)    0           block_10_expand_BN[0][0]
+block_10_expand_relu (ReLU)     (None, 5, 5, 512)    0           block_10_expand_BN[0][0]
 __________________________________________________________________________________________________
-block_10_depthwise (DepthwiseCo (None, 5, 5, 192)    4800        block_10_expand_relu[0][0]
+block_10_depthwise (DepthwiseCo (None, 5, 5, 512)    12800       block_10_expand_relu[0][0]
 __________________________________________________________________________________________________
-block_10_depthwise_BN (BatchNor (None, 5, 5, 192)    768         block_10_depthwise[0][0]
+block_10_depthwise_BN (BatchNor (None, 5, 5, 512)    2048        block_10_depthwise[0][0]
 __________________________________________________________________________________________________
-block_10_depthwise_relu (ReLU)  (None, 5, 5, 192)    0           block_10_depthwise_BN[0][0]
+block_10_depthwise_relu (ReLU)  (None, 5, 5, 512)    0           block_10_depthwise_BN[0][0]
 __________________________________________________________________________________________________
-block_10_project (Conv2D)       (None, 5, 5, 32)     6144        block_10_depthwise_relu[0][0]
+block_10_project (Conv2D)       (None, 5, 5, 128)    65536       block_10_depthwise_relu[0][0]
 __________________________________________________________________________________________________
-block_10_project_BN (BatchNorma (None, 5, 5, 32)     128         block_10_project[0][0]
+block_10_project_BN (BatchNorma (None, 5, 5, 128)    512         block_10_project[0][0]
 __________________________________________________________________________________________________
-block_10_add (Add)              (None, 5, 5, 32)     0           block_9_add[0][0]
+block_10_add (Add)              (None, 5, 5, 128)    0           block_9_add[0][0]
                                                                  block_10_project_BN[0][0]
 __________________________________________________________________________________________________
-conf0 (Conv2D)                  (None, 10, 10, 8)    2312        block_7_add[0][0]
+conf0 (Conv2D)                  (None, 10, 10, 8)    9224        block_7_add[0][0]
 __________________________________________________________________________________________________
-conf1 (Conv2D)                  (None, 5, 5, 8)      2312        block_10_add[0][0]
+conf1 (Conv2D)                  (None, 5, 5, 8)      9224        block_10_add[0][0]
 __________________________________________________________________________________________________
-loc0 (Conv2D)                   (None, 10, 10, 16)   4624        block_7_add[0][0]
+loc0 (Conv2D)                   (None, 10, 10, 16)   18448       block_7_add[0][0]
 __________________________________________________________________________________________________
-loc1 (Conv2D)                   (None, 5, 5, 16)     4624        block_10_add[0][0]
+loc1 (Conv2D)                   (None, 5, 5, 16)     18448       block_10_add[0][0]
 __________________________________________________________________________________________________
 Reshape_conf0 (Reshape)         (None, 400, 2)       0           conf0[0][0]
 __________________________________________________________________________________________________
@@ -250,7 +250,7 @@ Concatenate_predict (Concatenat (None, 500, 14)      0           Softmax_conf[0]
                                                                  Concatenate_loc[0][0]
                                                                  Concatenate_ab[0][0]
 ==================================================================================================
-Total params: 198,112
-Trainable params: 189,728
-Non-trainable params: 8,384
+Total params: 937,440
+Trainable params: 921,632
+Non-trainable params: 15,808
 __________________________________________________________________________________________________
