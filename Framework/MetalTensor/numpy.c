@@ -84,7 +84,7 @@ int argmax(float *x, int size) {
         return 0;
     }
     
-    int max = x[0];
+    float max = x[0];
     int index = 0;
     for (int i = 1; i < size; i++) {
         if (x[i] > max) {
@@ -95,4 +95,3 @@ int argmax(float *x, int size) {
     
     return index;
 }
-

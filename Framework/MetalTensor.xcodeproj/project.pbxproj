@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B1A000124197B6A00000001 /* MetalTensorLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B1A001224197B6A00000001 /* MetalTensorLogicTests.m */; };
+		6B1A000224197B6A00000001 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1A001424197B6A00000001 /* XCTest.framework */; };
+		6B1A000324197B6A00000001 /* MetalTensor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A8D233F2341D767005F88E6 /* MetalTensor.framework */; };
+		6B1A000424197B6A00000001 /* MetalImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB218E32470020D00738DF4 /* MetalImage.framework */; };
 		5A3BAAC223BB69090000D1BC /* MIGramMatrixLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A3BAAC023BB69090000D1BC /* MIGramMatrixLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A3BAAC323BB69090000D1BC /* MIGramMatrixLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3BAAC123BB69090000D1BC /* MIGramMatrixLayer.m */; };
 		5A3BAAC723BB6AE40000D1BC /* MIReduceUnaryLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A3BAAC523BB6AE40000D1BC /* MIReduceUnaryLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -114,7 +118,21 @@
 		5AFA70E223FF778E0021C56C /* MTResourceProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AFA70E123FF778E0021C56C /* MTResourceProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		6B1A000524197B6A00000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A8D23362341D767005F88E6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A8D233E2341D767005F88E6;
+			remoteInfo = MetalTensor;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		6B1A001124197B6A00000001 /* MetalTensorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalTensorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B1A001224197B6A00000001 /* MetalTensorLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalTensorLogicTests.m; sourceTree = "<group>"; };
+		6B1A001324197B6A00000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6B1A001424197B6A00000001 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		5A3BAAC023BB69090000D1BC /* MIGramMatrixLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIGramMatrixLayer.h; sourceTree = "<group>"; };
 		5A3BAAC123BB69090000D1BC /* MIGramMatrixLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MIGramMatrixLayer.m; sourceTree = "<group>"; };
 		5A3BAAC523BB6AE40000D1BC /* MIReduceUnaryLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIReduceUnaryLayer.h; sourceTree = "<group>"; };
@@ -224,6 +242,16 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6B1A002124197B6A00000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B1A000324197B6A00000001 /* MetalTensor.framework in Frameworks */,
+				6B1A000424197B6A00000001 /* MetalImage.framework in Frameworks */,
+				6B1A000224197B6A00000001 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A8D233C2341D767005F88E6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -240,6 +268,7 @@
 		5A59809424128E89007953EA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6B1A001424197B6A00000001 /* XCTest.framework */,
 				5AB218E32470020D00738DF4 /* MetalImage.framework */,
 				5A9FB19E24167C3C007A1F12 /* MetalPerformanceShaders.framework */,
 				5A9FB19C24167C35007A1F12 /* Metal.framework */,
@@ -251,6 +280,7 @@
 			isa = PBXGroup;
 			children = (
 				5A8D23412341D767005F88E6 /* MetalTensor */,
+				6B1A002224197B6A00000001 /* MetalTensorTests */,
 				5A8D23402341D767005F88E6 /* Products */,
 				5A59809424128E89007953EA /* Frameworks */,
 			);
@@ -260,8 +290,18 @@
 			isa = PBXGroup;
 			children = (
 				5A8D233F2341D767005F88E6 /* MetalTensor.framework */,
+				6B1A001124197B6A00000001 /* MetalTensorTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6B1A002224197B6A00000001 /* MetalTensorTests */ = {
+			isa = PBXGroup;
+			children = (
+				6B1A001324197B6A00000001 /* Info.plist */,
+				6B1A001224197B6A00000001 /* MetalTensorLogicTests.m */,
+			);
+			path = MetalTensorTests;
 			sourceTree = "<group>";
 		};
 		5A8D23412341D767005F88E6 /* MetalTensor */ = {
@@ -446,6 +486,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		6B1A002324197B6A00000001 /* MetalTensorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6B1A002724197B6A00000001 /* Build configuration list for PBXNativeTarget "MetalTensorTests" */;
+			buildPhases = (
+				6B1A002524197B6A00000001 /* Sources */,
+				6B1A002124197B6A00000001 /* Frameworks */,
+				6B1A002424197B6A00000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6B1A002624197B6A00000001 /* PBXTargetDependency */,
+			);
+			name = MetalTensorTests;
+			productName = MetalTensorTests;
+			productReference = 6B1A001124197B6A00000001 /* MetalTensorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		5A8D233E2341D767005F88E6 /* MetalTensor */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5A8D23472341D767005F88E6 /* Build configuration list for PBXNativeTarget "MetalTensor" */;
@@ -473,6 +531,10 @@
 				LastUpgradeCheck = 1100;
 				ORGANIZATIONNAME = fengshi;
 				TargetAttributes = {
+					6B1A002324197B6A00000001 = {
+						CreatedOnToolsVersion = 11.0;
+						TestTargetID = 5A8D233E2341D767005F88E6;
+					};
 					5A8D233E2341D767005F88E6 = {
 						CreatedOnToolsVersion = 11.0;
 					};
@@ -491,12 +553,20 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				6B1A002324197B6A00000001 /* MetalTensorTests */,
 				5A8D233E2341D767005F88E6 /* MetalTensor */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6B1A002424197B6A00000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A8D233D2341D767005F88E6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -507,6 +577,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6B1A002524197B6A00000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B1A000124197B6A00000001 /* MetalTensorLogicTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A8D233B2341D767005F88E6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -566,7 +644,69 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		6B1A002624197B6A00000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A8D233E2341D767005F88E6 /* MetalTensor */;
+			targetProxy = 6B1A000524197B6A00000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		6B1A002824197B6A00000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/../ThirdParts/",
+				);
+				INFOPLIST_FILE = MetalTensorTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fengshi.MetalTensorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6B1A002924197B6A00000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/../ThirdParts/",
+				);
+				INFOPLIST_FILE = MetalTensorTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fengshi.MetalTensorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		5A8D23452341D767005F88E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -748,6 +888,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6B1A002724197B6A00000001 /* Build configuration list for PBXNativeTarget "MetalTensorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6B1A002824197B6A00000001 /* Debug */,
+				6B1A002924197B6A00000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		5A8D23392341D767005F88E6 /* Build configuration list for PBXProject "MetalTensor" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
