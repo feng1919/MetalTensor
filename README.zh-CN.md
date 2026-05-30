@@ -12,8 +12,8 @@ MetalTensor 是一个基于 Apple Metal / Metal Performance Shaders 的轻量级
 
 > **注意**
 >
-> 1. 当前工程依赖 `ThirdParts/MetalImage.framework`
-> 2. 当前仓库未提供 CocoaPods / Swift Package Manager / Carthage 分发配置
+> 1. `MetalTensor` 现在已经支持通过 Swift Package Manager 分发，并会从 `https://github.com/feng1919/MetalImage` 自动解析 `MetalImage`
+> 2. `Examples/` 里的历史示例工程仍然是基于 Xcode project 的接入方式
 > 3. Metal 相关代码需要在真机运行，**不支持 Simulator**
 
 ## 适用场景
@@ -31,12 +31,11 @@ MetalTensor 适合这类工作：
 .
 ├── Framework/              # MetalTensor 框架源码与 Xcode 工程
 │   └── MetalTensor/
+├── Package.swift           # Swift Package Manager 清单
 ├── Examples/
 │   ├── MobileNetV2/        # 图像分类示例
 │   ├── PortraitSegment/    # 人像分割示例
 │   └── RapidFaceDetect/    # 人脸检测 / 关键点示例
-├── ThirdParts/
-│   └── MetalImage.framework
 └── LICENSE
 ```
 
@@ -49,6 +48,24 @@ MetalTensor 适合这类工作：
 - 可直接接收 `MTLTexture` 或 `MetalTensor` 作为输入
 - 可从输出层取回结果，或通过回调把结果接回渲染链路
 - 内置 SSD 解码相关工具，便于做目标检测
+
+## Swift Package Manager 接入
+
+先把 `MetalTensor` 加入依赖：
+
+```swift
+.package(url: "https://github.com/feng1919/MetalTensor", branch: "master")
+```
+
+然后在 target 里引用 `MetalTensor` product：
+
+```swift
+.product(name: "MetalTensor", package: "MetalTensor")
+```
+
+`MetalTensor` 会通过 Swift Package Manager 自动拉取 `MetalImage`，不再需要把 `MetalImage.framework` 手动内嵌到你的 app 或 framework target 里。
+
+在正式发布 tag 之前，Swift Package Manager 请先使用 `master` 分支接入。
 
 当前代码中可见的网络层类型包括：
 
@@ -76,10 +93,7 @@ MetalTensor 适合这类工作：
 - `Examples/PortraitSegment/PortraitSegment.xcodeproj`
 - `Examples/RapidFaceDetect/RapidFaceDetect.xcodeproj`
 
-示例工程会引用：
-
-- `Framework/MetalTensor.xcodeproj`
-- `ThirdParts/MetalImage.framework`
+示例工程会引用本地的 `Framework/MetalTensor.xcodeproj`。新的 Swift Package 目标则会通过远端包依赖解析 `MetalImage`，不再使用仓库内嵌的二进制 framework。
 
 ### 2. 选择真机
 

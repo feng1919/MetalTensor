@@ -12,8 +12,8 @@ The repository currently includes three complete demos:
 
 > **Note**
 >
-> 1. This project depends on `ThirdParts/MetalImage.framework`
-> 2. The repository does not currently provide CocoaPods / Swift Package Manager / Carthage distribution
+> 1. `MetalTensor` is now distributed through Swift Package Manager and resolves `MetalImage` from `https://github.com/feng1919/MetalImage`
+> 2. The legacy demo projects in `Examples/` are still Xcode-project based
 > 3. Metal code must run on a real device; **the simulator is not supported**
 
 ## Use Cases
@@ -31,12 +31,11 @@ MetalTensor is a good fit for:
 .
 ├── Framework/              # MetalTensor framework sources and Xcode project
 │   └── MetalTensor/
+├── Package.swift           # Swift Package Manager manifest
 ├── Examples/
 │   ├── MobileNetV2/        # Image classification demo
 │   ├── PortraitSegment/    # Portrait segmentation demo
 │   └── RapidFaceDetect/    # Face detection / landmarks demo
-├── ThirdParts/
-│   └── MetalImage.framework
 └── LICENSE
 ```
 
@@ -49,6 +48,24 @@ MetalTensor is a good fit for:
 - direct input from either `MTLTexture` or `MetalTensor`
 - output retrieval through output layers or completion callbacks
 - built-in SSD decoding utilities for detection workflows
+
+## Swift Package Manager
+
+Add `MetalTensor` as a package dependency:
+
+```swift
+.package(url: "https://github.com/feng1919/MetalTensor", branch: "master")
+```
+
+Then depend on the `MetalTensor` product:
+
+```swift
+.product(name: "MetalTensor", package: "MetalTensor")
+```
+
+`MetalImage` is pulled in automatically by `MetalTensor` through Swift Package Manager, so you no longer need to vendor `MetalImage.framework` inside your app or framework target.
+
+Until release tags are published, use the `master` branch in Swift Package Manager.
 
 Layer types visible in the current codebase include:
 
@@ -76,10 +93,7 @@ You can open any of these demo projects directly:
 - `Examples/PortraitSegment/PortraitSegment.xcodeproj`
 - `Examples/RapidFaceDetect/RapidFaceDetect.xcodeproj`
 
-Each demo references:
-
-- `Framework/MetalTensor.xcodeproj`
-- `ThirdParts/MetalImage.framework`
+Each demo references the local `Framework/MetalTensor.xcodeproj`. The Swift package target uses the remote `MetalImage` package dependency instead of the vendored binary framework.
 
 ### 2. Select a physical device
 
