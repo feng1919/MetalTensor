@@ -417,7 +417,7 @@
 		<string>1, 1, 1280</string>
 		<key>filters</key>
 		<string>1000</string>
-		<key>weight</key>
+		<key>weights</key>
 		<string>Logits</string>
 		<key>targets</key>
 		<string>softmax</string>
