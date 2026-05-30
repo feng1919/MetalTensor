@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Xcode user-specific data
+**/xcuserdata/
+**/*.xcuserstate
+**/*.pbxuser
+**/*.mode1v3
+**/*.mode2v3
+**/*.perspectivev3
+
+# Xcode generated workspace data for .xcodeproj projects
+**/*.xcodeproj/project.xcworkspace/
+
+# Xcode SCM/local metadata
+**/*.xccheckout
+**/*.xcscmblueprint
+
+# Local build artifacts
+build/
+DerivedData/
