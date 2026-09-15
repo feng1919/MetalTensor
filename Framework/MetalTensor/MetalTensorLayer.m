@@ -177,9 +177,11 @@
 }
 
 - (void)setImageToTargets {
-    for (ForwardTarget currentTarget in _targets) {
-        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
-        NSInteger index = [_targetIndices[indexOfObject] integerValue];
+    NSArray<ForwardTarget> *currentTargets = nil;
+    NSArray<NSNumber *> *currentIndices = nil;
+    [self snapshotTargets:&currentTargets indices:&currentIndices];
+    [currentTargets enumerateObjectsUsingBlock:^(ForwardTarget currentTarget, NSUInteger idx, BOOL *stop) {
+        NSInteger index = [currentIndices[idx] integerValue];
         [currentTarget setImage:_image atIndex:index];
         
         DB_TRACE(-_verbose+1, "\n%s ---%s---> %s(%ld)",
@@ -187,7 +189,7 @@
                  NSStringFromDataShape(_image.shape).UTF8String,
                  [currentTarget description].UTF8String,
                  index);
-    }
+    }];
 }
 
 - (void)removeCachedImages {
@@ -202,11 +204,13 @@
     [self setImageToTargets];
     [self removeImage];
     
-    for (ForwardTarget currentTarget in _targets) {
-        NSInteger indexOfObject = [_targets indexOfObject:currentTarget];
-        NSInteger imageIndex = [[_targetIndices objectAtIndex:indexOfObject] integerValue];
+    NSArray<ForwardTarget> *currentTargets = nil;
+    NSArray<NSNumber *> *currentIndices = nil;
+    [self snapshotTargets:&currentTargets indices:&currentIndices];
+    [currentTargets enumerateObjectsUsingBlock:^(ForwardTarget currentTarget, NSUInteger idx, BOOL *stop) {
+        NSInteger imageIndex = [currentIndices[idx] integerValue];
         [currentTarget imageReadyOnCommandBuffer:commandBuffer atIndex:imageIndex];
-    }
+    }];
 }
 
 - (void)removeCachedGradients {
@@ -278,6 +282,18 @@ GRADIENT_SUM_FINISH:
 
 #pragma mark - Private
 
+//  Returns a consistent copy of the forward targets and their input
+//  indices. The forward path iterates on one thread while addTarget /
+//  removeTarget may run on another; enumerating the live arrays would
+//  crash on concurrent mutation, so every iteration goes through this
+//  snapshot instead.
+- (void)snapshotTargets:(NSArray<ForwardTarget> **)targets indices:(NSArray<NSNumber *> **)indices {
+    @synchronized (self) {
+        *targets = [NSArray arrayWithArray:_targets];
+        *indices = [NSArray arrayWithArray:_targetIndices];
+    }
+}
+
 - (MPSCNNAdd *)reduceSum {
     if (!_reduceSum) {
         _reduceSum = [[MPSCNNAdd alloc] initWithDevice:_device];
@@ -298,11 +314,13 @@ GRADIENT_SUM_FINISH:
     
     [self updateOutputShape];
     
-    for (int i = 0; i < _targets.count; i++) {
-        ForwardTarget target = _targets[i];
-        NSInteger index = [_targetIndices[i] integerValue];
+    NSArray<ForwardTarget> *currentTargets = nil;
+    NSArray<NSNumber *> *currentIndices = nil;
+    [self snapshotTargets:&currentTargets indices:&currentIndices];
+    [currentTargets enumerateObjectsUsingBlock:^(ForwardTarget target, NSUInteger i, BOOL *stop) {
+        NSInteger index = [currentIndices[i] integerValue];
         [target setInputShape:&_outputShape atIndex:index];
-    }
+    }];
 }
 
 - (void)setImage:(MetalTensor)newImage atIndex:(NSInteger)imageIndex {
