@@ -38,13 +38,17 @@ static int _reuseCounter = 0;
 }
 
 - (NSInteger)registerReusePoolIdentifier {
-    _reuseCounter ++;
-    _reuseCacheMap[@(_reuseCounter)] = [[NSMutableDictionary alloc] init];
-    return _reuseCounter;
+    @synchronized (self) {
+        _reuseCounter ++;
+        _reuseCacheMap[@(_reuseCounter)] = [[NSMutableDictionary alloc] init];
+        return _reuseCounter;
+    }
 }
 
 - (void)unregisterReusePoolIdentifier:(NSInteger)identifier {
-    [_reuseCacheMap removeObjectForKey:@(identifier)];
+    @synchronized (self) {
+        [_reuseCacheMap removeObjectForKey:@(identifier)];
+    }
 }
 
 
@@ -144,46 +148,50 @@ static int _reuseCounter = 0;
 }
 
 - (void)beginContextWithCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
-    NSInteger poolIdentifier = [commandBuffer.label integerValue];
-    NSMutableDictionary *tensorCache = _reuseCacheMap[@(poolIdentifier)];
-    NSMutableArray *tensorList = [NSMutableArray array];
-    NSMutableArray *matrixList = [NSMutableArray array];
-    for (NSSet *set in tensorCache.allValues) {
-        id obj = set.anyObject;
-        if ([obj isKindOfClass:[MTTensor class]]) {
-            for (MetalTensor tensor in set.allObjects) {
-                if (tensor.poolIdentifier == poolIdentifier) {
-                    [tensorList addObject:tensor.imageDescriptor];
+    @synchronized (self) {
+        NSInteger poolIdentifier = [commandBuffer.label integerValue];
+        NSMutableDictionary *tensorCache = _reuseCacheMap[@(poolIdentifier)];
+        NSMutableArray *tensorList = [NSMutableArray array];
+        NSMutableArray *matrixList = [NSMutableArray array];
+        for (NSSet *set in tensorCache.allValues) {
+            id obj = set.anyObject;
+            if ([obj isKindOfClass:[MTTensor class]]) {
+                for (MetalTensor tensor in set.allObjects) {
+                    if (tensor.poolIdentifier == poolIdentifier) {
+                        [tensorList addObject:tensor.imageDescriptor];
+                    }
                 }
             }
-        }
-        else if ([obj isKindOfClass:[MTMatrix class]]){
-            for (MetalMatrix matrix in set.allObjects) {
-                if (matrix.poolIdentifier == poolIdentifier) {
-                    [matrixList addObject:matrix.matrixDescriptor];
+            else if ([obj isKindOfClass:[MTMatrix class]]){
+                for (MetalMatrix matrix in set.allObjects) {
+                    if (matrix.poolIdentifier == poolIdentifier) {
+                        [matrixList addObject:matrix.matrixDescriptor];
+                    }
                 }
             }
+            else {
+                NSAssert(NO, @"Unsupported resource type: %@", obj);
+            }
         }
-        else {
-            NSAssert(NO, @"Unsupported resource type: %@", obj);
+        
+        if (tensorList.count > 0) {
+            [MPSTemporaryImage prefetchStorageWithCommandBuffer:commandBuffer imageDescriptorList:tensorList];
         }
-    }
-    
-    if (tensorList.count > 0) {
-        [MPSTemporaryImage prefetchStorageWithCommandBuffer:commandBuffer imageDescriptorList:tensorList];
-    }
-    if (matrixList.count > 0) {
-        [MPSTemporaryMatrix prefetchStorageWithCommandBuffer:commandBuffer matrixDescriptorList:matrixList];
+        if (matrixList.count > 0) {
+            [MPSTemporaryMatrix prefetchStorageWithCommandBuffer:commandBuffer matrixDescriptorList:matrixList];
+        }
     }
 }
 
 - (void)endContextWithCommandBuffer:(id<MTLCommandBuffer>)commandBufferfer {
-    NSInteger identifier = [commandBufferfer.label integerValue];
-    NSMutableDictionary *tensorCache = _reuseCacheMap[@(identifier)];
-    for (NSSet *set in tensorCache.allValues) {
-        for (id<MTResource> resource in set.allObjects) {
-            if (resource.poolIdentifier == identifier) {
-                [resource deleteContent];
+    @synchronized (self) {
+        NSInteger identifier = [commandBufferfer.label integerValue];
+        NSMutableDictionary *tensorCache = _reuseCacheMap[@(identifier)];
+        for (NSSet *set in tensorCache.allValues) {
+            for (id<MTResource> resource in set.allObjects) {
+                if (resource.poolIdentifier == identifier) {
+                    [resource deleteContent];
+                }
             }
         }
     }
