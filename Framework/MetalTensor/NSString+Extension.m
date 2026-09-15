@@ -51,6 +51,9 @@
                 else if ([v1 isKindOfClass:[NSDictionary class]]){
                     [mv addObject:[(NSDictionary *)v1 removeBlankSpaces]];
                 }
+                else {
+                    [mv addObject:v1];
+                }
             }
             dict[key] = [NSArray arrayWithArray:mv];
         }
