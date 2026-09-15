@@ -26,10 +26,6 @@ let package = Package(
             exclude: [
                 "Info.plist"
             ],
-            resources: [
-                .copy("MNNPreprocess.metal"),
-                .copy("SWAP_BR.bin")
-            ],
             publicHeadersPath: ".",
             cSettings: [
                 .headerSearchPath(".")

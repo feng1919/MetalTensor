@@ -7,8 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#if __has_include(<MetalImage/MetalImage.h>)
 #import <MetalImage/MetalImage.h>
+#else
+#import "MetalImage.h"
+#endif
+#if __has_include(<MetalImage/MetalImageFunction.h>)
 #import <MetalImage/MetalImageFunction.h>
+#else
+#import "MetalImageFunction.h"
+#endif
 #import "MetalTensorProtocols.h"
 
 NS_ASSUME_NONNULL_BEGIN

@@ -7,7 +7,11 @@
 //
 
 #import "MTImageTensor.h"
+#if __has_include(<MetalImage/MetalDevice.h>)
 #import <MetalImage/MetalDevice.h>
+#else
+#import "MetalDevice.h"
+#endif
 
 @implementation MTImageTensor {
     

@@ -8,7 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import <Metal/Metal.h>
+#if __has_include(<MetalImage/MetalImage.h>)
 #import <MetalImage/MetalImage.h>
+#else
+#import "MetalImage.h"
+#endif
 
 //! Project version number for MetalTensor.
 FOUNDATION_EXPORT double MetalTensorVersionNumber;
@@ -36,31 +40,17 @@ FOUNDATION_EXPORT const unsigned char MetalTensorVersionString[];
 #import "MetalTensorNode.h"
 #import "MetalTensorOutputLayer.h"
 #import "MIArithmeticLayer.h"
-#import "MIBatchNormalizationLayer.h"
 #import "MIConcatenateLayer.h"
 #import "MIConvolutionLayer.h"
 #import "MIDataSource.h"
-#import "MIDropoutLayer.h"
 #import "MIFullyConnectedLayer.h"
-#import "MIInceptionV3Module.h"
 #import "MIInvertedResidualModule.h"
-#import "MIL2NormalizationLayer.h"
 #import "MIPoolingAverageLayer.h"
 #import "MIPoolingMaxLayer.h"
 #import "MIReshapeLayer.h"
-#import "MIResidualModule.h"
 #import "MISeparableConvolutionLayer.h"
 #import "MISoftMaxLayer.h"
 #import "MITransposeConvolutionLayer.h"
-#import "MIMatrixMultiplyLayer.h"
-#import "MIGramMatrixLayer.h"
-#import "MIReduceUnaryLayer.h"
-#import "MTMeanSquaredErrorLayer.h"
-#import "MetalTensorSpacialReduce.h"
-#import "MTChannelReduce.h"
-#import "MetalTensorSlice.h"
-#import "MTTotalVariationLayer.h"
-#import "MTGramMatrixLayer.h"
 
 
 #import "MPSImage+Extension.h"

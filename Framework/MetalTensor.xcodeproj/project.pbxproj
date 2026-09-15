@@ -11,19 +11,8 @@
 		6B1A000224197B6A00000001 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1A001424197B6A00000001 /* XCTest.framework */; };
 		6B1A000324197B6A00000001 /* MetalTensor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A8D233F2341D767005F88E6 /* MetalTensor.framework */; };
 		6B1A000424197B6A00000001 /* MetalImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB218E32470020D00738DF4 /* MetalImage.framework */; };
-		5A3BAAC223BB69090000D1BC /* MIGramMatrixLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A3BAAC023BB69090000D1BC /* MIGramMatrixLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A3BAAC323BB69090000D1BC /* MIGramMatrixLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3BAAC123BB69090000D1BC /* MIGramMatrixLayer.m */; };
-		5A3BAAC723BB6AE40000D1BC /* MIReduceUnaryLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A3BAAC523BB6AE40000D1BC /* MIReduceUnaryLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A3BAAC823BB6AE40000D1BC /* MIReduceUnaryLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3BAAC623BB6AE40000D1BC /* MIReduceUnaryLayer.m */; };
-		5A4EA39D23BB349900B68DE5 /* MIMatrixMultiplyLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A4EA39B23BB349900B68DE5 /* MIMatrixMultiplyLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A4EA39E23BB349900B68DE5 /* MIMatrixMultiplyLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4EA39C23BB349900B68DE5 /* MIMatrixMultiplyLayer.m */; };
-		5A5B243323C9F45600BBEED3 /* MetalTensorSlice.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A5B243123C9F45600BBEED3 /* MetalTensorSlice.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A5B243423C9F45600BBEED3 /* MetalTensorSlice.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B243223C9F45600BBEED3 /* MetalTensorSlice.m */; };
-		5A7FA55D23D6E34D006C7907 /* MTChannelCompress.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A7FA55B23D6E34D006C7907 /* MTChannelCompress.h */; };
-		5A7FA55E23D6E34D006C7907 /* MTChannelCompress.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7FA55C23D6E34D006C7907 /* MTChannelCompress.m */; };
 		5A8D23442341D767005F88E6 /* MetalTensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23422341D767005F88E6 /* MetalTensor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23952341DA03005F88E6 /* MIReshapeLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D234B2341D9FB005F88E6 /* MIReshapeLayer.m */; };
-		5A8D23962341DA03005F88E6 /* MIResidualModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D234C2341D9FB005F88E6 /* MIResidualModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23972341DA03005F88E6 /* MIDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D234D2341D9FB005F88E6 /* MIDataSource.m */; };
 		5A8D23982341DA03005F88E6 /* MISoftMaxLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D234E2341D9FB005F88E6 /* MISoftMaxLayer.m */; };
 		5A8D23992341DA03005F88E6 /* MPSImage+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D234F2341D9FB005F88E6 /* MPSImage+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -31,7 +20,6 @@
 		5A8D239B2341DA03005F88E6 /* MTImageTensor.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23512341D9FB005F88E6 /* MTImageTensor.m */; };
 		5A8D239C2341DA03005F88E6 /* MetalTensorNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23522341D9FB005F88E6 /* MetalTensorNode.m */; };
 		5A8D239D2341DA03005F88E6 /* FPSCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23532341D9FB005F88E6 /* FPSCounter.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A8D239E2341DA03005F88E6 /* MIL2NormalizationLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23542341D9FB005F88E6 /* MIL2NormalizationLayer.m */; };
 		5A8D239F2341DA03005F88E6 /* MetalTensorLayerDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23552341D9FB005F88E6 /* MetalTensorLayerDescriptor.m */; };
 		5A8D23A02341DA03005F88E6 /* MTTensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23562341D9FB005F88E6 /* MTTensor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23A12341DA03005F88E6 /* MetalTensorOutputLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23572341D9FB005F88E6 /* MetalTensorOutputLayer.m */; };
@@ -51,48 +39,38 @@
 		5A8D23AF2341DA03005F88E6 /* MIPoolingMaxLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23652341D9FC005F88E6 /* MIPoolingMaxLayer.m */; };
 		5A8D23B02341DA03005F88E6 /* MISoftMaxLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23662341D9FC005F88E6 /* MISoftMaxLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23B12341DA03005F88E6 /* MetalTensorProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23672341D9FC005F88E6 /* MetalTensorProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A8D23B22341DA03005F88E6 /* MIBatchNormalizationLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23682341D9FD005F88E6 /* MIBatchNormalizationLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23B32341DA03005F88E6 /* metal_tensor_structures.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23692341D9FD005F88E6 /* metal_tensor_structures.c */; };
 		5A8D23B42341DA03005F88E6 /* MISeparableConvolutionLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D236A2341D9FD005F88E6 /* MISeparableConvolutionLayer.m */; };
 		5A8D23B52341DA03005F88E6 /* MIConcatenateLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D236B2341D9FD005F88E6 /* MIConcatenateLayer.m */; };
-		5A8D23B62341DA03005F88E6 /* MIDropoutLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D236C2341D9FD005F88E6 /* MIDropoutLayer.m */; };
-		5A8D23B72341DA03005F88E6 /* MIInceptionV3Module.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D236D2341D9FD005F88E6 /* MIInceptionV3Module.m */; };
 		5A8D23B82341DA03005F88E6 /* MIPoolingMaxLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D236E2341D9FD005F88E6 /* MIPoolingMaxLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23B92341DA03005F88E6 /* MIReshapeLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D236F2341D9FD005F88E6 /* MIReshapeLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23BA2341DA03005F88E6 /* MTTensor.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23702341D9FD005F88E6 /* MTTensor.m */; };
-		5A8D23BB2341DA03005F88E6 /* MIInceptionV3Module.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23712341D9FD005F88E6 /* MIInceptionV3Module.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23BD2341DA03005F88E6 /* MTTensorCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23732341D9FD005F88E6 /* MTTensorCache.m */; };
 		5A8D23BE2341DA03005F88E6 /* MetalTensorLayerDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23742341D9FD005F88E6 /* MetalTensorLayerDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23BF2341DA03005F88E6 /* MIDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23752341D9FD005F88E6 /* MIDataSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23C02341DA03005F88E6 /* MISeparableConvolutionLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23762341D9FD005F88E6 /* MISeparableConvolutionLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A8D23C12341DA03005F88E6 /* MIL2NormalizationLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23772341D9FE005F88E6 /* MIL2NormalizationLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23C22341DA03005F88E6 /* numpy.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23782341D9FE005F88E6 /* numpy.c */; };
 		5A8D23C32341DA03005F88E6 /* MetalTensorNeuronLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23792341D9FE005F88E6 /* MetalTensorNeuronLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23C42341DA03005F88E6 /* MIPoolingAverageLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D237A2341D9FE005F88E6 /* MIPoolingAverageLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23C52341DA03005F88E6 /* metal_tensor_structures.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D237B2341D9FE005F88E6 /* metal_tensor_structures.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23C62341DA03005F88E6 /* NSString+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D237C2341D9FE005F88E6 /* NSString+Extension.m */; };
-		5A8D23C72341DA03005F88E6 /* MIDropoutLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D237D2341D9FE005F88E6 /* MIDropoutLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23C82341DA04005F88E6 /* MetalLayerSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D237E2341D9FE005F88E6 /* MetalLayerSwitch.m */; };
 		5A8D23CA2341DA04005F88E6 /* MetalLayerSwitch.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23802341D9FE005F88E6 /* MetalLayerSwitch.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23CB2341DA04005F88E6 /* MPSImage+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23812341D9FE005F88E6 /* MPSImage+Extension.m */; };
 		5A8D23CC2341DA04005F88E6 /* MetalNeuralNetwork.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23822341D9FF005F88E6 /* MetalNeuralNetwork.m */; };
 		5A8D23CD2341DA04005F88E6 /* MIFullyConnectedLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23832341D9FF005F88E6 /* MIFullyConnectedLayer.m */; };
 		5A8D23CE2341DA04005F88E6 /* MIConvolutionLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23842341D9FF005F88E6 /* MIConvolutionLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A8D23CF2341DA04005F88E6 /* MIResidualModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23852341D9FF005F88E6 /* MIResidualModule.m */; };
 		5A8D23D02341DA04005F88E6 /* MetalTensorInputLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23862341D9FF005F88E6 /* MetalTensorInputLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23D12341DA04005F88E6 /* numpy.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23872341D9FF005F88E6 /* numpy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23D22341DA04005F88E6 /* MIInvertedResidualModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23882341D9FF005F88E6 /* MIInvertedResidualModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23D42341DA04005F88E6 /* NSString+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D238A2341D9FF005F88E6 /* NSString+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23D52341DA04005F88E6 /* MetalTensorNeuronLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D238B2341D9FF005F88E6 /* MetalTensorNeuronLayer.m */; };
-		5A8D23D62341DA04005F88E6 /* MIBatchNormalizationLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D238C2341D9FF005F88E6 /* MIBatchNormalizationLayer.m */; };
 		5A8D23D72341DA04005F88E6 /* MetalTensorNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D238D2341D9FF005F88E6 /* MetalTensorNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23DB2341DA04005F88E6 /* MetalTensorLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23912341DA00005F88E6 /* MetalTensorLayer.m */; };
 		5A8D23DC2341DA04005F88E6 /* MTImageTensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23922341DA00005F88E6 /* MTImageTensor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23DE2341DA04005F88E6 /* MIArithmeticLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23942341DA00005F88E6 /* MIArithmeticLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23E12341E020005F88E6 /* metal_tensor_log.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23DF2341E020005F88E6 /* metal_tensor_log.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23E22341E020005F88E6 /* metal_tensor_log.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23E02341E020005F88E6 /* metal_tensor_log.c */; };
-		5A8F18F723FEA3E1002CAB59 /* MTGramMatrixLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8F18F523FEA3E1002CAB59 /* MTGramMatrixLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A8F18F823FEA3E1002CAB59 /* MTGramMatrixLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F18F623FEA3E1002CAB59 /* MTGramMatrixLayer.m */; };
 		5A9FB19D24167C36007A1F12 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9FB19C24167C35007A1F12 /* Metal.framework */; platformFilter = ios; };
 		5A9FB19F24167C3C007A1F12 /* MetalPerformanceShaders.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9FB19E24167C3C007A1F12 /* MetalPerformanceShaders.framework */; platformFilter = ios; };
 		5AB218E42470020D00738DF4 /* MetalImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB218E32470020D00738DF4 /* MetalImage.framework */; platformFilter = ios; settings = {ATTRIBUTES = (Required, ); }; };
@@ -105,14 +83,6 @@
 		5AC43CD7237C306500E740EA /* ssd_prior_box.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CCF237C306500E740EA /* ssd_prior_box.c */; };
 		5AC43CD8237C306500E740EA /* SSDConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CD0237C306500E740EA /* SSDConfig.m */; };
 		5AC43CD9237C306500E740EA /* SSDObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AC43CD1237C306500E740EA /* SSDObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5AE0F48423CBF54000D9E957 /* MetalTensorSpacialReduce.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AE0F48223CBF54000D9E957 /* MetalTensorSpacialReduce.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5AE0F48523CBF54000D9E957 /* MetalTensorSpacialReduce.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE0F48323CBF54000D9E957 /* MetalTensorSpacialReduce.m */; };
-		5AE0F48823CD93C800D9E957 /* MTMeanSquaredErrorLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AE0F48623CD93C800D9E957 /* MTMeanSquaredErrorLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5AE0F48923CD93C800D9E957 /* MTMeanSquaredErrorLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE0F48723CD93C800D9E957 /* MTMeanSquaredErrorLayer.m */; };
-		5AE0F48C23CD96B600D9E957 /* MTChannelReduce.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AE0F48A23CD96B600D9E957 /* MTChannelReduce.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5AE0F48D23CD96B600D9E957 /* MTChannelReduce.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE0F48B23CD96B600D9E957 /* MTChannelReduce.m */; };
-		5AE0F4A023CEC2C700D9E957 /* MTTotalVariationLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AE0F49E23CEC2C700D9E957 /* MTTotalVariationLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5AE0F4A123CEC2C700D9E957 /* MTTotalVariationLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE0F49F23CEC2C700D9E957 /* MTTotalVariationLayer.m */; };
 		5AFA70DF23FEC0710021C56C /* MTMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AFA70DD23FEC0710021C56C /* MTMatrix.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5AFA70E023FEC0710021C56C /* MTMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFA70DE23FEC0710021C56C /* MTMatrix.m */; };
 		5AFA70E223FF778E0021C56C /* MTResourceProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AFA70E123FF778E0021C56C /* MTResourceProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -133,21 +103,10 @@
 		6B1A001224197B6A00000001 /* MetalTensorLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalTensorLogicTests.m; sourceTree = "<group>"; };
 		6B1A001324197B6A00000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6B1A001424197B6A00000001 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
-		5A3BAAC023BB69090000D1BC /* MIGramMatrixLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIGramMatrixLayer.h; sourceTree = "<group>"; };
-		5A3BAAC123BB69090000D1BC /* MIGramMatrixLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MIGramMatrixLayer.m; sourceTree = "<group>"; };
-		5A3BAAC523BB6AE40000D1BC /* MIReduceUnaryLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIReduceUnaryLayer.h; sourceTree = "<group>"; };
-		5A3BAAC623BB6AE40000D1BC /* MIReduceUnaryLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MIReduceUnaryLayer.m; sourceTree = "<group>"; };
-		5A4EA39B23BB349900B68DE5 /* MIMatrixMultiplyLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIMatrixMultiplyLayer.h; sourceTree = "<group>"; };
-		5A4EA39C23BB349900B68DE5 /* MIMatrixMultiplyLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MIMatrixMultiplyLayer.m; sourceTree = "<group>"; };
-		5A5B243123C9F45600BBEED3 /* MetalTensorSlice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalTensorSlice.h; sourceTree = "<group>"; };
-		5A5B243223C9F45600BBEED3 /* MetalTensorSlice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalTensorSlice.m; sourceTree = "<group>"; };
-		5A7FA55B23D6E34D006C7907 /* MTChannelCompress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTChannelCompress.h; sourceTree = "<group>"; };
-		5A7FA55C23D6E34D006C7907 /* MTChannelCompress.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTChannelCompress.m; sourceTree = "<group>"; };
 		5A8D233F2341D767005F88E6 /* MetalTensor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MetalTensor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A8D23422341D767005F88E6 /* MetalTensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalTensor.h; sourceTree = "<group>"; };
 		5A8D23432341D767005F88E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5A8D234B2341D9FB005F88E6 /* MIReshapeLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIReshapeLayer.m; sourceTree = "<group>"; };
-		5A8D234C2341D9FB005F88E6 /* MIResidualModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIResidualModule.h; sourceTree = "<group>"; };
 		5A8D234D2341D9FB005F88E6 /* MIDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIDataSource.m; sourceTree = "<group>"; };
 		5A8D234E2341D9FB005F88E6 /* MISoftMaxLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MISoftMaxLayer.m; sourceTree = "<group>"; };
 		5A8D234F2341D9FB005F88E6 /* MPSImage+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MPSImage+Extension.h"; sourceTree = "<group>"; };
@@ -155,7 +114,6 @@
 		5A8D23512341D9FB005F88E6 /* MTImageTensor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTImageTensor.m; sourceTree = "<group>"; };
 		5A8D23522341D9FB005F88E6 /* MetalTensorNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetalTensorNode.m; sourceTree = "<group>"; };
 		5A8D23532341D9FB005F88E6 /* FPSCounter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FPSCounter.h; sourceTree = "<group>"; };
-		5A8D23542341D9FB005F88E6 /* MIL2NormalizationLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIL2NormalizationLayer.m; sourceTree = "<group>"; };
 		5A8D23552341D9FB005F88E6 /* MetalTensorLayerDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetalTensorLayerDescriptor.m; sourceTree = "<group>"; };
 		5A8D23562341D9FB005F88E6 /* MTTensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTTensor.h; sourceTree = "<group>"; };
 		5A8D23572341D9FB005F88E6 /* MetalTensorOutputLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetalTensorOutputLayer.m; sourceTree = "<group>"; };
@@ -175,48 +133,38 @@
 		5A8D23652341D9FC005F88E6 /* MIPoolingMaxLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIPoolingMaxLayer.m; sourceTree = "<group>"; };
 		5A8D23662341D9FC005F88E6 /* MISoftMaxLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MISoftMaxLayer.h; sourceTree = "<group>"; };
 		5A8D23672341D9FC005F88E6 /* MetalTensorProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetalTensorProtocols.h; sourceTree = "<group>"; };
-		5A8D23682341D9FD005F88E6 /* MIBatchNormalizationLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIBatchNormalizationLayer.h; sourceTree = "<group>"; };
 		5A8D23692341D9FD005F88E6 /* metal_tensor_structures.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = metal_tensor_structures.c; sourceTree = "<group>"; };
 		5A8D236A2341D9FD005F88E6 /* MISeparableConvolutionLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MISeparableConvolutionLayer.m; sourceTree = "<group>"; };
 		5A8D236B2341D9FD005F88E6 /* MIConcatenateLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIConcatenateLayer.m; sourceTree = "<group>"; };
-		5A8D236C2341D9FD005F88E6 /* MIDropoutLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIDropoutLayer.m; sourceTree = "<group>"; };
-		5A8D236D2341D9FD005F88E6 /* MIInceptionV3Module.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIInceptionV3Module.m; sourceTree = "<group>"; };
 		5A8D236E2341D9FD005F88E6 /* MIPoolingMaxLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIPoolingMaxLayer.h; sourceTree = "<group>"; };
 		5A8D236F2341D9FD005F88E6 /* MIReshapeLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIReshapeLayer.h; sourceTree = "<group>"; };
 		5A8D23702341D9FD005F88E6 /* MTTensor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTTensor.m; sourceTree = "<group>"; };
-		5A8D23712341D9FD005F88E6 /* MIInceptionV3Module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIInceptionV3Module.h; sourceTree = "<group>"; };
 		5A8D23732341D9FD005F88E6 /* MTTensorCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTTensorCache.m; sourceTree = "<group>"; };
 		5A8D23742341D9FD005F88E6 /* MetalTensorLayerDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetalTensorLayerDescriptor.h; sourceTree = "<group>"; };
 		5A8D23752341D9FD005F88E6 /* MIDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIDataSource.h; sourceTree = "<group>"; };
 		5A8D23762341D9FD005F88E6 /* MISeparableConvolutionLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MISeparableConvolutionLayer.h; sourceTree = "<group>"; };
-		5A8D23772341D9FE005F88E6 /* MIL2NormalizationLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIL2NormalizationLayer.h; sourceTree = "<group>"; };
 		5A8D23782341D9FE005F88E6 /* numpy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = numpy.c; sourceTree = "<group>"; };
 		5A8D23792341D9FE005F88E6 /* MetalTensorNeuronLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetalTensorNeuronLayer.h; sourceTree = "<group>"; };
 		5A8D237A2341D9FE005F88E6 /* MIPoolingAverageLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIPoolingAverageLayer.h; sourceTree = "<group>"; };
 		5A8D237B2341D9FE005F88E6 /* metal_tensor_structures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = metal_tensor_structures.h; sourceTree = "<group>"; };
 		5A8D237C2341D9FE005F88E6 /* NSString+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Extension.m"; sourceTree = "<group>"; };
-		5A8D237D2341D9FE005F88E6 /* MIDropoutLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIDropoutLayer.h; sourceTree = "<group>"; };
 		5A8D237E2341D9FE005F88E6 /* MetalLayerSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetalLayerSwitch.m; sourceTree = "<group>"; };
 		5A8D23802341D9FE005F88E6 /* MetalLayerSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetalLayerSwitch.h; sourceTree = "<group>"; };
 		5A8D23812341D9FE005F88E6 /* MPSImage+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MPSImage+Extension.m"; sourceTree = "<group>"; };
 		5A8D23822341D9FF005F88E6 /* MetalNeuralNetwork.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetalNeuralNetwork.m; sourceTree = "<group>"; };
 		5A8D23832341D9FF005F88E6 /* MIFullyConnectedLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIFullyConnectedLayer.m; sourceTree = "<group>"; };
 		5A8D23842341D9FF005F88E6 /* MIConvolutionLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIConvolutionLayer.h; sourceTree = "<group>"; };
-		5A8D23852341D9FF005F88E6 /* MIResidualModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIResidualModule.m; sourceTree = "<group>"; };
 		5A8D23862341D9FF005F88E6 /* MetalTensorInputLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetalTensorInputLayer.h; sourceTree = "<group>"; };
 		5A8D23872341D9FF005F88E6 /* numpy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = numpy.h; sourceTree = "<group>"; };
 		5A8D23882341D9FF005F88E6 /* MIInvertedResidualModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIInvertedResidualModule.h; sourceTree = "<group>"; };
 		5A8D238A2341D9FF005F88E6 /* NSString+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Extension.h"; sourceTree = "<group>"; };
 		5A8D238B2341D9FF005F88E6 /* MetalTensorNeuronLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetalTensorNeuronLayer.m; sourceTree = "<group>"; };
-		5A8D238C2341D9FF005F88E6 /* MIBatchNormalizationLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIBatchNormalizationLayer.m; sourceTree = "<group>"; };
 		5A8D238D2341D9FF005F88E6 /* MetalTensorNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetalTensorNode.h; sourceTree = "<group>"; };
 		5A8D23912341DA00005F88E6 /* MetalTensorLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetalTensorLayer.m; sourceTree = "<group>"; };
 		5A8D23922341DA00005F88E6 /* MTImageTensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTImageTensor.h; sourceTree = "<group>"; };
 		5A8D23942341DA00005F88E6 /* MIArithmeticLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIArithmeticLayer.h; sourceTree = "<group>"; };
 		5A8D23DF2341E020005F88E6 /* metal_tensor_log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = metal_tensor_log.h; sourceTree = "<group>"; };
 		5A8D23E02341E020005F88E6 /* metal_tensor_log.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = metal_tensor_log.c; sourceTree = "<group>"; };
-		5A8F18F523FEA3E1002CAB59 /* MTGramMatrixLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTGramMatrixLayer.h; sourceTree = "<group>"; };
-		5A8F18F623FEA3E1002CAB59 /* MTGramMatrixLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGramMatrixLayer.m; sourceTree = "<group>"; };
 		5A9FB19C24167C35007A1F12 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		5A9FB19E24167C3C007A1F12 /* MetalPerformanceShaders.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalPerformanceShaders.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/MetalPerformanceShaders.framework; sourceTree = DEVELOPER_DIR; };
 		5AB218E32470020D00738DF4 /* MetalImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalImage.framework; path = ../ThirdParts/MetalImage.framework; sourceTree = "<group>"; };
@@ -228,14 +176,6 @@
 		5AC43CCF237C306500E740EA /* ssd_prior_box.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ssd_prior_box.c; sourceTree = "<group>"; };
 		5AC43CD0237C306500E740EA /* SSDConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSDConfig.m; sourceTree = "<group>"; };
 		5AC43CD1237C306500E740EA /* SSDObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSDObject.h; sourceTree = "<group>"; };
-		5AE0F48223CBF54000D9E957 /* MetalTensorSpacialReduce.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalTensorSpacialReduce.h; sourceTree = "<group>"; };
-		5AE0F48323CBF54000D9E957 /* MetalTensorSpacialReduce.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalTensorSpacialReduce.m; sourceTree = "<group>"; };
-		5AE0F48623CD93C800D9E957 /* MTMeanSquaredErrorLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTMeanSquaredErrorLayer.h; sourceTree = "<group>"; };
-		5AE0F48723CD93C800D9E957 /* MTMeanSquaredErrorLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTMeanSquaredErrorLayer.m; sourceTree = "<group>"; };
-		5AE0F48A23CD96B600D9E957 /* MTChannelReduce.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTChannelReduce.h; sourceTree = "<group>"; };
-		5AE0F48B23CD96B600D9E957 /* MTChannelReduce.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTChannelReduce.m; sourceTree = "<group>"; };
-		5AE0F49E23CEC2C700D9E957 /* MTTotalVariationLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTTotalVariationLayer.h; sourceTree = "<group>"; };
-		5AE0F49F23CEC2C700D9E957 /* MTTotalVariationLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTTotalVariationLayer.m; sourceTree = "<group>"; };
 		5AFA70DD23FEC0710021C56C /* MTMatrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTMatrix.h; sourceTree = "<group>"; };
 		5AFA70DE23FEC0710021C56C /* MTMatrix.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTMatrix.m; sourceTree = "<group>"; };
 		5AFA70E123FF778E0021C56C /* MTResourceProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTResourceProtocol.h; sourceTree = "<group>"; };
@@ -341,24 +281,16 @@
 				5A8D238B2341D9FF005F88E6 /* MetalTensorNeuronLayer.m */,
 				5A8D23942341DA00005F88E6 /* MIArithmeticLayer.h */,
 				5A8D235F2341D9FC005F88E6 /* MIArithmeticLayer.m */,
-				5A8D23682341D9FD005F88E6 /* MIBatchNormalizationLayer.h */,
-				5A8D238C2341D9FF005F88E6 /* MIBatchNormalizationLayer.m */,
 				5A8D23612341D9FC005F88E6 /* MIConcatenateLayer.h */,
 				5A8D236B2341D9FD005F88E6 /* MIConcatenateLayer.m */,
 				5A8D23842341D9FF005F88E6 /* MIConvolutionLayer.h */,
 				5A8D235D2341D9FC005F88E6 /* MIConvolutionLayer.m */,
 				5A8D23752341D9FD005F88E6 /* MIDataSource.h */,
 				5A8D234D2341D9FB005F88E6 /* MIDataSource.m */,
-				5A8D237D2341D9FE005F88E6 /* MIDropoutLayer.h */,
-				5A8D236C2341D9FD005F88E6 /* MIDropoutLayer.m */,
 				5A8D235B2341D9FC005F88E6 /* MIFullyConnectedLayer.h */,
 				5A8D23832341D9FF005F88E6 /* MIFullyConnectedLayer.m */,
-				5A8D23712341D9FD005F88E6 /* MIInceptionV3Module.h */,
-				5A8D236D2341D9FD005F88E6 /* MIInceptionV3Module.m */,
 				5A8D23882341D9FF005F88E6 /* MIInvertedResidualModule.h */,
 				5A8D23592341D9FC005F88E6 /* MIInvertedResidualModule.m */,
-				5A8D23772341D9FE005F88E6 /* MIL2NormalizationLayer.h */,
-				5A8D23542341D9FB005F88E6 /* MIL2NormalizationLayer.m */,
 				5A8D23672341D9FC005F88E6 /* MetalTensorProtocols.h */,
 				5A8D237A2341D9FE005F88E6 /* MIPoolingAverageLayer.h */,
 				5A8D235E2341D9FC005F88E6 /* MIPoolingAverageLayer.m */,
@@ -366,30 +298,8 @@
 				5A8D23652341D9FC005F88E6 /* MIPoolingMaxLayer.m */,
 				5A8D236F2341D9FD005F88E6 /* MIReshapeLayer.h */,
 				5A8D234B2341D9FB005F88E6 /* MIReshapeLayer.m */,
-				5A8D234C2341D9FB005F88E6 /* MIResidualModule.h */,
-				5A8D23852341D9FF005F88E6 /* MIResidualModule.m */,
 				5A8D23762341D9FD005F88E6 /* MISeparableConvolutionLayer.h */,
 				5A8D236A2341D9FD005F88E6 /* MISeparableConvolutionLayer.m */,
-				5A4EA39B23BB349900B68DE5 /* MIMatrixMultiplyLayer.h */,
-				5A4EA39C23BB349900B68DE5 /* MIMatrixMultiplyLayer.m */,
-				5A3BAAC023BB69090000D1BC /* MIGramMatrixLayer.h */,
-				5A3BAAC123BB69090000D1BC /* MIGramMatrixLayer.m */,
-				5A8F18F523FEA3E1002CAB59 /* MTGramMatrixLayer.h */,
-				5A8F18F623FEA3E1002CAB59 /* MTGramMatrixLayer.m */,
-				5A5B243123C9F45600BBEED3 /* MetalTensorSlice.h */,
-				5A5B243223C9F45600BBEED3 /* MetalTensorSlice.m */,
-				5AE0F48A23CD96B600D9E957 /* MTChannelReduce.h */,
-				5AE0F48B23CD96B600D9E957 /* MTChannelReduce.m */,
-				5A7FA55B23D6E34D006C7907 /* MTChannelCompress.h */,
-				5A7FA55C23D6E34D006C7907 /* MTChannelCompress.m */,
-				5AE0F48223CBF54000D9E957 /* MetalTensorSpacialReduce.h */,
-				5AE0F48323CBF54000D9E957 /* MetalTensorSpacialReduce.m */,
-				5A3BAAC523BB6AE40000D1BC /* MIReduceUnaryLayer.h */,
-				5A3BAAC623BB6AE40000D1BC /* MIReduceUnaryLayer.m */,
-				5AE0F48623CD93C800D9E957 /* MTMeanSquaredErrorLayer.h */,
-				5AE0F48723CD93C800D9E957 /* MTMeanSquaredErrorLayer.m */,
-				5AE0F49E23CEC2C700D9E957 /* MTTotalVariationLayer.h */,
-				5AE0F49F23CEC2C700D9E957 /* MTTotalVariationLayer.m */,
 				5A8D23662341D9FC005F88E6 /* MISoftMaxLayer.h */,
 				5A8D234E2341D9FB005F88E6 /* MISoftMaxLayer.m */,
 				5AFA70E123FF778E0021C56C /* MTResourceProtocol.h */,
@@ -422,52 +332,37 @@
 			files = (
 				5A8D23C32341DA03005F88E6 /* MetalTensorNeuronLayer.h in Headers */,
 				5A8D23AD2341DA03005F88E6 /* MetalTensorLayer.h in Headers */,
-				5A5B243323C9F45600BBEED3 /* MetalTensorSlice.h in Headers */,
-				5AE0F48823CD93C800D9E957 /* MTMeanSquaredErrorLayer.h in Headers */,
-				5AE0F48423CBF54000D9E957 /* MetalTensorSpacialReduce.h in Headers */,
 				5A8D23D02341DA04005F88E6 /* MetalTensorInputLayer.h in Headers */,
 				5A8D23CE2341DA04005F88E6 /* MIConvolutionLayer.h in Headers */,
 				5A8D23AB2341DA03005F88E6 /* MIConcatenateLayer.h in Headers */,
 				5A8D23D72341DA04005F88E6 /* MetalTensorNode.h in Headers */,
-				5A8F18F723FEA3E1002CAB59 /* MTGramMatrixLayer.h in Headers */,
 				5A8D23AE2341DA03005F88E6 /* MetalTensorOutputLayer.h in Headers */,
 				5A8D23D42341DA04005F88E6 /* NSString+Extension.h in Headers */,
 				5A8D23D22341DA04005F88E6 /* MIInvertedResidualModule.h in Headers */,
-				5AE0F4A023CEC2C700D9E957 /* MTTotalVariationLayer.h in Headers */,
 				5A8D23B02341DA03005F88E6 /* MISoftMaxLayer.h in Headers */,
-				5A3BAAC223BB69090000D1BC /* MIGramMatrixLayer.h in Headers */,
 				5A8D23A02341DA03005F88E6 /* MTTensor.h in Headers */,
 				5A8D23B92341DA03005F88E6 /* MIReshapeLayer.h in Headers */,
 				5A8D23C42341DA03005F88E6 /* MIPoolingAverageLayer.h in Headers */,
 				5AC43CD2237C306500E740EA /* ssd_prior_box.h in Headers */,
 				5A8D23992341DA03005F88E6 /* MPSImage+Extension.h in Headers */,
 				5A8D23AC2341DA03005F88E6 /* MITransposeConvolutionLayer.h in Headers */,
-				5A7FA55D23D6E34D006C7907 /* MTChannelCompress.h in Headers */,
 				5A8D23BE2341DA03005F88E6 /* MetalTensorLayerDescriptor.h in Headers */,
 				5AC43CD5237C306500E740EA /* SSDConfig.h in Headers */,
 				5A8D23C52341DA03005F88E6 /* metal_tensor_structures.h in Headers */,
 				5A8D23C02341DA03005F88E6 /* MISeparableConvolutionLayer.h in Headers */,
-				5A8D23C12341DA03005F88E6 /* MIL2NormalizationLayer.h in Headers */,
 				5A8D23CA2341DA04005F88E6 /* MetalLayerSwitch.h in Headers */,
 				5A8D23B12341DA03005F88E6 /* MetalTensorProtocols.h in Headers */,
-				5A8D23BB2341DA03005F88E6 /* MIInceptionV3Module.h in Headers */,
 				5A8D23DC2341DA04005F88E6 /* MTImageTensor.h in Headers */,
-				5AE0F48C23CD96B600D9E957 /* MTChannelReduce.h in Headers */,
-				5A8D23C72341DA03005F88E6 /* MIDropoutLayer.h in Headers */,
 				5AC43CD6237C306500E740EA /* ssd_decoder.h in Headers */,
 				5A8D23442341D767005F88E6 /* MetalTensor.h in Headers */,
-				5A8D23962341DA03005F88E6 /* MIResidualModule.h in Headers */,
 				5A8D23B82341DA03005F88E6 /* MIPoolingMaxLayer.h in Headers */,
 				5A8D23D12341DA04005F88E6 /* numpy.h in Headers */,
 				5A8D23DE2341DA04005F88E6 /* MIArithmeticLayer.h in Headers */,
 				5A8D23A42341DA03005F88E6 /* MTTensorCache.h in Headers */,
 				5AFA70E223FF778E0021C56C /* MTResourceProtocol.h in Headers */,
 				5A8D23A22341DA03005F88E6 /* MetalNeuralNetwork.h in Headers */,
-				5A3BAAC723BB6AE40000D1BC /* MIReduceUnaryLayer.h in Headers */,
-				5A4EA39D23BB349900B68DE5 /* MIMatrixMultiplyLayer.h in Headers */,
 				5AC43CD9237C306500E740EA /* SSDObject.h in Headers */,
 				5A8D239D2341DA03005F88E6 /* FPSCounter.h in Headers */,
-				5A8D23B22341DA03005F88E6 /* MIBatchNormalizationLayer.h in Headers */,
 				5A8D23E12341E020005F88E6 /* metal_tensor_log.h in Headers */,
 				5A8D23BF2341DA03005F88E6 /* MIDataSource.h in Headers */,
 				5A8D23A52341DA03005F88E6 /* MIFullyConnectedLayer.h in Headers */,
@@ -582,46 +477,33 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AB218E6247002BD00738DF4 /* MetalImage.framework in Sources */,
-				5A8D23CF2341DA04005F88E6 /* MIResidualModule.m in Sources */,
 				5A8D23B52341DA03005F88E6 /* MIConcatenateLayer.m in Sources */,
 				5AC43CD8237C306500E740EA /* SSDConfig.m in Sources */,
-				5A8D239E2341DA03005F88E6 /* MIL2NormalizationLayer.m in Sources */,
 				5A8D239F2341DA03005F88E6 /* MetalTensorLayerDescriptor.m in Sources */,
 				5AC43CD7237C306500E740EA /* ssd_prior_box.c in Sources */,
 				5A8D23A62341DA03005F88E6 /* MITransposeConvolutionLayer.m in Sources */,
 				5A8D23CD2341DA04005F88E6 /* MIFullyConnectedLayer.m in Sources */,
 				5A8D23E22341E020005F88E6 /* metal_tensor_log.c in Sources */,
-				5A4EA39E23BB349900B68DE5 /* MIMatrixMultiplyLayer.m in Sources */,
 				5A8D239C2341DA03005F88E6 /* MetalTensorNode.m in Sources */,
-				5AE0F4A123CEC2C700D9E957 /* MTTotalVariationLayer.m in Sources */,
 				5A8D23A32341DA03005F88E6 /* MIInvertedResidualModule.m in Sources */,
 				5A8D23A12341DA03005F88E6 /* MetalTensorOutputLayer.m in Sources */,
 				5A8D23A72341DA03005F88E6 /* MIConvolutionLayer.m in Sources */,
 				5A8D23CC2341DA04005F88E6 /* MetalNeuralNetwork.m in Sources */,
 				5A8D23AA2341DA03005F88E6 /* FPSCounter.m in Sources */,
-				5A8D23D62341DA04005F88E6 /* MIBatchNormalizationLayer.m in Sources */,
 				5A8D23C22341DA03005F88E6 /* numpy.c in Sources */,
 				5AC43CD4237C306500E740EA /* SSDObject.m in Sources */,
 				5A8D23C62341DA03005F88E6 /* NSString+Extension.m in Sources */,
 				5A8D23A92341DA03005F88E6 /* MIArithmeticLayer.m in Sources */,
-				5A5B243423C9F45600BBEED3 /* MetalTensorSlice.m in Sources */,
 				5A8D23982341DA03005F88E6 /* MISoftMaxLayer.m in Sources */,
-				5A8F18F823FEA3E1002CAB59 /* MTGramMatrixLayer.m in Sources */,
 				5A8D239B2341DA03005F88E6 /* MTImageTensor.m in Sources */,
 				5A8D23DB2341DA04005F88E6 /* MetalTensorLayer.m in Sources */,
 				5AC43CD3237C306500E740EA /* ssd_decoder.c in Sources */,
-				5AE0F48D23CD96B600D9E957 /* MTChannelReduce.m in Sources */,
-				5AE0F48923CD93C800D9E957 /* MTMeanSquaredErrorLayer.m in Sources */,
-				5A3BAAC823BB6AE40000D1BC /* MIReduceUnaryLayer.m in Sources */,
-				5AE0F48523CBF54000D9E957 /* MetalTensorSpacialReduce.m in Sources */,
 				5A8D239A2341DA03005F88E6 /* MetalTensorInputLayer.m in Sources */,
 				5A8D23972341DA03005F88E6 /* MIDataSource.m in Sources */,
 				5A8D23952341DA03005F88E6 /* MIReshapeLayer.m in Sources */,
 				5A8D23D52341DA04005F88E6 /* MetalTensorNeuronLayer.m in Sources */,
-				5A3BAAC323BB69090000D1BC /* MIGramMatrixLayer.m in Sources */,
 				5A8D23CB2341DA04005F88E6 /* MPSImage+Extension.m in Sources */,
 				5A8D23BA2341DA03005F88E6 /* MTTensor.m in Sources */,
-				5A8D23B72341DA03005F88E6 /* MIInceptionV3Module.m in Sources */,
 				5A8D23B42341DA03005F88E6 /* MISeparableConvolutionLayer.m in Sources */,
 				5A8D23B32341DA03005F88E6 /* metal_tensor_structures.c in Sources */,
 				5A8D23C82341DA04005F88E6 /* MetalLayerSwitch.m in Sources */,
@@ -629,8 +511,6 @@
 				5A8D23A82341DA03005F88E6 /* MIPoolingAverageLayer.m in Sources */,
 				5A8D23AF2341DA03005F88E6 /* MIPoolingMaxLayer.m in Sources */,
 				5AFA70E023FEC0710021C56C /* MTMatrix.m in Sources */,
-				5A8D23B62341DA03005F88E6 /* MIDropoutLayer.m in Sources */,
-				5A7FA55E23D6E34D006C7907 /* MTChannelCompress.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

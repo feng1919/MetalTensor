@@ -15,7 +15,11 @@
 #import "MetalTensorInputLayer.h"
 #import "MetalTensorOutputLayer.h"
 #import "MetalTensorLayerDescriptor.h"
+#if __has_include(<MetalImage/MetalImageOutput.h>)
 #import <MetalImage/MetalImageOutput.h>
+#else
+#import "MetalImageOutput.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
