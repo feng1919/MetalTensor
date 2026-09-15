@@ -403,12 +403,19 @@
     else {
         __weak __auto_type weakSelf = self;
         MetalImageTexture *processing = _inputTexture;
+        dispatch_semaphore_t networkSemaphore = _network_semaphore;
         dispatch_async(_network_queue, ^{
             __strong __auto_type strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                // The network is gone; nobody waits on the semaphore anymore,
+                // but the texture must still be released.
+                [processing unlock];
+                return;
+            }
             [strongSelf predict:processing.texture];
             [processing unlock];
             
-            dispatch_semaphore_signal(strongSelf->_network_semaphore);
+            dispatch_semaphore_signal(networkSemaphore);
         });
     }
 }
