@@ -1,6 +1,10 @@
 #import "MobileNetV2Pipeline.h"
 
+#if __has_include(<MetalImage/MetalImage.h>)
 #import <MetalImage/MetalImage.h>
+#else
+#import "MetalImage.h"
+#endif
 #import <MetalTensor/FPSCounter.h>
 
 #import "MobileNetV2.h"

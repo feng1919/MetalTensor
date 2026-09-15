@@ -7,7 +7,11 @@
 //
 
 #import "ViewController.h"
+#if __has_include(<MetalImage/MetalImage.h>)
 #import <MetalImage/MetalImage.h>
+#else
+#import "MetalImage.h"
+#endif
 #import "MobileNetV2.h"
 #import <MetalTensor/FPSCounter.h>
 

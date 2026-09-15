@@ -6,7 +6,11 @@
 //  Copyright © 2019 fengshi. All rights reserved.
 //
 
+#if __has_include(<MetalImage/MetalImage.h>)
 #import <MetalImage/MetalImage.h>
+#else
+#import "MetalImage.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

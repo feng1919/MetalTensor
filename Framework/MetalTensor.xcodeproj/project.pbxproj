@@ -10,7 +10,7 @@
 		6B1A000124197B6A00000001 /* MetalTensorLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B1A001224197B6A00000001 /* MetalTensorLogicTests.m */; };
 		6B1A000224197B6A00000001 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1A001424197B6A00000001 /* XCTest.framework */; };
 		6B1A000324197B6A00000001 /* MetalTensor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A8D233F2341D767005F88E6 /* MetalTensor.framework */; };
-		6B1A000424197B6A00000001 /* MetalImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB218E32470020D00738DF4 /* MetalImage.framework */; };
+		6B1A000424197B6A00000001 /* MetalImage in Frameworks */ = {isa = PBXBuildFile; productRef = 5AB218F02470030000738DF4 /* MetalImage */; };
 		5A8D23442341D767005F88E6 /* MetalTensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A8D23422341D767005F88E6 /* MetalTensor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A8D23952341DA03005F88E6 /* MIReshapeLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D234B2341D9FB005F88E6 /* MIReshapeLayer.m */; };
 		5A8D23972341DA03005F88E6 /* MIDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D234D2341D9FB005F88E6 /* MIDataSource.m */; };
@@ -73,8 +73,7 @@
 		5A8D23E22341E020005F88E6 /* metal_tensor_log.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D23E02341E020005F88E6 /* metal_tensor_log.c */; };
 		5A9FB19D24167C36007A1F12 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9FB19C24167C35007A1F12 /* Metal.framework */; platformFilter = ios; };
 		5A9FB19F24167C3C007A1F12 /* MetalPerformanceShaders.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9FB19E24167C3C007A1F12 /* MetalPerformanceShaders.framework */; platformFilter = ios; };
-		5AB218E42470020D00738DF4 /* MetalImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB218E32470020D00738DF4 /* MetalImage.framework */; platformFilter = ios; settings = {ATTRIBUTES = (Required, ); }; };
-		5AB218E6247002BD00738DF4 /* MetalImage.framework in Sources */ = {isa = PBXBuildFile; fileRef = 5AB218E32470020D00738DF4 /* MetalImage.framework */; platformFilter = ios; };
+		5AB218E42470020D00738DF4 /* MetalImage in Frameworks */ = {isa = PBXBuildFile; productRef = 5AB218F02470030000738DF4 /* MetalImage */; };
 		5AC43CD2237C306500E740EA /* ssd_prior_box.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AC43CCA237C306500E740EA /* ssd_prior_box.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5AC43CD3237C306500E740EA /* ssd_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CCB237C306500E740EA /* ssd_decoder.c */; };
 		5AC43CD4237C306500E740EA /* SSDObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC43CCC237C306500E740EA /* SSDObject.m */; };
@@ -167,7 +166,6 @@
 		5A8D23E02341E020005F88E6 /* metal_tensor_log.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = metal_tensor_log.c; sourceTree = "<group>"; };
 		5A9FB19C24167C35007A1F12 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		5A9FB19E24167C3C007A1F12 /* MetalPerformanceShaders.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalPerformanceShaders.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/MetalPerformanceShaders.framework; sourceTree = DEVELOPER_DIR; };
-		5AB218E32470020D00738DF4 /* MetalImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalImage.framework; path = ../ThirdParts/MetalImage.framework; sourceTree = "<group>"; };
 		5AC43CCA237C306500E740EA /* ssd_prior_box.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssd_prior_box.h; sourceTree = "<group>"; };
 		5AC43CCB237C306500E740EA /* ssd_decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ssd_decoder.c; sourceTree = "<group>"; };
 		5AC43CCC237C306500E740EA /* SSDObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSDObject.m; sourceTree = "<group>"; };
@@ -209,7 +207,6 @@
 			isa = PBXGroup;
 			children = (
 				6B1A001424197B6A00000001 /* XCTest.framework */,
-				5AB218E32470020D00738DF4 /* MetalImage.framework */,
 				5A9FB19E24167C3C007A1F12 /* MetalPerformanceShaders.framework */,
 				5A9FB19C24167C35007A1F12 /* Metal.framework */,
 			);
@@ -429,6 +426,9 @@
 			};
 			buildConfigurationList = 5A8D23392341D767005F88E6 /* Build configuration list for PBXProject "MetalTensor" */;
 			compatibilityVersion = "Xcode 9.3";
+			packageReferences = (
+				5AB218EF2470030000738DF4 /* XCRemoteSwiftPackageReference "https://github.com/feng1919/MetalImage" */,
+			);
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -476,7 +476,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5AB218E6247002BD00738DF4 /* MetalImage.framework in Sources */,
 				5A8D23B52341DA03005F88E6 /* MIConcatenateLayer.m in Sources */,
 				5AC43CD8237C306500E740EA /* SSDConfig.m in Sources */,
 				5A8D239F2341DA03005F88E6 /* MetalTensorLayerDescriptor.m in Sources */,
@@ -538,7 +537,7 @@
 					"$(PROJECT_DIR)/../ThirdParts/",
 				);
 				INFOPLIST_FILE = MetalTensorTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -565,7 +564,7 @@
 					"$(PROJECT_DIR)/../ThirdParts/",
 				);
 				INFOPLIST_FILE = MetalTensorTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -712,7 +711,7 @@
 				);
 				INFOPLIST_FILE = MetalTensor/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -743,7 +742,7 @@
 				);
 				INFOPLIST_FILE = MetalTensor/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -788,6 +787,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+/* Begin XCRemoteSwiftPackageReference section */
+		5AB218EF2470030000738DF4 /* XCRemoteSwiftPackageReference "https://github.com/feng1919/MetalImage" */ = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/feng1919/MetalImage"; requirement = {branch = master; kind = branch; }; };
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5AB218F02470030000738DF4 /* MetalImage */ = {isa = XCSwiftPackageProductDependency; productName = MetalImage; };
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5A8D23362341D767005F88E6 /* Project object */;
 }

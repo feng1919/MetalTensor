@@ -261,7 +261,6 @@ If your app already uses `MetalImage`, integration is relatively straightforward
 ## Known Limitations
 
 - the current repository is primarily organized around iOS framework code and demos
-- demo projects depend on the bundled `MetalImage.framework`
 - there is no model conversion tool in this repository; model descriptors and weights must be prepared separately
 - this repository focuses on **inference**, not training
 

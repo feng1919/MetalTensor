@@ -261,7 +261,6 @@ MetalTensor 本身是为 `MetalImage` 生态设计的。`MetalNeuralNetwork` 继
 ## 已知限制
 
 - 当前仓库主要以 iOS 工程和示例为主
-- 示例工程依赖仓库内自带的 `MetalImage.framework`
 - 未提供模型转换工具；模型描述文件和权重需要你自行准备
 - README 中未覆盖训练流程，仓库重点是 **推理**
 

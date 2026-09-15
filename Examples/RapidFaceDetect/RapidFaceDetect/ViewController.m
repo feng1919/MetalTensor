@@ -7,7 +7,11 @@
 //
 
 #import "ViewController.h"
+#if __has_include(<MetalImage/MetalImage.h>)
 #import <MetalImage/MetalImage.h>
+#else
+#import "MetalImage.h"
+#endif
 #import <MetalTensor/FPSCounter.h>
 #import <MetalTensor/MetalTensor.h>
 #import "RapidFaceDetectFilter.h"

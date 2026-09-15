@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,8 +12,7 @@
 		5A8D23FD2341F100005F88E6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D23FC2341F100005F88E6 /* Assets.xcassets */; };
 		5A8D24032341F100005F88E6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D24022341F100005F88E6 /* main.m */; };
 		5A8D240A234369D0005F88E6 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D2409234369D0005F88E6 /* Default-568h@2x.png */; };
-		5ACC727A23437751008125BE /* MetalImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACC727823437748008125BE /* MetalImage.framework */; };
-		5ACC727B23437751008125BE /* MetalImage.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACC727823437748008125BE /* MetalImage.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5ACC727A23437751008125BE /* MetalImage in Frameworks */ = {isa = PBXBuildFile; productRef = AA00000000000000000000012 /* MetalImage */; };
 		5ACC728623438180008125BE /* MetalTensor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACC728523438174008125BE /* MetalTensor.framework */; };
 		5ACC728723438180008125BE /* MetalTensor.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACC728523438174008125BE /* MetalTensor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5ACC728B2343834A008125BE /* MobileNetV2Summory in Resources */ = {isa = PBXBuildFile; fileRef = 5ACC72882343834A008125BE /* MobileNetV2Summory */; };
@@ -42,7 +41,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5ACC727B23437751008125BE /* MetalImage.framework in Embed Frameworks */,
 				5ACC728723438180008125BE /* MetalTensor.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -60,7 +58,6 @@
 		5A8D24012341F100005F88E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5A8D24022341F100005F88E6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		5A8D2409234369D0005F88E6 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		5ACC727823437748008125BE /* MetalImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalImage.framework; path = ../../ThirdParts/MetalImage.framework; sourceTree = "<group>"; };
 		5ACC728023438173008125BE /* MetalTensor.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MetalTensor.xcodeproj; path = ../../Framework/MetalTensor.xcodeproj; sourceTree = "<group>"; };
 		5ACC72882343834A008125BE /* MobileNetV2Summory */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MobileNetV2Summory; sourceTree = "<group>"; };
 		5ACC72892343834A008125BE /* MobileNetV2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileNetV2.m; sourceTree = "<group>"; };
@@ -91,7 +88,6 @@
 			children = (
 				5A8D2409234369D0005F88E6 /* Default-568h@2x.png */,
 				5ACC728023438173008125BE /* MetalTensor.xcodeproj */,
-				5ACC727823437748008125BE /* MetalImage.framework */,
 				5A8D23EF2341F0FE005F88E6 /* MobileNetV2 */,
 				5A8D23EE2341F0FE005F88E6 /* Products */,
 				5A8D241523436E76005F88E6 /* Frameworks */,
@@ -181,6 +177,9 @@
 			};
 			buildConfigurationList = 5A8D23E82341F0FE005F88E6 /* Build configuration list for PBXProject "MobileNetV2" */;
 			compatibilityVersion = "Xcode 9.3";
+			packageReferences = (
+				AA00000000000000000000011 /* XCRemoteSwiftPackageReference "https://github.com/feng1919/MetalImage" */,
+			);
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -368,7 +367,6 @@
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/../../ThirdParts",
 				);
 				INFOPLIST_FILE = MobileNetV2/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -395,7 +393,6 @@
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/../../ThirdParts",
 				);
 				INFOPLIST_FILE = MobileNetV2/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -432,6 +429,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+/* Begin XCRemoteSwiftPackageReference section */
+		AA00000000000000000000011 /* XCRemoteSwiftPackageReference "https://github.com/feng1919/MetalImage" */ = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/feng1919/MetalImage"; requirement = {branch = master; kind = branch; }; };
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA00000000000000000000012 /* MetalImage */ = {isa = XCSwiftPackageProductDependency; productName = MetalImage; };
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5A8D23E52341F0FE005F88E6 /* Project object */;
 }

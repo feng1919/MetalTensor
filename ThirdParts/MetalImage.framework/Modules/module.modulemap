@@ -1,6 +1,0 @@
-framework module MetalImage {
-  umbrella header "MetalImage.h"
-
-  export *
-  module * { export * }
-}

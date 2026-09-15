@@ -7,8 +7,16 @@
 //
 
 #import "PortraitSegmentNet.h"
+#if __has_include(<MetalImage/UIImage+Texture.h>)
 #import <MetalImage/UIImage+Texture.h>
+#else
+#import "UIImage+Texture.h"
+#endif
+#if __has_include(<MetalImage/MetalDevice.h>)
 #import <MetalImage/MetalDevice.h>
+#else
+#import "MetalDevice.h"
+#endif
 #import <MetalTensor/FPSCounter.h>
 
 @interface PortraitSegmentNet()
