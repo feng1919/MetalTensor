@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "metalimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feng1919/MetalImage",
+      "state" : {
+        "branch" : "master",
+        "revision" : "66868f5194cd9bbf031ac20bc51d8d733bbdc100"
+      }
+    }
+  ],
+  "version" : 2
+}

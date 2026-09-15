@@ -307,7 +307,14 @@
 		5A8D23412341D767005F88E6 /* MetalTensor */ = {
 			isa = PBXGroup;
 			children = (
-				5AC43CC9237C306500E740EA /* SSD */,
+				5AC43CCB237C306500E740EA /* ssd_decoder.c */,
+				5AC43CCE237C306500E740EA /* ssd_decoder.h */,
+				5AC43CCF237C306500E740EA /* ssd_prior_box.c */,
+				5AC43CCA237C306500E740EA /* ssd_prior_box.h */,
+				5AC43CCD237C306500E740EA /* SSDConfig.h */,
+				5AC43CD0237C306500E740EA /* SSDConfig.m */,
+				5AC43CD1237C306500E740EA /* SSDObject.h */,
+				5AC43CCC237C306500E740EA /* SSDObject.m */,
 				5A8D23432341D767005F88E6 /* Info.plist */,
 				5A8D23422341D767005F88E6 /* MetalTensor.h */,
 				5A8D23532341D9FB005F88E6 /* FPSCounter.h */,
@@ -404,21 +411,6 @@
 				5A8D23872341D9FF005F88E6 /* numpy.h */,
 			);
 			path = MetalTensor;
-			sourceTree = "<group>";
-		};
-		5AC43CC9237C306500E740EA /* SSD */ = {
-			isa = PBXGroup;
-			children = (
-				5AC43CCB237C306500E740EA /* ssd_decoder.c */,
-				5AC43CCE237C306500E740EA /* ssd_decoder.h */,
-				5AC43CCF237C306500E740EA /* ssd_prior_box.c */,
-				5AC43CCA237C306500E740EA /* ssd_prior_box.h */,
-				5AC43CCD237C306500E740EA /* SSDConfig.h */,
-				5AC43CD0237C306500E740EA /* SSDConfig.m */,
-				5AC43CD1237C306500E740EA /* SSDObject.h */,
-				5AC43CCC237C306500E740EA /* SSDObject.m */,
-			);
-			path = SSD;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

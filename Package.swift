@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "MetalTensor",
     platforms: [
-        .iOS(.v12)
+        .iOS(.v13)
     ],
     products: [
         .library(
@@ -30,11 +30,9 @@ let package = Package(
                 .copy("MNNPreprocess.metal"),
                 .copy("SWAP_BR.bin")
             ],
-            publicHeadersPath: "include",
+            publicHeadersPath: ".",
             cSettings: [
-                .headerSearchPath("."),
-                .headerSearchPath("include"),
-                .headerSearchPath("SSD")
+                .headerSearchPath(".")
             ],
             linkerSettings: [
                 .linkedFramework("Accelerate", .when(platforms: [.iOS])),

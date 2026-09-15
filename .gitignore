@@ -19,3 +19,6 @@
 # Local build artifacts
 build/
 DerivedData/
+
+# SwiftPM local clone cache
+.spm-clones/
