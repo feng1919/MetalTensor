@@ -11,98 +11,58 @@
 #import "MIDataSource.h"
 #include "numpy.h"
 
+//  Single source of truth mapping plist layer types to their descriptor
+//  and layer classes. Adding a layer type means adding one entry here.
+static NSArray *LayerTypeEntry(Class descriptorClass, Class layerClass)
+{
+    return @[ descriptorClass, layerClass ];
+}
+
+static NSDictionary<NSString *, NSArray *> *LayerTypeRegistry(void)
+{
+    static NSDictionary<NSString *, NSArray *> *registry = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        registry = @{
+            @"convolution"       : LayerTypeEntry([MIConvolutionLayerDescriptor class], [MIConvolutionLayer class]),
+            @"dense"             : LayerTypeEntry([MIFullyConnectedLayerDescriptor class], [MIFullyConnectedLayer class]),
+            @"softmax"           : LayerTypeEntry([MISoftMaxLayerDescriptor class], [MISoftMaxLayer class]),
+            @"pooling_average"   : LayerTypeEntry([MIPoolingAverageLayerDescriptor class], [MIPoolingAverageLayer class]),
+            @"pooling_max"       : LayerTypeEntry([MIPoolingMaxLayerDescriptor class], [MIPoolingMaxLayer class]),
+            @"reshape"           : LayerTypeEntry([MIReshapeLayerDescriptor class], [MIReshapeLayer class]),
+            @"input"             : LayerTypeEntry([MetalTensorInputLayerDescriptor class], [MetalTensorInputLayer class]),
+            @"output"            : LayerTypeEntry([MetalTensorOutputLayerDescriptor class], [MetalTensorOutputLayer class]),
+            @"concatenate"       : LayerTypeEntry([MIConcatenateLayerDescriptor class], [MIConcatenateLayer class]),
+            @"inverted_residual" : LayerTypeEntry([MIInvertedResidualModuleDescriptor class], [MIInvertedResidualModule class]),
+            @"arithmetic"        : LayerTypeEntry([MIArithmeticLayerDescriptor class], [MIArithmeticLayer class]),
+            @"neuron"            : LayerTypeEntry([MetalTensorNeuronLayerDescriptor class], [MetalTensorNeuronLayer class]),
+            @"trans_conv"        : LayerTypeEntry([MITransposeConvolutionLayerDescriptor class], [MITransposeConvolutionLayer class]),
+        };
+    });
+    return registry;
+}
+
+static NSArray *LayerTypeEntryForType(NSString *type)
+{
+    // An omitted type means convolution, matching the descriptor default.
+    NSString *key = [type length] == 0 ? @"convolution" : type;
+    NSArray *entry = LayerTypeRegistry()[key];
+    if (entry == nil) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Unknown layer type '%@'. Supported types: %@",
+                           type, [LayerTypeRegistry().allKeys sortedArrayUsingSelector:@selector(compare:)]];
+    }
+    return entry;
+}
+
 Class DescriptorWithType(NSString *type)
 {
-    if ([type length] == 0) {
-        // If the type were not specified
-        return [MIConvolutionLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"convolution"]) {
-        return [MIConvolutionLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"dense"]) {
-        return [MIFullyConnectedLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"softmax"]) {
-        return [MISoftMaxLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"pooling_average"]) {
-        return [MIPoolingAverageLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"pooling_max"]) {
-        return [MIPoolingMaxLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"reshape"]) {
-        return [MIReshapeLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"input"]) {
-        return [MetalTensorInputLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"output"]) {
-        return [MetalTensorOutputLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"concatenate"]) {
-        return [MIConcatenateLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"inverted_residual"]) {
-        return [MIInvertedResidualModuleDescriptor class];
-    }
-    if ([type isEqualToString:@"arithmetic"]) {
-        return [MIArithmeticLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"neuron"]) {
-        return [MetalTensorNeuronLayerDescriptor class];
-    }
-    if ([type isEqualToString:@"trans_conv"]) {
-        return [MITransposeConvolutionLayerDescriptor class];
-    }
-    assert(0);
-    return nil;
+    return LayerTypeEntryForType(type)[0];
 }
 
 Class LayerWithType(NSString *type)
 {
-    if ([type isEqualToString:@"convolution"]) {
-        return [MIConvolutionLayer class];
-    }
-    if ([type isEqualToString:@"dense"]) {
-        return [MIFullyConnectedLayer class];
-    }
-    if ([type isEqualToString:@"softmax"]) {
-        return [MISoftMaxLayer class];
-    }
-    if ([type isEqualToString:@"pooling_average"]) {
-        return [MIPoolingAverageLayer class];
-    }
-    if ([type isEqualToString:@"pooling_max"]) {
-        return [MIPoolingMaxLayer class];
-    }
-    if ([type isEqualToString:@"reshape"]) {
-        return [MIReshapeLayer class];
-    }
-    if ([type isEqualToString:@"input"]) {
-        return [MetalTensorInputLayer class];
-    }
-    if ([type isEqualToString:@"output"]) {
-        return [MetalTensorOutputLayer class];
-    }
-    if ([type isEqualToString:@"concatenate"]) {
-        return [MIConcatenateLayer class];
-    }
-    if ([type isEqualToString:@"inverted_residual"]) {
-        return [MIInvertedResidualModule class];
-    }
-    if ([type isEqualToString:@"arithmetic"]) {
-        return [MIArithmeticLayer class];
-    }
-    if ([type isEqualToString:@"neuron"]) {
-        return [MetalTensorNeuronLayer class];
-    }
-    if ([type isEqualToString:@"trans_conv"]) {
-        return [MITransposeConvolutionLayer class];
-    }
-    assert(0);
-    return nil;
+    return LayerTypeEntryForType(type)[1];
 }
 
 @implementation MetalTensorLayerDescriptor

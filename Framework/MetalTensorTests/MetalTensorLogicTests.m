@@ -57,6 +57,23 @@
     XCTAssertEqual(LayerWithType(@"reshape"), [MIReshapeLayer class]);
     XCTAssertEqual(LayerWithType(@"output"), [MetalTensorOutputLayer class]);
     
+    // Descriptor and layer factories must stay paired for every known type.
+    NSArray<NSString *> *knownTypes = @[
+        @"convolution", @"dense", @"softmax", @"pooling_average", @"pooling_max",
+        @"reshape", @"input", @"output", @"concatenate", @"inverted_residual",
+        @"arithmetic", @"neuron", @"trans_conv",
+    ];
+    for (NSString *type in knownTypes) {
+        Class descriptorClass = DescriptorWithType(type);
+        Class layerClass = LayerWithType(type);
+        XCTAssertTrue(descriptorClass != Nil, @"missing descriptor for %@", type);
+        XCTAssertTrue(layerClass != Nil, @"missing layer for %@", type);
+        NSString *layerName = NSStringFromClass(layerClass);
+        XCTAssertEqualObjects([layerName stringByAppendingString:@"Descriptor"],
+                              NSStringFromClass(descriptorClass),
+                              @"descriptor/layer pair drifted for type %@", type);
+    }
+
     NSDictionary *dictionary = [@{
         @"inputs": @" 2, 3, 4 ; 5, 6, 7 ",
         @"output": @" 8, 9, 10 ",
@@ -83,6 +100,11 @@
     XCTAssertEqualObjects(descriptor.targets, (@[@"layer_a", @"layer_b"]));
     XCTAssertEqualObjects(descriptor.targetIndices, (@[@"0", @"1"]));
     XCTAssertTrue(descriptor.needBackward);
+}
+
+- (void)testUnknownLayerTypeFailsFast {
+    XCTAssertThrowsSpecificNamed(DescriptorWithType(@"no_such_layer"), NSException, NSInvalidArgumentException);
+    XCTAssertThrowsSpecificNamed(LayerWithType(@"no_such_layer"), NSException, NSInvalidArgumentException);
 }
 
 - (void)testConvolutionDescriptorDefaults {
