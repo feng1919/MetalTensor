@@ -112,26 +112,35 @@
 
 - (void)lock {
     if (_referenceCountingEnable) {
-        _referenceCounting++;
-    }
-}
-
-- (void)unlock {
-    if (_referenceCountingEnable) {
-        NSAssert(_referenceCounting > 0, @"Tried to overrelease a temporary image.");
-        _referenceCounting--;
-        if (_referenceCounting < 1) {
-            //        if ([_image isKindOfClass:[MPSTemporaryImage class]]) {
-            //            [(MPSTemporaryImage *)_image setReadCount:0];
-            //        }
-            //        self.image = nil;
-            [[MTTensorCache sharedCache] cacheResource:self];
+        @synchronized (self) {
+            _referenceCounting++;
         }
     }
 }
 
+- (void)unlock {
+    if (!_referenceCountingEnable) {
+        return;
+    }
+    BOOL shouldRecycle = NO;
+    @synchronized (self) {
+        NSAssert(_referenceCounting > 0, @"Tried to overrelease a temporary image.");
+        _referenceCounting--;
+        shouldRecycle = (_referenceCounting < 1);
+    }
+    // Recycle outside the tensor monitor: MTTensorCache.fetchTensor holds
+    // the cache monitor while taking the tensor monitor, so acquiring the
+    // cache monitor from inside the tensor monitor would invert that
+    // order and can deadlock.
+    if (shouldRecycle) {
+        [[MTTensorCache sharedCache] cacheResource:self];
+    }
+}
+
 - (int)referenceCounting {
-    return _referenceCounting;
+    @synchronized (self) {
+        return _referenceCounting;
+    }
 }
 
 - (void)newContentOnCommandBuffer:(id<MTLCommandBuffer>)commandBuffer {
