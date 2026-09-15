@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build:
+    name: Build (iOS)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Swift package
+        run: xcodebuild -scheme MetalTensor -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
+
+      - name: Build framework project
+        run: xcodebuild -project Framework/MetalTensor.xcodeproj -scheme MetalTensor -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
+
+      - name: Build SwiftTensor demo
+        run: xcodebuild -project Examples/ImageNet-Swift/SwiftTensor.xcodeproj -scheme SwiftTensor -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
+
+  test:
+    name: Logic tests (iOS Simulator)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: xcodebuild -project Framework/MetalTensor.xcodeproj -scheme MetalTensor -destination 'platform=iOS Simulator,name=iPhone 15' CODE_SIGNING_ALLOWED=NO test
